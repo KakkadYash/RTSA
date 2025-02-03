@@ -23,7 +23,7 @@ load_dotenv()
 app.config['UPLOAD_FOLDER'] = './temp'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 app.config['GOOGLE_CLOUD_PROJECT'] = 'uploaded-data-443715'
-app.config['GOOGLE_CLOUD_KEYFILE'] = r'C:\ReactionTech\workarea\backend\config\uploaded-data-443715-8508d1ea601d.json'
+app.config['GOOGLE_CLOUD_KEYFILE'] = r'C:\ReactionTech\WebSA\Notworking\backend\config\uploaded-data-443715-8508d1ea601d.json'
 app.config['MYSQL_CONFIG'] = {
     'host': os.getenv('DB_HOST'),
     'user': os.getenv('DB_USER'),
@@ -36,6 +36,7 @@ if not os.path.exists(app.config['GOOGLE_CLOUD_KEYFILE']):
     print(f"Service account key file not found: {app.config['GOOGLE_CLOUD_KEYFILE']}")
 else:
     print(f"Service account key file found: {app.config['GOOGLE_CLOUD_KEYFILE']}")
+
 # MySQL Helper Function
 def get_db_connection():
     """Create a new database connection."""
@@ -60,7 +61,7 @@ bucket_name = 'video_data_bucket_001'
 bucket = storage_client.bucket(bucket_name)
 
 # Load TensorFlow model
-height_model = keras.models.load_model('C:\\ReactionTech\\workarea\\backend\\height_estimation_model.h5')
+height_model = keras.models.load_model('C:\\ReactionTech\\WebSA\\Notworking\\backend\\height_estimation_model.h5')
 
 # Landmark extraction
 def extract_landmarks(image):
