@@ -1,0 +1,131 @@
+/* General Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #fff;
+    color: #000;
+    text-align: center;
+    padding-bottom: 50px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #272728; /* Optional background color */
+}
+
+.logo-container {
+    display: inline-block;
+}
+
+.logo {
+    height: 50px; /* Adjust the height as needed */
+    width: auto; /* Maintain aspect ratio */
+    cursor: pointer; /* Optional, makes the logo clickable */
+}
+
+/* Video and Canvas Styles */
+#video-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+video, canvas {
+    width: 25vw; /* Relative width based on the viewport */
+    height: auto; /* Maintain aspect ratio */
+    border: 2px solid #ff0000; /* Red border for emphasis */
+}
+
+/* Results Section Styles */
+#results {
+    margin-top: 30px;
+    align-items: center;
+}
+
+/* Increase gap between the button and charts */
+#analyzeButton {
+    margin-bottom: 20px; /* Adds space below the button */
+}
+
+/* Chart Container (aligned side by side and centered) */
+#charts-container {
+    display: flex;
+    justify-content: center; /* Centers the charts horizontally in the container */
+    align-items: center;
+    gap: 20px; /* Space between the charts */
+    margin: 0 auto; /* Ensures the container is centered */
+    width: fit-content; /* Container width fits the content (charts) */
+    height: 350px;
+    margin-top: 20px; /* Adjust the gap between the button and charts container */
+}
+#container {
+    display: flex;
+    justify-content: center; /* Centers the charts horizontally in the container */
+    align-items: center;
+    gap: 20px; /* Space between the charts */
+    margin: 0 auto; /* Ensures the container is centered */
+    width: fit-content; /* Container width fits the content (charts) */
+    margin-top: 20px; /* Adjust the gap between the button and charts container */
+}
+/* Smaller, fixed-size squares for the charts */
+.chart-square {
+    max-height: 350px;  /* Fixed width */
+    max-width: 350px; /* Fixed height */
+    border: 2px solid #ff0000;
+}
+
+/* Hidden class to toggle visibility */
+.hidden {
+    display: none;
+}
+
+/* Speedometer Chart Customizations */
+#speedometerChart {
+    width: 150px;
+    height: 150px;
+}
+
+/* CSS for the head movement chart */
+#headMovementChart {
+    width: 150px;
+    height: 150px;
+    position: relative;
+}
+/* CSS for the new head angle line chart */
+#headAngleLineChart {
+    width: 150px;
+    height: 150px;
+    position: relative;
+}
+/* Loading overlay styles */
+.loading-overlay {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+    z-index: 1000; /* Ensures overlay is on top */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Loading spinner animation */
+.loading-spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
