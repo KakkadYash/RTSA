@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Sports Analytics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="ch.css">
+</head>
+<body>
+    <!-- Profile Page -->
+    <div id="profilePage" class="vh-100">
+        <!-- Top navigation bar with menu button -->
+        <nav class="navbar navbar-light bg-light">
+            <div class="container-fluid">
+                <button id="menuButton" class="btn">
+                    <i id="menuIcon" class="fas fa-bars"></i>
+                </button>
+                <h3 class="ms-3">Profile Page</h3>
+                
+                <!-- Log Out Button -->
+                <button id="logoutButton" class="btn btn-danger ms-auto">Log Out</button>
+            </div>
+        </nav>
+
+        <!-- Sidebar Menu -->
+        <div id="sideMenu" class="bg-light position-fixed vh-100">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="profile">User Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="progress">Progress Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="history">History</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="subscription">View and Manage Subscription</a>
+                </li>
+                <li class="nav-item">
+                    <a href="./analytics/a.html" target="_blank" class="nav-link" id="newAnalyticsLink">New Analytics</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="catalog">Drills Catalog  </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="contentArea" class="container mt-3">
+            <div id="profile" class="tab-content d-none">
+                <h2>User Profile</h2>
+                <form id="userProfileForm" class="mt-4">
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" id="name" class="form-control" required>
+                    </div>
+            
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+            
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" class="form-control" required>
+                    </div>
+            
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" class="form-control" required>
+                    </div>
+            
+                    <!-- Age -->
+                    <div class="mb-3">
+                        <label for="age" class="form-label">Age of the Athlete</label>
+                        <input type="number" id="age" class="form-control" placeholder="Enter your age" max="999" required>
+                    </div>
+            
+                    <!-- State of Residence -->
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State of Residence</label>
+                        <select id="state" class="form-select" required>
+                            <option value="" selected disabled>Choose your state</option>
+                            <!-- Add all US states -->
+                            <option value="Alabama">Alabama</option>
+                            <option value="Alaska">Alaska</option>
+                            <option value="Arizona">Arizona</option>
+                            <option value="Arkansas">Arkansas</option>
+                            <option value="California">California</option>
+                            <option value="Colorado">Colorado</option>
+                            <option value="Connecticut">Connecticut</option>
+                            <option value="Delaware">Delaware</option>
+                            <option value="Florida">Florida</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Hawaii">Hawaii</option>
+                            <option value="Idaho">Idaho</option>
+                            <option value="Illinois">Illinois</option>
+                            <option value="Indiana">Indiana</option>
+                            <option value="Iowa">Iowa</option>
+                            <option value="Kansas">Kansas</option>
+                            <option value="Kentucky">Kentucky</option>
+                            <option value="Louisiana">Louisiana</option>
+                            <option value="Maine">Maine</option>
+                            <option value="Maryland">Maryland</option>
+                            <option value="Massachusetts">Massachusetts</option>
+                            <option value="Michigan">Michigan</option>
+                            <option value="Minnesota">Minnesota</option>
+                            <option value="Mississippi">Mississippi</option>
+                            <option value="Missouri">Missouri</option>
+                            <option value="Montana">Montana</option>
+                            <option value="Nebraska">Nebraska</option>
+                            <option value="Nevada">Nevada</option>
+                            <option value="New Hampshire ">New Hampshire</option>
+                            <option value="New Jersey">New Jersey</option>
+                            <option value="New Mexico">New Mexico</option>
+                            <option value="New York">New York</option>
+                            <option value="North Carolina">North Carolina</option>
+                            <option value="Ohio">Ohio</option>
+                            <option value="Oklahoma">Oklahoma</option>
+                            <option value="Oregon">Oregon</option>
+                            <option value="Pennsylvania">Pennsylvania</option>
+                            <option value="Rhode Island">Rhode Island</option>
+                            <option value="South Carolina">South Carolina</option>
+                            <option value="South Dakota">South Dakota</option>
+                            <option value="Tennessee">Tennessee</option>
+                            <option value="Texas">Texas</option>
+                            <option value="Utah">Utah</option>
+                            <option value="Vermont">Vermont</option>
+                            <option value="Virginia">Virginia</option>
+                            <option value="Washington">Washington</option>
+                            <option value="West Virginia">West Virginia</option>
+                            <option value="Wisconsin">Wisconsin</option>
+                            <option value="Wyoming">Wyoming</option>
+                        </select>
+                    </div>
+            
+                    <!-- Sports Interests -->
+                    <div class="mb-3">
+                        <label for="sports" class="form-label">Sports Interests (select up to 3)</label>
+                        <select id="sports" class="form-select" multiple size="5" required>
+                            <option value="Football">Football</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Baseball">Baseball</option>
+                            <option value="Soccer">Soccer</option>
+                            <option value="Tennis">Tennis</option>
+                            <option value="Swimming">Swimming</option>
+                            <option value="Track and Field">Track and Field</option>
+                            <option value="Hockey">Hockey</option>
+                        </select>
+                    </div>
+            
+                    <!-- Save Button -->
+                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                </form>
+            </div>
+            <div id="progress" class="tab-content d-none">
+                <h2>Progress Dashboard</h2>
+            </div>
+            <div id="history" class="tab-content d-none">
+                <h2>History</h2>
+                <table id="history-table" class="table">
+                    <thead>
+                        <tr>
+                            <th>Sr.No.</th>
+                            <th>Video Link</th>
+                            <th>Thumbnail</th>
+                            <th>Upload Date</th>
+                            <th>Video Name</th>
+                            <th>Ideal Head %</th>
+                            <th>Top Speed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body">
+                        <!-- Rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="subscription" class="tab-content d-none">
+                <h2>View and Manage Subscription</h2>
+            </div>
+            <div id="analytics" class="tab-content d-none">
+                <h2>New Analytics</h2>
+                <!-- Load existing sports analytics page content here -->
+            </div>
+            <div id="catalog" class="tab-content d-none">
+                <h2>Drills Catalog</h2>
+            </div>
+        </div>
+    </div>
+    <script src="sp.js"></script>
+</body>
+</html>

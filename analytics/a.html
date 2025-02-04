@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trial</title>
+  <link rel="stylesheet" href="b.css">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+</head>
+
+<body>
+  <header class="header">
+    <div class="logo-container">
+        <img src= "./Reaction-Technologies-Logo-white.png" alt="Company Logo" class="logo">
+    </div>
+  </header>
+  
+  <h1>Reaction Technologies</h1>
+  <h2>Sports Analytics</h2>
+
+  <!-- Video upload form -->
+  <form id="videoForm">
+    <label for="uploadButton">Upload Video:</label>
+    <input type="file" id="uploadButton" accept="video/*">
+  </form>
+
+  <!-- Video and canvas container -->
+  <div id="video-container">
+    <video id="uploaded-video" controls></video>
+    <canvas id="output_canvas"></canvas>
+  </div>
+
+  <div id="results">
+    <button id="analyzeButton" type="submit">Analyze Video</button>
+  </div>
+
+  <!-- Visual charts arranged side by side -->
+  <div id="charts-container">
+    <canvas id="headMovementChart" class="hidden chart-square"></canvas>
+    <canvas id="speedometerChart" class="hidden chart-square"></canvas>
+    <canvas id="athleticScoreChart" class="hidden chart-square"></canvas>
+    <canvas id="callOutChart" class="hidden chart-square"></canvas>
+    <canvas id="forceChart" class="hidden chart-square"></canvas> 
+  </div>
+
+  <div id="container">
+    <canvas id="headAngleLineChart" class="hidden chart-square"></canvas>
+    <canvas id="speedHistogramChart" class="hidden chart-square"></canvas> 
+    <canvas id="accelerationChart" class="hidden chart-square"></canvas> 
+    <canvas id="jumpHeightChart" class="hidden chart-square"></canvas>  
+  </div>
+
+  <div id="speedDisplay">Speed: 0 yards/second</div>
+  <div id="timeDisplay">Time: 0 seconds</div>
+  <div id="distanceDisplay">Distance: 0 yards</div>  
+  <div id="postureDisplay">Posture: Crouching</div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlayHEML" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <script src="d.js"></script>
+  </div>
+</body>
+</html>
