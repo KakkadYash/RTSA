@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    video_Id, // Use videoId from the upload step
+                    video_id, // Use videoId from the upload step
                     idealHeadPercentage,
                     topSpeed,
                 }),
