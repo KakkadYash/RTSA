@@ -733,7 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData();
         formData.append('video', videoFile);
     
-        const response = await fetch('http://127.0.0.1:5500/estimate_height', {
+        const response = await fetch('http://127.0.0.1:5000/estimate_height', {
             method: 'POST',
             body: formData
         });
