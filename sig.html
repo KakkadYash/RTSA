@@ -47,32 +47,23 @@
     <script>
         document.getElementById("signUpForm").addEventListener("submit", function(event) {
             event.preventDefault();
-
-            // Optional: Basic field validation
-            if (!document.getElementById("name").value || 
-                !document.getElementById("email").value || 
-                !document.getElementById("username").value || 
-                !document.getElementById("password").value) {
-                alert("All fields are required.");
-                return;
-            }
-
+        
             const name = document.getElementById('name').value.trim();
             const username = document.getElementById('username').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
-
+        
             if (!name || !username || !email || !password) {
                 alert('Please fill out all fields.');
                 return;
             }
-
+        
             fetch('http://localhost:5000/signup', {
-                method: 'OPTIONS',
+                method: 'POST',  // ✅ Change this from 'OPTIONS' to 'POST'
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, username, email, password }),
             })
-            .then(response => response.json())
+            .then(response => response.json())  // Handle response correctly
             .then(data => {
                 if (data.error) {
                     alert(data.error);
