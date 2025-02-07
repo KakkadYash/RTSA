@@ -728,24 +728,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
         return movementCount;
     }
-
     async function estimateHeight(videoFile) {
-        const formData = new FormData();
-        formData.append('video', videoFile);
-    
-        const response = await fetch('http://127.0.0.1:5000/estimate_height', {
-            method: 'POST',
-            body: formData
-        });
-    
-        const data = await response.json();
-        if (data.estimated_height) {
-            // Use the estimated height in meters
-            const athleteHeightInMeters = data.estimated_height;
-            return athleteHeightInMeters;
-        } else {
-            console.error('Error estimating height:', data.error);
-        }
+           const formData = new FormData();
+           formData.append('video', videoFile);
+           
+           try {
+               const response = await fetch('http://127.0.0.1:5000/estimate_height', {
+                   method: 'POST',
+                   body: formData
+              });
+       
+              const data = await response.json();  // Parse the JSON response
+              if (data.estimated_height) {
+                   // Use the estimated height in meters
+                   const athleteHeightInMeters = data.estimated_height;
+                   return athleteHeightInMeters;
+              } else {
+                   console.error('Error estimating height:', data.error || 'Unknown error');
+              }
+       } catch (error) {
+              console.error('Error during height estimation:', error);
+       }
     }
 
     // Function to calculate the scale factor based on the athlete's height
