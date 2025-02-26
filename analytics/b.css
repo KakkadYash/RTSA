@@ -55,13 +55,13 @@ body {
 
 /* Charts Section Styles */
 .charts-section {
-    flex: 2 1 600px;
+    flex: 1 1 200px;
     border: 2px solid #ddd;
     padding: 10px;
 }
 
 .charts-grid {
-    display: flex;
+    display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     margin-top: 10px;
