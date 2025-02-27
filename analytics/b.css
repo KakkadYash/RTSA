@@ -55,7 +55,9 @@ body {
 
 /* Charts Section Styles */
 .charts-section {
-    flex: 1 1 200px;
+    flex: 2;
+    min-width: 400px;
+    max-width: 60%;  /* Charts section takes about 60% of width */
     border: 2px solid #ddd;
     padding: 10px;
 }
