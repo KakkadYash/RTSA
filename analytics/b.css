@@ -71,11 +71,20 @@ body {
     margin-top: 10px;
 }
 
-/* Individual Chart Style */
-.chart {
+/* Container for each chart with a fixed height */
+.chart-container {
+    position: relative;
+    height: 300px;  /* Fixed height for every chart */
     width: 100%;
-    height: 300px;       /* Fixed height for each chart */
+}
+
+/* Force canvas to fill its container */
+.chart-container .chart {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 300px !important;
     border: 2px solid #ff0000;
+    box-sizing: border-box;
 }
 
 /* Loading overlay styles */
