@@ -418,9 +418,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });    
 
-    // Initialize MediaPipe Pose
+    // Initialize MediaPipe Pose with an explicit version for assets
     const pose = new Pose({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+        locateFile: (file) => {
+            // Using an explicit version (e.g., 0.5) helps ensure that the asset file paths are correct.
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/${file}`;
+        }
     });
     pose.setOptions({
         modelComplexity: 1,
@@ -430,8 +433,8 @@ document.addEventListener('DOMContentLoaded', function() {
         minTrackingConfidence: 0.6
     });
 
-    // The onResults callback now performs analysis and updates charts
-    // but no longer clears or redraws the video frame.
+    // The onResults callback now performs analysis and updates charts,
+    // but does not clear or redraw the video frame.
     pose.onResults(onResults);
 
     function showLoadingAnimationHEML() {
