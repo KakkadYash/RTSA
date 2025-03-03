@@ -80,8 +80,8 @@ body {
 
 /* Force canvas to fill its container */
 .chart-container .chart {
-    width: 100% !important;
-    height: 100% !important;
+    width: 300px;
+/*     height: 100% !important; */
     max-height: 300px !important;
     border: 2px solid #ff0000;
     box-sizing: border-box;
