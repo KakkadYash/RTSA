@@ -41,9 +41,6 @@ const appState = {
     score: 0
 };
 
-// Global variable to store the latest pose results for overlay drawing
-let latestPoseResults = null;
-
 document.addEventListener('DOMContentLoaded', function() {
     const uploadButton = document.getElementById('uploadButton');
     const analyzeButton = document.getElementById('analyzeButton');
@@ -418,12 +415,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });    
 
-    // Initialize MediaPipe Pose with an explicit version for assets
+    // Initialize MediaPipe Pose
     const pose = new Pose({
-        locateFile: (file) => {
-            // Using an explicit version (e.g., 0.5) helps ensure that the asset file paths are correct.
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/${file}`;
-        }
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
     });
     pose.setOptions({
         modelComplexity: 1,
@@ -433,8 +427,6 @@ document.addEventListener('DOMContentLoaded', function() {
         minTrackingConfidence: 0.6
     });
 
-    // The onResults callback now performs analysis and updates charts,
-    // but does not clear or redraw the video frame.
     pose.onResults(onResults);
 
     function showLoadingAnimationHEML() {
@@ -447,53 +439,26 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.style.display = 'none';
     }
 
-    // Updated processVideo: continuously draws the video frame and overlays,
-    // and sends the current frame to the Pose model asynchronously.
     function processVideo(videoElement) {
         videoElement.addEventListener('play', () => {
-            const drawLoop = () => {
+            const analyzeFrame = () => {
                 if (!videoElement.paused && !videoElement.ended) {
-                    // Ensure canvas dimensions match video
                     canvasElement.width = videoElement.videoWidth;
                     canvasElement.height = videoElement.videoHeight;
-                    
-                    // Draw the current video frame
                     canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-                    
-                    // Send frame for pose estimation without waiting (decoupled processing)
-                    pose.send({ image: canvasElement }).catch(error => console.error("Error sending frame to Pose model:", error));
-                    
-                    // If pose results are available, overlay the landmarks
-                    if (latestPoseResults && latestPoseResults.poseLandmarks) {
-                        const landmarks = latestPoseResults.poseLandmarks;
-                        const leftShoulder = landmarks[11];
-                        const rightShoulder = landmarks[12];
-                        const eye = landmarks[LEFT_EYE_INDEX];
-                        const avgShoulderX = (leftShoulder.x + rightShoulder.x) / 2;
-                        const avgShoulderY = (leftShoulder.y + rightShoulder.y) / 2;
-                        const distance = Math.sqrt(Math.pow(eye.x - avgShoulderX, 2) + Math.pow(eye.y - avgShoulderY, 2));
-                        const baseDistance = 0.3;
-                        const scalingFactor = baseDistance / distance;
-                        const minScale = 0.5;
-                        const maxScale = 3;
-                        const effectiveScale = Math.min(maxScale, Math.max(minScale, scalingFactor));
-                        const lineWidth = effectiveScale * 1;
-                        const landmarkRadius = effectiveScale * 0.5;
-                        drawConnectors(canvasCtx, landmarks, POSE_CONNECTIONS, { color: 'white', lineWidth: lineWidth });
-                        drawLandmarks(canvasCtx, landmarks, { color: 'red', lineWidth: landmarkRadius });
-                    }
-                    requestAnimationFrame(drawLoop);
+
+                    pose.send({ image: canvasElement })
+                        .then(() => requestAnimationFrame(analyzeFrame))
+                        .catch(error => console.error("Error sending frame to Pose model:", error));
                 }
             };
-            drawLoop();
+            analyzeFrame();
         });
     }
 
-    // Updated onResults: only performs analysis and chart updates.
     function onResults(results) {
-        // Store the latest results for overlay drawing
-        latestPoseResults = results;
-        
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
         if (results.poseLandmarks) {
             if (!appState.landmarkHistory) {
                 appState.landmarkHistory = [];
@@ -517,14 +482,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 appState.athleteBoundingBox = currentBoundingBox;
             }
-            
-            // Centralized time management: use current time for calculations
-            const currentTime = performance.now();
-            let timeElapsedSinceLastFrame = 0;
-            if (appState.previousFrameTime) {
-                timeElapsedSinceLastFrame = (currentTime - appState.previousFrameTime) / 1000;
-            }
-            appState.previousFrameTime = currentTime;
+            const timeElapsedSinceLastFrame = (performance.now() - appState.previousFrameTime) / 1000;
+            appState.previousFrameTime = performance.now();
 
             const eye = results.poseLandmarks[LEFT_EYE_INDEX];
             const leftShoulder = results.poseLandmarks[11];
@@ -539,6 +498,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const minScale = 0.5;
             const maxScale = 3;
             const effectiveScale = Math.min(maxScale, Math.max(minScale, scalingFactor));
+            const lineWidth = effectiveScale * 1;
+            const landmarkRadius = effectiveScale * 0.5;
+            drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: 'white', lineWidth: lineWidth });
+            drawLandmarks(canvasCtx, results.poseLandmarks, { color: 'red', lineWidth: landmarkRadius });
 
             const headAngle = calculateHeadAngle(results.poseLandmarks); 
             console.log("Head angle data:", headAngle);
