@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Logout
     logoutButton.addEventListener("click", () => {
         localStorage.clear();
-        window.location.href = "login.html";
+        window.location.href = "lo.html";
     });
 
     document.getElementById("userProfileForm").addEventListener("submit", async (e) => {
