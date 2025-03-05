@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
             onClick: function(evt, activeElements) {
                 if (activeElements.length > 0) {
                     const index = activeElements[0].index;
