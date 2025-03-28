@@ -45,23 +45,125 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     fetchProfileData();
 
+    // Declare chart instances globally to ensure they can be updated
+    let headAngleChart, topSpeedChart, athleticScoreChart;
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: { beginAtZero: true }
+        }
+    };
+    // Function to create or update a chart
+    function createOrUpdateChart(chartInstance, ctx, labels, data, label, color) {
+        if (chartInstance) {
+            chartInstance.destroy();  // Destroy existing chart instance
+        }
+        return new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    borderColor: color,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // Function to load and update progress dashboard charts
+    const loadProgressDashboard = async () => {
+        try {
+            const userId = localStorage.getItem("user_id");
+            const response = await fetch(`http://127.0.0.1:5000/history?userId=${userId}`);
+            const historyData = await response.json();
+
+            if (!Array.isArray(historyData.history)) {
+                console.error("Error: historyData is not an array", historyData);
+                return;
+            }
+
+            // Ensure that all values are properly converted and logged
+            const labels = historyData.history.map((item, index) => `Athlete ${index + 1}`);
+            const headAngleData = historyData.history.map(item => {
+                return item.ideal_head_angle_percentage !== null ? parseFloat(item.ideal_head_angle_percentage) : 0;
+            });
+            const topSpeedData = historyData.history.map(item => {
+                return item.top_speed !== null ? parseFloat(item.top_speed) : 0;
+            });
+            const athleticScoreData = historyData.history.map(item => {
+                return item.athletic_score !== null ? parseFloat(item.athletic_score) : 0;
+            });
+            
+            // Chart.js setup
+            const ctx1 = document.getElementById("headAngleChart").getContext("2d");
+            const ctx2 = document.getElementById("topSpeedChart").getContext("2d");
+            const ctx3 = document.getElementById("athleticScoreChart").getContext("2d");
+
+            // Update or create charts
+            headAngleChart = createOrUpdateChart(headAngleChart, ctx1, labels, headAngleData, "Ideal Head Angle %", "blue");
+            topSpeedChart = createOrUpdateChart(topSpeedChart, ctx2, labels, topSpeedData, "Top Speed (km/h)", "red");
+            athleticScoreChart = createOrUpdateChart(athleticScoreChart, ctx3, labels, athleticScoreData, "Average Athletic Score", "green");
+
+        } catch (error) {
+            console.error("Error loading progress dashboard:", error);
+        }
+    };
+
+    const totaluploads = async () => {
+        try {
+            const userId = localStorage.getItem("user_id"); // Get user ID inside the function
+            if (!userId) {
+                console.error("User ID not found.");
+                return;
+            }
+            const response = await fetch(`http://127.0.0.1:5000/get-total-uploads?userId=${userId}`); // API call to Flask backend
+            if (!response.ok) throw new Error("Failed to fetch total uploads");
+            const data = await response.json();
+            document.getElementById('uploadCounter').textContent = data.total_uploads;
+        } catch (error) {
+            console.error("Error fetching total uploads:", error);
+        }
+    }
+
+    // Load progress dashboard when the Progress tab is clicked
+    const progressTab = document.querySelector('[data-tab="progress"]');
+    progressTab.addEventListener("click", () => {
+        loadProgressDashboard();
+        totaluploads();
+    });
+
     // Fetch and populate history data
     const loadHistory = async () => {
         try {
             const response = await fetch(`http://127.0.0.1:5000/history?userId=${userId}`);
             const historyData = await response.json();
-
+    
+            console.log("History API Response:", historyData); // Debugging log
+    
             const tableBody = document.getElementById('history-table-body');
             tableBody.innerHTML = ''; // Clear previous rows
-
-            historyData.forEach((item, index) => {
+    
+            // Ensure historyData is an array before using .forEach()
+            if (!Array.isArray(historyData.history)) {
+                console.error("Error: historyData is not an array", historyData);
+                return;
+            }
+    
+            historyData.history.forEach((item, index) => {
                 const row = `
                     <tr>
                         <td>${index + 1}</td>
+                        <td><a href="${item.video_url}" target="_blank">${item.video_name}</a></td>
                         <td><img src="${item.thumbnail_url}" alt="Thumbnail" width="100"></td>
                         <td>${new Date(item.upload_date).toLocaleDateString()}</td>
-                        <td><a href="${item.video_url}" target="_blank">${item.video_name}</a></td>
-                        <td>${item.head_percentage || 'N/A'}%</td>
+                        <td>${item.ideal_head_angle_percentage || 'N/A'}%</td>
                         <td>${item.top_speed || 'N/A'} km/h</td>
                     </tr>`;
                 tableBody.innerHTML += row;
