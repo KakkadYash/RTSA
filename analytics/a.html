@@ -10,16 +10,18 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 </head>
-
 <body>
   <header class="header">
     <div class="logo-container">
-        <img src="./Reaction-Technologies-Logo-white.png" alt="Company Logo" class="logo">
+      <img src="./Reaction-Technologies-Logo-white.png" alt="Company Logo" class="logo">
     </div>
     <h1>Reaction Technologies</h1>
     <h2>Sports Analytics</h2>
   </header>
-
+  <!-- Loading overlay (hidden initially) -->
+  <div id="loadingOverlayHEML" class="loading-overlay">
+    <div class="loading-spinner"></div>
+  </div>
   <div class="main-container">
     <!-- Video Section -->
     <div class="video-section">
@@ -28,52 +30,40 @@
         <label for="uploadButton">Upload Video:</label>
         <input type="file" id="uploadButton" accept="video/*">
       </form>
-      <video id="uploaded-video" controls></video>
-      <canvas id="output_canvas"></canvas>
+      <!-- Preview video element (visible initially) -->
+      <video id="uploaded-video" controls style="display: block;"></video>
+      <!-- Canvas output for processed video (hidden initially) -->
+      <canvas id="output_canvas" style="display: none;"></canvas>
+      <!-- Button to start processed playback (revealed after analysis) -->
+      <button id="playProcessedButton" type="button" controls style="display: none;">Play Processed Video</button>
       <div id="video-info">
         <div id="speedDisplay">Speed: 0 yards/second</div>
         <div id="timeDisplay">Time: 0 seconds</div>
         <div id="distanceDisplay">Distance: 0 yards</div>
-        <div id="postureDisplay">Posture: Crouching</div>
+        <div id="postureDisplay">Posture: N/A</div>
       </div>
-      <button id="analyzeButton" type="submit">Analyze Video</button>
+      <!-- Analyze button -->
+      <button id="analyzeButton" type="button">Analyze Video</button>
+      <!-- Analyzing indicator (hidden initially) -->
+      <div id="analyzingIndicator" style="display: none; margin-top: 10px;">
+         <span class="small-spinner"></span> Analyzing...
+      </div>
     </div>
 
     <!-- Charts Section -->
     <div class="charts-section">
       <h3>Analytics Dashboard</h3>
-     <!-- Inside your .charts-grid container -->
       <div class="charts-grid">
-        <div class="chart-container">
-          <canvas id="headMovementChart" class="chart"></canvas>
-        </div>
-        <div class="chart-container">
-          <canvas id="speedometerChart" class="chart"></canvas>
-        </div>
-        <div class="chart-container">
-          <canvas id="athleticScoreChart" class="chart"></canvas>
-        </div>
-        <div class="chart-container">
-          <canvas id="headAngleLineChart" class="chart"></canvas>
-        </div>
-        <div class="chart-container">
-          <canvas id="speedHistogramChart" class="chart"></canvas>
-        </div>
-        <div class="chart-container">
-          <canvas id="accelerationChart" class="chart"></canvas>
-        </div>
-        <div class="chart-container">
-          <canvas id="jumpHeightChart" class="chart"></canvas>
-        </div>
+        <div class="chart-container"><canvas id="headMovementChart" class="chart"></canvas></div>
+        <div class="chart-container"><canvas id="speedometerChart" class="chart"></canvas></div>
+        <div class="chart-container"><canvas id="athleticScoreChart" class="chart"></canvas></div>
+        <div class="chart-container"><canvas id="headAngleLineChart" class="chart"></canvas></div>
+        <div class="chart-container"><canvas id="speedHistogramChart" class="chart"></canvas></div>
+        <div class="chart-container"><canvas id="accelerationChart" class="chart"></canvas></div>
+        <div class="chart-container"><canvas id="jumpHeightChart" class="chart"></canvas></div>
       </div>
     </div>
   </div>
-
-  <!-- Loading Overlay -->
-  <div id="loadingOverlayHEML" class="loading-overlay">
-    <div class="loading-spinner"></div>
-  </div>
-
   <script src="d.js"></script>
 </body>
 </html>
