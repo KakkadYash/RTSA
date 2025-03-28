@@ -88,3 +88,25 @@
     top: 10px;
     left: 10px;
 }
+
+canvas {
+    max-height: 200px !important;
+    width: 100% !important;
+}
+
+.counter-box {
+    width: 200px;
+    height: 100px;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    margin: 20px;
+}
