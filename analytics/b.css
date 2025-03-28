@@ -59,8 +59,8 @@ body {
     flex: 2 1 600px;
     border: 2px solid #ddd;
     padding: 10px;
-    max-height: 800px;   /* Limit the overall height */
-    overflow-y: auto;    /* Enable vertical scrolling if content exceeds 800px */
+    max-height: 800px;
+    overflow-y: auto;
 }
 
 /* Charts Grid */
@@ -71,20 +71,30 @@ body {
     margin-top: 10px;
 }
 
-/* Container for each chart with a fixed height */
 .chart-container {
     position: relative;
-    height: 300px;  /* Fixed height for every chart */
-    width: 100%;
+    height: 100%;  /* Ensures chart uses full container height */
+    width: 100%;   /* Ensures chart uses full container width */
+    display: flex; /* Centers chart properly */
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Prevents chart overflow issues */
 }
 
-/* Force canvas to fill its container */
 .chart-container .chart {
-    width: 100% !important;
-    height: 100% !important;
-    max-height: 300px !important;
+    width: 90% !important;  /* Adjusts the width to fit the container */
+    height: 90% !important; /* Adjusts the height to fit the container */
+    max-height: 280px !important; /* Limits extreme zooming */
     border: 2px solid #ff0000;
     box-sizing: border-box;
+}
+
+#headAngleLineChart, 
+#speedHistogramChart, 
+#accelerationChart, 
+#jumpHeightChart {
+    height: 240px !important; /* Increase height */
+    max-height: 400px !important; /* Prevents excessive stretching */
 }
 
 /* Loading overlay styles */
@@ -113,4 +123,11 @@ body {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Play Processed Video button styling */
+#playProcessedButton {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
 }
