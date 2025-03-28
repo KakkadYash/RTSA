@@ -12,7 +12,7 @@ const LEFT_EYE_INDEX = 1;         // Landmark index for left eye
 const MAX_SPEED = 5;
 const ACCELERATION_THRESHOLD = 0.5; // Threshold for acceleration changes
 const JUMP_HEIGHT_BASELINE = 0.01; // Minimum height change to detect a jump
-
+       
 // Encapsulating variables in an object to avoid global scope
 const appState = {
     videoFile: null,
@@ -38,15 +38,20 @@ const appState = {
     agilityData: [],
     balanceScore: [],
     landmarkHistory: [],
-    score: 0
+    score: 0,
+    athleteHeightInMeters: null,
+    topSpeed: 0,
 };
 
+// Wait for the DOM to load
 document.addEventListener('DOMContentLoaded', function() {
     const uploadButton = document.getElementById('uploadButton');
     const analyzeButton = document.getElementById('analyzeButton');
     const videoElement = document.getElementById('uploaded-video');
     const canvasElement = document.getElementById('output_canvas');
     const canvasCtx = canvasElement.getContext('2d');
+    const playProcessedButton = document.getElementById('playProcessedButton');
+    const loadingOverlay = document.getElementById('analyzingIndicator');
 
     // Custom plugin to draw text in the center of the doughnut chart
     const centerLabelPlugin = {
@@ -58,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
+            // Set text based on chart type
             if (chart.canvas.id === 'speedometerChart') {
                 const speedValue = chart.data.datasets[0].data[0] || 0;
                 ctx.fillText(`${speedValue.toFixed(2)} yards/sec`, width / 2, height / 2);
@@ -69,24 +75,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // Register the custom plugin
     Chart.register(centerLabelPlugin);
 
-    // Initialize speed histogram chart with onClick to seek video to a timestamp
+    // Initialize the histogram with a frequency polygon for speed
     const speedHistogramChart = new Chart(document.getElementById('speedHistogramChart').getContext('2d'), {
         type: 'bar',
         data: {
             labels: [],  // X-axis labels (seconds)
             datasets: [
                 {
-                    label: 'Speed Frequency',
+                    label: 'Speed Frequency',  // Histogram data
                     data: [],
                     backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                    borderWidth: 1,
-                    categoryPercentage: 1.0,
-                    barPercentage: 1.0
+                    borderWidth: 1
                 },
                 {
-                    label: 'Speed Trend',
+                    label: 'Speed Trend',  // Frequency polygon overlay
                     data: [],
                     type: 'line',
                     borderColor: '#FF5733',
@@ -98,34 +103,30 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
-            onClick: function(evt, activeElements) {
-                if (activeElements.length > 0) {
-                    const index = activeElements[0].index;
-                    const timestamp = this.data.labels[index];
-                    console.log("Seeking video to timestamp: " + timestamp);
-                    videoElement.currentTime = timestamp;
-                }
-            },
+            maintainAspectRatio: false,
             scales: {
                 x: {
-                    title: {
-                        display: true,
-                        text: 'Time (seconds)'
-                    }
+                    title: { display: true, text: 'Time (seconds)' },
+                    ticks: { autoSkip: false, maxTicksLimit: 10 } // More clickable labels
                 },
                 y: {
-                    title: {
-                        display: true,
-                        text: 'Speed (yards/second)'
-                    },
-                    beginAtZero: true
+                    title: { display: true, text: 'Speed (yards/sec)' },
+                    suggestedMin: 0,
+                    suggestedMax: 10,  // Adjust this based on your data
+                    ticks: { stepSize: 1 } // Avoids excessive zoom
+                }
+            },
+            onClick: (evt, activeElements) => {
+                if(activeElements.length > 0) {
+                    const index = activeElements[0].index;
+                    const timestamp = speedHistogramChart.data.labels[index];
+                    seekToTimestamp(timestamp);
                 }
             }
         }
     });
 
-    // Speedometer chart for top speed
+    // Chart.js setup for the speed Progress Chart
     const speedProgressChart = new Chart(document.getElementById('speedometerChart').getContext('2d'), {
         type: 'doughnut',
         data: {
@@ -162,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             cutout: '70%',
             plugins: {
                 tooltip: {
@@ -176,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
        
-    // Initialize head angle line chart with click event to seek video frame
+    // Initialize the line chart for head angle tracking with click-to-seek functionality
     const headAngleLineChart = new Chart(document.getElementById('headAngleLineChart').getContext('2d'), {
         type: 'line',
         data: {
@@ -191,28 +192,17 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
-            onClick: function(evt, activeElements) {
-                if (activeElements.length > 0) {
-                    const index = activeElements[0].index;
-                    const timestamp = this.data.labels[index];
-                    console.log("Seeking video to timestamp: " + timestamp);
-                    videoElement.currentTime = timestamp;
-                }
-            },
+            maintainAspectRatio: false,
             scales: {
                 x: {
-                    title: {
-                        display: true,
-                        text: 'Time (seconds)'
-                    }
+                    title: { display: true, text: 'Time (seconds)' },
+                    ticks: { autoSkip: false, maxTicksLimit: 10 } // Ensures clickable points
                 },
                 y: {
-                    title: {
-                        display: true,
-                        text: 'Head Angle (degrees)'
-                    },
+                    title: { display: true, text: 'Head Angle (degrees)' },
                     suggestedMin: 0,
-                    suggestedMax: 180
+                    suggestedMax: 180,
+                    ticks: { stepSize: 10 } // Adjusts label spacing for clarity
                 }
             },
             plugins: {
@@ -233,11 +223,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 }
+            },
+            onClick: (evt, activeElements) => {
+                if(activeElements.length > 0) {
+                    const index = activeElements[0].index;
+                    const timestamp = headAngleLineChart.data.labels[index];
+                    seekToTimestamp(timestamp);
+                }
             }
         }
     });
 
-    // Acceleration chart with click-to-seek functionality (scatter chart)
+    // Additional chart for acceleration visualization with click-to-seek
     const accelerationChart = new Chart(document.getElementById('accelerationChart').getContext('2d'), {
         type: 'scatter',
         data: {
@@ -253,25 +250,29 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
-            onClick: function(evt, activeElements) {
-                if (activeElements.length > 0) {
-                    const element = activeElements[0];
-                    const datasetIndex = element.datasetIndex;
-                    const index = element.index;
-                    const datapoint = this.data.datasets[datasetIndex].data[index];
-                    const timestamp = datapoint.x;
-                    console.log("Seeking video to timestamp: " + timestamp);
-                    videoElement.currentTime = timestamp;
+            maintainAspectRatio: false,
+            scales: {
+                x: { 
+                    title: { display: true, text: 'Time (seconds)' },
+                    ticks: { autoSkip: false, maxTicksLimit: 10 } 
+                },
+                y: { 
+                    title: { display: true, text: 'Acceleration (yards/s²)' },
+                    suggestedMin: -5,
+                    suggestedMax: 10,
+                    ticks: { stepSize: 1 } // Makes values easier to read
                 }
             },
-            scales: {
-                x: { title: { display: true, text: 'Time (seconds)' } },
-                y: { title: { display: true, text: 'Acceleration (yards/s²)' } }
+            onClick: (evt, activeElements) => {
+                if(activeElements.length > 0) {
+                    const index = activeElements[0].index;
+                    const timestamp = accelerationChart.data.labels[index];
+                    seekToTimestamp(timestamp);
+                }
             }
         }
     });
 
-    // Athletic score radar chart (unchanged from before)
     const atheleticscorechart = new Chart(document.getElementById('athleticScoreChart').getContext('2d'), {
         type: 'radar',
         data: {
@@ -299,23 +300,13 @@ document.addEventListener('DOMContentLoaded', function() {
         },
     });
 
-    // Jump height chart with click-to-seek functionality
-    let jumpData = appState.jumpHeights.map((jump, index) => ({
-        x: jump.time,
-        y: jump.height
-    }));
-    
-    const chartElement = document.getElementById('jumpHeightChart');
-    if (!chartElement) {
-        console.error("Canvas element with ID 'jumpHeightChart' not found.");
-    }
-    
-    const jumpHeightChart = new Chart(chartElement.getContext('2d'), {
+    // Chart for jump height visualization with click-to-seek
+    const jumpHeightChart = new Chart(document.getElementById('jumpHeightChart').getContext('2d'), {
         type: 'bar',
         data: {
             datasets: [{
                 label: 'Jump Height (yards)',
-                data: jumpData,
+                data: [],
                 backgroundColor: 'blue',
                 borderColor: 'blue',
                 borderWidth: 1
@@ -323,66 +314,57 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
             responsive: true,
-            onClick: function(evt, activeElements) {
-                if (activeElements.length > 0) {
-                    const index = activeElements[0].index;
-                    const datapoint = this.data.datasets[0].data[index];
-                    const timestamp = datapoint.x;
-                    console.log("Seeking video to timestamp: " + timestamp);
-                    videoElement.currentTime = timestamp;
-                }
-            },
+            maintainAspectRatio: false,
             scales: {
                 x: {
-                    type: 'linear',
                     title: { display: true, text: 'Time (seconds)' },
-                    ticks: { stepSize: 1 }
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return Math.round(value);  // Only whole numbers
+                        },
+                        stepSize: 1, // Ensures only 1, 2, 3, ... appear
+                        autoSkip: true, // Ensures every tick is displayed
+                    }
                 },
                 y: {
                     title: { display: true, text: 'Jump Height (yards)' },
-                    beginAtZero: true
+                    suggestedMin: 0,
+                    suggestedMax: 2,  // Adjust based on expected values
+                    ticks: { stepSize: 0.2 }
+                }
+            },
+            onClick: (evt, activeElements) => {
+                if(activeElements.length > 0) {
+                    const index = activeElements[0].index;
+                    const label = jumpHeightChart.data.labels[index];
+                    const match = label.match(/Time: ([\d\.]+)s/);
+                    if(match) {
+                        const timestamp = parseFloat(match[1]);
+                        seekToTimestamp(timestamp);
+                    }
                 }
             }
         }
     });
     
-    // Handle file upload
-    uploadButton.addEventListener('change', async (event) => {
+    // UPLOAD BUTTON: Only select and preview video (no uploading or height estimation)
+    uploadButton.addEventListener('change', (event) => {
         appState.videoFile = event.target.files[0];
-        const videoURL = URL.createObjectURL(appState.videoFile);
-        videoElement.src = videoURL;
-        videoElement.style.display = 'block';
-        resetCharts();
-        resetAnalysisData();
-        showLoadingAnimationHEML();
-
-        const formData = new FormData();
-        formData.append('video', appState.videoFile);
-        formData.append('userId', localStorage.getItem('user_id'));
-        const uploadResponse = await fetch('http://127.0.0.1:5000/upload', {
-            method: 'POST',
-            body: formData,
-        });
-
-        try {
-            const estimatedHeight = await estimateHeight(appState.videoFile);
-            if (estimatedHeight) {
-                console.log(`Estimated height received: ${estimatedHeight} meters`);
-                appState.athleteHeightInMeters = estimatedHeight;
-            } else {
-                console.error("Height estimation failed.");
-                return;
-            }
-        } catch (error) {
-            console.error("Error during height estimation:", error);
-        } finally {
-            hideLoadingAnimationHEML();
+        if (appState.videoFile) {
+            const videoURL = URL.createObjectURL(appState.videoFile);
+            videoElement.src = videoURL;
+            videoElement.style.display = 'block';
+            // Reset charts and analysis data for new video upload
+            resetCharts();
+            resetAnalysisData();
+            // Ensure processed canvas and play button are hidden
+            canvasElement.style.display = 'none';
+            playProcessedButton.style.display = 'none';
         }
-        videoElement.onloadeddata = () => {
-            console.log("Video loaded successfully");
-        };
     });
 
+    // -----------------------------
+    // ANALYZE BUTTON: Process the temporary video file (no immediate uploading or DB save)
     analyzeButton.addEventListener('click', async (event) => {
         event.preventDefault();
     
@@ -391,32 +373,46 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
     
-        appState.cueTime = performance.now();
-        console.log("Cue time recorded:", appState.cueTime);
-        processVideo(videoElement);
-
-        try {
-            const response = await fetch('http://127.0.0.1:5000/saveAnalytics', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    video_id, // Use videoId from the upload step
-                    idealHeadPercentage,
-                    topSpeed,
-                }),
-            });
-
-            if (!response.ok) throw new Error('Failed to save analytics.');
-            const result = await response.json();
-            console.log('Analytics saved successfully:', result);
-            alert('Analytics saved successfully!');
-        } catch (error) {
-            console.error('Error saving analytics:', error);
-            alert('An error occurred while saving analytics.');
+        // Show loading overlay during processing
+        analyzingIndicator.style.display = 'block';
+    
+        // Execute height estimation (processing step) for analysis
+        const estimatedHeight = await estimateHeight(appState.videoFile);
+        if (estimatedHeight) {
+            appState.athleteHeightInMeters = estimatedHeight;
+            console.log(`Estimated height received: ${estimatedHeight}`);
+        } else {
+            console.error("Height estimation failed.");
+            analyzingIndicator.style.display = 'none';
+            return;
         }
-    });    
+    
+        // Hide loading overlay once processing setup is complete
+        analyzingIndicator.style.display = 'none';
+    
+        // Hide the original video element and display the processed output canvas
+        videoElement.style.display = 'none';
+        canvasElement.style.display = 'block';
+        playProcessedButton.style.display = 'block';
+    
+        // Reset video playback to the beginning and start processing
+        videoElement.currentTime = 0;
+        // Start processing frames (drawing on canvas with pose landmarks)
+        processVideo(videoElement);
+    
+        // When processed video playback ends, trigger auto save of analytics
+        videoElement.addEventListener('ended', () => {
+            autoSaveAnalytics();
+        });
+    });
+    
+    // Play Processed Video button: allow user to start/restart playback of the processed output
+    playProcessedButton.addEventListener('click', () => {
+        videoElement.play();
+        playProcessedButton.style.display = 'none';
+    });
 
-    // Initialize MediaPipe Pose
+    // Initialize MediaPipe Pose (added to fix "pose is not defined")
     const pose = new Pose({
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
     });
@@ -427,36 +423,121 @@ document.addEventListener('DOMContentLoaded', function() {
         minDetectionConfidence: 0.6,
         minTrackingConfidence: 0.6
     });
-
     pose.onResults(onResults);
+    
+    // -----------------------------
+    // Process video: reads from hidden video element and draws frames (with pose analysis) onto the canvas
+    function processVideo(videoEl) {
+        let thumbnailCaptured = false;
+        function processFrame() {
+            if (videoEl.paused || videoEl.ended) return;
+            
+            canvasElement.width = videoEl.videoWidth;
+            canvasElement.height = videoEl.videoHeight;
+            canvasCtx.drawImage(videoEl, 0, 0, canvasElement.width, canvasElement.height);
+            
+            // Capture and save one frame as a thumbnail when video reaches ~2 sec
+            if (!thumbnailCaptured && videoEl.currentTime >= 2) {
+                saveThumbnail();
+                thumbnailCaptured = true; // Prevent multiple captures
+            }
 
-    function showLoadingAnimationHEML() {
-        const overlay = document.getElementById('loadingOverlayHEML');
-        overlay.style.display = 'flex';
+            pose.send({ image: canvasElement }).then(() => {
+                setTimeout(processFrame, 20); // Ensure smooth frame processing
+            }).catch(error => console.error("Error processing frame:", error));
+        }
+    
+        videoEl.addEventListener('play', processFrame);
     }
 
-    function hideLoadingAnimationHEML() {
-        const overlay = document.getElementById('loadingOverlayHEML');
-        overlay.style.display = 'none';
+    // Function to save thumbnail as an image file
+    function saveThumbnail() {
+        canvasElement.toBlob(blob => {
+            if (blob) {
+                appState.thumbnailFile = new File([blob], "thumbnail.png", { type: "image/png" });
+                console.log("Thumbnail captured successfully!");
+            }
+        }, "image/png");
     }
 
-    function processVideo(videoElement) {
-        videoElement.addEventListener('play', () => {
-            const analyzeFrame = () => {
-                if (!videoElement.paused && !videoElement.ended) {
-                    canvasElement.width = videoElement.videoWidth;
-                    canvasElement.height = videoElement.videoHeight;
-                    canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+    // -----------------------------
+    // Seek to a specific timestamp and display that frame on the canvas
+    function seekToTimestamp(timestamp) {
+        videoElement.pause();
+        videoElement.currentTime = timestamp;
+        videoElement.addEventListener('seeked', function() {
+            canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+        }, { once: true });
+    }
+    
+    // -----------------------------
+    // Auto Save Analytics: Once processing is complete, save the video and analytics metadata
+    async function autoSaveAnalytics() {
+        try {
+            const formData = new FormData();
+            formData.append('video', appState.videoFile);
+            formData.append('userId', localStorage.getItem('user_id'));
+            // ✅ Ensure thumbnail exists before appending
+            if (appState.thumbnailFile) {
+                formData.append('thumbnail', appState.thumbnailFile); // ✅ Fixed spelling
+            }
+            const uploadResponse = await fetch('http://127.0.0.1:5000/upload', {
+                method: 'POST',
+                body: formData,
+            });
+    
+            const uploadResult = await uploadResponse.json();
+            console.log('Video uploaded successfully:', uploadResult);
+    
+            if (!uploadResult.video_id) {
+                console.error('Video upload failed. No video_id received.');
+                return;
+            }
+    
+            appState.videoId = uploadResult.video_id;
 
-                    pose.send({ image: canvasElement })
-                        .then(() => requestAnimationFrame(analyzeFrame))
-                        .catch(error => console.error("Error sending frame to Pose model:", error));
-                }
+            // Compute ideal head angle percentage
+            const idealHeadPercentage = appState.idealHeadAngleFrames 
+            ? Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100) 
+            : 0;
+
+            // Compute the average athletic score
+            const scores = calculateAthleticScores();
+            const averageAthleticScore = scores.length > 0 
+                ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
+                : 0;
+
+            const analyticsData = {
+                video_Id: appState.videoId,
+                userId: localStorage.getItem('user_id'),  // ✅ Ensure userId is included
+                idealHeadPercentage: appState.idealHeadAngleFrames ? 
+                    Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100) : 0,
+                averageAthleticScore: averageAthleticScore,
+                topSpeed: appState.topSpeed || 0
             };
-            analyzeFrame();
-        });
-    }
-
+    
+            console.log("Sending analytics data:", analyticsData);
+    
+            const analyticsResponse = await fetch('http://127.0.0.1:5000/saveAnalytics', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(analyticsData),
+            });
+    
+            const analyticsResult = await analyticsResponse.json();
+            console.log('Analytics saved successfully:', analyticsResult);
+            alert('Analytics saved successfully!');
+            
+        } catch (error) {
+            console.error('Error in autoSaveAnalytics:', error);
+            alert('An error occurred while saving analytics.');
+        }
+    }        
+    
+    // -----------------------------
+    // The rest of the functions (onResults, calculateDistance, analyzeFrame, etc.) remain as in the original code.
+    // They process pose landmarks, update charts, and calculate metrics.
+    
     function onResults(results) {
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
         canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
@@ -465,15 +546,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 appState.landmarkHistory = [];
             }
             appState.landmarkHistory.push([...results.poseLandmarks]);
+    
             const MAX_HISTORY_FRAMES = 100;
             if (appState.landmarkHistory.length > MAX_HISTORY_FRAMES) {
                 appState.landmarkHistory.shift();
             }
             const posture = detectPosture(results.poseLandmarks);
             document.getElementById("postureDisplay").textContent = `Posture: ${posture}`;
-
+    
             const currentBoundingBox = calculateBoundingBox(results.poseLandmarks);
-
+    
             if (!appState.athleteLocked) {
                 lockOnAthlete(results.poseLandmarks);
             } else {
@@ -485,7 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             const timeElapsedSinceLastFrame = (performance.now() - appState.previousFrameTime) / 1000;
             appState.previousFrameTime = performance.now();
-
+    
             const eye = results.poseLandmarks[LEFT_EYE_INDEX];
             const leftShoulder = results.poseLandmarks[11];
             const rightShoulder = results.poseLandmarks[12];
@@ -501,15 +583,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const effectiveScale = Math.min(maxScale, Math.max(minScale, scalingFactor));
             const lineWidth = effectiveScale * 1;
             const landmarkRadius = effectiveScale * 0.5;
+    
             drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: 'white', lineWidth: lineWidth });
             drawLandmarks(canvasCtx, results.poseLandmarks, { color: 'red', lineWidth: landmarkRadius });
-
-            const headAngle = calculateHeadAngle(results.poseLandmarks); 
+    
+            const headAngle = calculateHeadAngle(results.poseLandmarks);
             console.log("Head angle data:", headAngle);
             if (headAngle >= 5) {
                 appState.totalFrames++;
             }
-            
             const currentVideoTime = Math.floor(videoElement.currentTime);
             if (currentVideoTime > appState.currentSecond) {
                 appState.currentSecond = currentVideoTime;
@@ -517,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 headAngleLineChart.data.labels.push(appState.currentSecond);
                 headAngleLineChart.data.datasets[0].data.push(headAngle);
                 headAngleLineChart.update();
-
+    
                 const speedThisSecond = appState.smoothedSpeed;
                 if (!isNaN(speedThisSecond) && speedThisSecond >= 0) {
                     speedHistogramChart.data.labels.push(appState.currentSecond);
@@ -528,27 +610,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.warn("Skipping invalid speed value for histogram:", speedThisSecond);
                 }
             }
-
+    
             if (headAngle >= HEAD_ANGLE_MIN && headAngle <= HEAD_ANGLE_MAX) {
                 appState.idealHeadAngleFrames++;
             }
-            
+    
             if (results.poseLandmarks[LEFT_ANKLE_INDEX] && results.poseLandmarks[LEFT_EYE_INDEX]) {
                 analyzeFrame(results.poseLandmarks, appState.athleteHeightInMeters, timeElapsedSinceLastFrame, posture);
-            }           
+            }
+    
             detectDrillStart(results.poseLandmarks);
             detectDrillEnd(results.poseLandmarks);
         } else {
             console.log("No landmarks detected");
         }
     }
-
+    
     function lockOnAthlete(landmarks) {
         appState.athleteBoundingBox = calculateBoundingBox(landmarks);
         appState.athleteLocked = true;
         console.log("Locked onto athlete");
     }
-
+    
     function isAthleteInFrame(currentLandmarks) {
         const currentBoundingBox = calculateBoundingBox(currentLandmarks);
         const overlapX = Math.max(0, Math.min(appState.athleteBoundingBox.maxX, currentBoundingBox.maxX) - Math.max(appState.athleteBoundingBox.minX, currentBoundingBox.minX));
@@ -557,7 +640,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const athleteArea = (appState.athleteBoundingBox.maxX - appState.athleteBoundingBox.minX) * (appState.athleteBoundingBox.maxY - appState.athleteBoundingBox.minY);
         return overlapArea / athleteArea >= OVERLAP_THRESHOLD;
     }
-
+    
     function calculateBoundingBox(landmarks) {
         let minX = Math.min(...landmarks.map(l => l.x));
         let maxX = Math.max(...landmarks.map(l => l.x));
@@ -565,25 +648,25 @@ document.addEventListener('DOMContentLoaded', function() {
         let maxY = Math.max(...landmarks.map(l => l.y));
         return { minX, maxX, minY, maxY };
     }
-
+    
     function calculateHeadAngle(landmarks) {
         const leftEye = landmarks[3];
         const rightEye = landmarks[6];
         const leftShoulder = landmarks[12];
         const rightShoulder = landmarks[13];
-
+    
         const headPositionX = (leftEye.x + rightEye.x) / 2;
         const headPositionY = (leftEye.y + rightEye.y) / 2;
         const shoulderPositionX = (leftShoulder.x + rightShoulder.x) / 2;
         const shoulderPositionY = (leftShoulder.y + rightShoulder.y) / 2;
-
+    
         const deltaX = shoulderPositionX - headPositionX;
         const deltaY = shoulderPositionY - headPositionY;
         const headAngle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-
+    
         return headAngle;
     }
-
+    
     function showHeadAngleChart() {
         const idealPercentage = Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100);
         headAngleChart.data.datasets[0].data[0] = idealPercentage;
@@ -591,7 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
         headAngleChart.update();
         console.log("Head angle analysis complete");
     }
-
+    
     function calculateAngle(pointA, pointB, pointC) {
         const vectorAB = { x: pointB.x - pointA.x, y: pointB.y - pointA.y };
         const vectorBC = { x: pointC.x - pointB.x, y: pointC.y - pointB.y };
@@ -602,20 +685,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const angle = Math.acos(cosineAngle) * (180 / Math.PI);
         return angle;
     }
-
+    
     function detectPosture(landmarks) {
         const kneeAngle = calculateAngle(
             landmarks[LEFT_HIP_INDEX], 
             landmarks[LEFT_KNEE_INDEX], 
             landmarks[LEFT_ANKLE_INDEX]
         );
-    
         const hipAngle = calculateAngle(
             landmarks[LEFT_SHOULDER_INDEX], 
             landmarks[LEFT_HIP_INDEX], 
             landmarks[LEFT_KNEE_INDEX]
         );
-
         const torsoAngle = calculateAngle(
             landmarks[LEFT_HIP_INDEX], 
             landmarks[LEFT_SHOULDER_INDEX], 
@@ -634,11 +715,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return "Running";
         }
     }
-
+    
     function normalize(value, min, max) {
         return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
     }
-
+    
     function calculateAthleticScores(posture) {
         const footworkScore = calculateFootworkScore();
         const speedScore = normalize(appState.smoothedSpeed, 0, 15);
@@ -647,12 +728,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const postureScore = posture === "Crouching" ? 90 : posture === "Upright Standing" ? 80 : 50;
         return [footworkScore, speedScore, accelerationScore, headAngleScore, postureScore];
     }
-
+    
     function calculateFootworkScore() {
         const totalMovements = analyzeFootMovements(appState.landmarkHistory);
         return normalize(totalMovements, 0, 100);
     }
-
+    
     function analyzeFootMovements(landmarkHistory) {
         const footLandmarks = [LEFT_ANKLE_INDEX, RIGHT_ANKLE_INDEX];
         let movementCount = 0;
@@ -660,28 +741,34 @@ document.addEventListener('DOMContentLoaded', function() {
         for (let i = 1; i < landmarkHistory.length; i++) {
             const prevFrame = landmarkHistory[i - 1];
             const currFrame = landmarkHistory[i];
+    
             if (!prevFrame || !currFrame) {
                 console.warn(`Skipping frame ${i}: Invalid frame data.`);
                 continue;
-            }    
+            }
+    
             let frameMovementCount = 0;
+    
             for (const footIndex of footLandmarks) {
                 const prevPos = prevFrame[footIndex];
                 const currPos = currFrame[footIndex];
+    
                 if (!prevPos || !currPos || prevPos.x === undefined || currPos.x === undefined) {
                     console.warn(`Skipping foot ${footIndex} in frame ${i}: Invalid foot landmark data.`);
                     continue;
                 }
+    
                 if (Math.abs(currPos.x - prevPos.x) > 0.01 || Math.abs(currPos.y - prevPos.y) > 0.01) {
                     frameMovementCount++;
                 }
             }
+    
             movementCount += frameMovementCount;
         }
     
         return movementCount;
     }
-
+    
     async function estimateHeight(videoFile) {
         const formData = new FormData();
         formData.append('video', videoFile);
@@ -700,7 +787,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error during height estimation:', error);
         }
     }
-
+    
     function calculateScaleFactor(landmarks, athleteHeightInMeters) {
         const headPosition = landmarks[LEFT_EYE_INDEX];
         const anklePosition = landmarks[LEFT_ANKLE_INDEX];
@@ -718,14 +805,14 @@ document.addEventListener('DOMContentLoaded', function() {
             console.warn("Required landmarks not found for distance calculation");
             return;
         }
-
+    
         const rightHip = landmarks[RIGHT_HIP_INDEX];
         const leftHip = landmarks[LEFT_HIP_INDEX];
         const currentPosition = {
             x: (rightHip.x + leftHip.x) / 2,
             y: (rightHip.y + leftHip.y) / 2,
         };
-
+    
         if (!appState.startTime) {
             appState.startTime = performance.now();
             appState.previousFrameTime = appState.startTime;
@@ -737,6 +824,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentTime = performance.now();
         const timeElapsedSinceLastFrame = (currentTime - appState.previousFrameTime) / 1000;
         if (timeElapsedSinceLastFrame <= 0 || timeElapsedSinceLastFrame > 1) return;
+    
         const scaleFactor = calculateScaleFactor(landmarks, athleteHeightInMeters);
         const distanceCovered = Math.sqrt(
             Math.pow(currentPosition.x - appState.previousLegPosition.x, 2) +
@@ -744,20 +832,22 @@ document.addEventListener('DOMContentLoaded', function() {
         );
         console.log(`Scale Factor: ${scaleFactor}`);
         if (distanceCovered < 0.1) return;
-        
+    
         appState.totalDistance += distanceCovered;
         appState.previousLegPosition = currentPosition;
         appState.previousFrameTime = currentTime;
-        
+    
         const SAFE_TIME_THRESHOLD = 0.05;
         const timeStep = Math.max(timeElapsedSinceLastFrame, SAFE_TIME_THRESHOLD);
         const speed = distanceCovered / timeStep;
+    
         appState.speedData.push(speed);
         const smoothingFactor = 0.5;
         appState.smoothedSpeed = smoothingFactor * speed + (1 - smoothingFactor) * appState.smoothedSpeed;
-        appState.topSpeed = Math.max(appState.topSpeed || 0, speed);
+    
+        appState.topSpeed = Math.max(appState.topSpeed || 0, speed); 
         const averageSpeed = appState.totalDistance / appState.totalTime;
-
+    
         speedProgressChart.data.datasets[0].data[0] = averageSpeed;
         speedProgressChart.update();
     
@@ -793,6 +883,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (invalidScores.length > 0) {
             console.error("Invalid athletic scores detected:", invalidScores);
         }
+    
         if (scores.every(score => !isNaN(score))) {
             appState.score = scores;
             atheleticscorechart.data.datasets[0].data = scores;
@@ -800,8 +891,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             console.error("Invalid athletic scores, skipping chart update.");
         }
-    }  
-
+    }
+    
     function movingAverage(data, windowSize) {
         let smoothedaccData = [];
         for (let i = 0; i < data.length; i++) {
@@ -813,16 +904,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return smoothedaccData;
     }
-
-    appState.smoothedAccelerationData = movingAverage(appState.accelerationData, 10); 
-
+    
+    appState.smoothedAccelerationData = movingAverage(appState.accelerationData, 10);
+    
     function detectDrillStart(landmarks) {
         const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
         const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
-    
         const avgAnkleX = (leftAnkle.x + rightAnkle.x) / 2;
         const avgAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
-    
         const distanceMoved = Math.sqrt(
             Math.pow(avgAnkleX - appState.previousLegPosition.x, 2) +
             Math.pow(avgAnkleY - appState.previousLegPosition.y, 2)
@@ -839,15 +928,15 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("Drill started");
         }
         appState.previousLegPosition = { x: avgAnkleX, y: avgAnkleY };
-    }      
-
+    }
+    
     function detectDrillEnd(landmarks) {
         appState.endTime = performance.now();
         appState.totalTime = (appState.endTime - appState.startTime) / 1000;
         appState.isDrillActive = false;
         console.log(`Drill Time: ${appState.totalTime}, Start Time: ${appState.startTime}`);
     }
-
+    
     function calculateAcceleration(speedData, deltaTime) {
         if (speedData.length < 2 || deltaTime <= 0) return 0;
         const latestSpeed = speedData[speedData.length - 1];
@@ -859,25 +948,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
         const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
         const averageAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
-
+    
         if (!appState.previousAnkleY) {
             appState.previousAnkleY = averageAnkleY;
             return;
         }
-
+    
         const jumpHeight = appState.previousAnkleY - averageAnkleY;
-
+    
         if (jumpHeight > JUMP_HEIGHT_BASELINE) {
             if (typeof appState.currentSecond !== "number") {
                 console.error("Current time (appState.currentSecond) is invalid.");
                 return;
             }
-
+    
             appState.jumpHeights.push({
                 time: appState.currentSecond,
                 height: jumpHeight
             });
-
+    
             jumpHeightChart.data.labels.push(`Time: ${appState.currentSecond.toFixed(2)}s`);
             jumpHeightChart.data.datasets[0].data.push({
                 x: appState.currentSecond,
@@ -887,7 +976,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         appState.previousAnkleY = averageAnkleY;
     }
-
+    
     function resetCharts() {
         speedProgressChart.data.datasets[0].data[0] = 0; 
         speedProgressChart.update();
@@ -907,7 +996,7 @@ document.addEventListener('DOMContentLoaded', function() {
         jumpHeightChart.data.datasets[0].data = [];
         jumpHeightChart.update();
     }
-
+    
     function resetAnalysisData() {
         appState.previousLegPosition = { x: 0, y: 0 };
         appState.idealHeadAngleFrames = 0;
