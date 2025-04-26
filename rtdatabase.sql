@@ -28,9 +28,20 @@ CREATE TABLE Analytics (
     ideal_head_angle_percentage FLOAT NOT NULL,
     top_speed FLOAT NOT NULL,
     athletic_score INT NOT NULL,
+    Jump_Height FLOAT NULL,
+    Stride_Length FLOAT NULL,
+    peak_acc FLOAT NULL,
+	peak_dec FLOAT NULL,
     FOREIGN KEY (video_id) REFERENCES Videos(video_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
+
+DROP TABLE IF EXISTS Analytics;
+DROP TABLE IF EXISTS Videos;
+DROP TABLE IF EXISTS Users;
+
+DELETE FROM Videos
+WHERE video_id = '2';
 
 SELECT * FROM Users;
 SELECT COUNT(*) AS total_videos 
@@ -54,3 +65,4 @@ DESCRIBE Analytics;
 SELECT * FROM Users;
 SELECT * FROM Videos;
 SELECT * FROM Analytics;
+
