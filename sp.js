@@ -83,38 +83,98 @@ document.addEventListener("DOMContentLoaded", function () {
             const userId = localStorage.getItem("user_id");
             const response = await fetch(`http://127.0.0.1:5000/history?userId=${userId}`);
             const historyData = await response.json();
-
+    
             if (!Array.isArray(historyData.history)) {
                 console.error("Error: historyData is not an array", historyData);
                 return;
             }
-
-            // Ensure that all values are properly converted and logged
-            const labels = historyData.history.map((item, index) => `Athlete ${index + 1}`);
-            const headAngleData = historyData.history.map(item => {
-                return item.ideal_head_angle_percentage !== null ? parseFloat(item.ideal_head_angle_percentage) : 0;
-            });
-            const topSpeedData = historyData.history.map(item => {
-                return item.top_speed !== null ? parseFloat(item.top_speed) : 0;
-            });
-            const athleticScoreData = historyData.history.map(item => {
-                return item.athletic_score !== null ? parseFloat(item.athletic_score) : 0;
-            });
-            
-            // Chart.js setup
+    
+            // Sort by upload date
+            historyData.history.sort((a, b) => new Date(a.upload_date) - new Date(b.upload_date));
+    
+            const uploadDates = historyData.history.map(item => new Date(item.upload_date));
+            const firstDate = uploadDates[0];
+            const lastDate = uploadDates[uploadDates.length - 1];
+            const timeSpanDays = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24));
+    
+            let labels = [];
+            let headAngleData = [];
+            let topSpeedData = [];
+            let athleticScoreData = [];
+    
+            // Decide granularity
+            if (timeSpanDays <= 7) {
+                // DAILY granularity
+                labels = uploadDates.map((_, i) => `Day ${i + 1}`);
+                headAngleData = historyData.history.map(item => parseFloat(item.ideal_head_angle_percentage) || 0);
+                topSpeedData = historyData.history.map(item => parseFloat(item.top_speed) || 0);
+                athleticScoreData = historyData.history.map(item => parseFloat(item.athletic_score) || 0);
+            } else if (timeSpanDays <= 28) {
+                // WEEKLY granularity
+                const weeklyData = {};
+    
+                historyData.history.forEach(item => {
+                    const date = new Date(item.upload_date);
+                    const weekNumber = Math.ceil(((date - firstDate) / (1000 * 60 * 60 * 24)) / 7) + 1;
+                    const key = `Week ${weekNumber}`;
+    
+                    if (!weeklyData[key]) {
+                        weeklyData[key] = { head: [], speed: [], score: [] };
+                    }
+    
+                    weeklyData[key].head.push(parseFloat(item.ideal_head_angle_percentage) || 0);
+                    weeklyData[key].speed.push(parseFloat(item.top_speed) || 0);
+                    weeklyData[key].score.push(parseFloat(item.athletic_score) || 0);
+                });
+    
+                labels = Object.keys(weeklyData);
+                headAngleData = labels.map(key => average(weeklyData[key].head));
+                topSpeedData = labels.map(key => average(weeklyData[key].speed));
+                athleticScoreData = labels.map(key => average(weeklyData[key].score));
+            } else {
+                // MONTHLY granularity
+                const monthlyData = {};
+    
+                historyData.history.forEach(item => {
+                    const date = new Date(item.upload_date);
+                    const monthNumber = (date.getFullYear() - firstDate.getFullYear()) * 12 + (date.getMonth() - firstDate.getMonth()) + 1;
+                    const key = `Month ${monthNumber}`;
+    
+                    if (!monthlyData[key]) {
+                        monthlyData[key] = { head: [], speed: [], score: [] };
+                    }
+    
+                    monthlyData[key].head.push(parseFloat(item.ideal_head_angle_percentage) || 0);
+                    monthlyData[key].speed.push(parseFloat(item.top_speed) || 0);
+                    monthlyData[key].score.push(parseFloat(item.athletic_score) || 0);
+                });
+    
+                labels = Object.keys(monthlyData);
+                headAngleData = labels.map(key => average(monthlyData[key].head));
+                topSpeedData = labels.map(key => average(monthlyData[key].speed));
+                athleticScoreData = labels.map(key => average(monthlyData[key].score));
+            }
+    
+            // Chart.js updates
             const ctx1 = document.getElementById("headAngleChart").getContext("2d");
             const ctx2 = document.getElementById("topSpeedChart").getContext("2d");
             const ctx3 = document.getElementById("athleticScoreChart").getContext("2d");
-
-            // Update or create charts
+    
             headAngleChart = createOrUpdateChart(headAngleChart, ctx1, labels, headAngleData, "Ideal Head Angle %", "blue");
             topSpeedChart = createOrUpdateChart(topSpeedChart, ctx2, labels, topSpeedData, "Top Speed (km/h)", "red");
             athleticScoreChart = createOrUpdateChart(athleticScoreChart, ctx3, labels, athleticScoreData, "Average Athletic Score", "green");
-
+    
         } catch (error) {
             console.error("Error loading progress dashboard:", error);
         }
     };
+    
+    // Helper function
+    function average(arr) {
+        if (!arr.length) return 0;
+        return arr.reduce((a, b) => a + b, 0) / arr.length;
+    }    
+
 
     const totaluploads = async () => {
         try {
