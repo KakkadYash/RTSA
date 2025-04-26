@@ -31,7 +31,7 @@ CREATE TABLE Analytics (
     Jump_Height FLOAT NULL,
     Stride_Length FLOAT NULL,
     peak_acc FLOAT NULL,
-    peak_dec FLOAT NULL,
+	peak_dec FLOAT NULL,
     FOREIGN KEY (video_id) REFERENCES Videos(video_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
