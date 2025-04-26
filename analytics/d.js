@@ -11,6 +11,7 @@ const RIGHT_ANKLE_INDEX = 28;     // Landmark index for right ankle
 const LEFT_EYE_INDEX = 1;         // Landmark index for left eye
 const MAX_SPEED = 5;
 const ACCELERATION_THRESHOLD = 0.5; // Threshold for acceleration changes
+const DECELERATION_THRESHOLD = 0.5;
 const JUMP_HEIGHT_BASELINE = 0.01; // Minimum height change to detect a jump
        
 // Encapsulating variables in an object to avoid global scope
@@ -33,8 +34,11 @@ const appState = {
     smoothedSpeed: 0,
     accelerationData: [],
     smoothedAccelerationData: [],
+    decelerationData: [],
+    smoothedDecelerationData: [],
     reactionTimeData: [],
     jumpHeights: [],
+    stridelength: [],
     agilityData: [],
     balanceScore: [],
     landmarkHistory: [],
@@ -273,6 +277,45 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Additional chart for deceleration visualization with click-to-seek
+    const decelerationChart = new Chart(document.getElementById('decelerationDisplay').getContext('2d'), {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Deceleration (yards/s²)',
+                data: appState.smoothedAccelerationData.map((y, i) => ({ x: i, y })),
+                backgroundColor: 'blue',
+                borderColor: 'green',
+                pointRadius: 2,
+                borderWidth: 2,
+                showLine: true,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { 
+                    title: { display: true, text: 'Time (seconds)' },
+                    ticks: { autoSkip: false, maxTicksLimit: 10 } 
+                },
+                y: { 
+                    title: { display: true, text: 'Deceleration (yards/s²)' },
+                    suggestedMin: -5,
+                    suggestedMax: 10,
+                    ticks: { stepSize: 1 } // Makes values easier to read
+                }
+            },
+            onClick: (evt, activeElements) => {
+                if(activeElements.length > 0) {
+                    const index = activeElements[0].index;
+                    const timestamp = accelerationChart.data.labels[index];
+                    seekToTimestamp(timestamp);
+                }
+            }
+        }
+    });
+
     const atheleticscorechart = new Chart(document.getElementById('athleticScoreChart').getContext('2d'), {
         type: 'radar',
         data: {
@@ -346,6 +389,52 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    // Chart for Stride length visualization with click-to-seek
+    const strideChart = new Chart(document.getElementById('strideLengthDisplay').getContext('2d'), {
+        type: 'bar',
+        data: {
+            datasets: [{
+                label: 'Stride Length (yards)',
+                data: [],
+                backgroundColor: 'orange',
+                borderColor: 'orange',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Time (seconds)' },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return Math.round(value);  // Only whole numbers
+                        },
+                        stepSize: 1, // Ensures only 1, 2, 3, ... appear
+                        autoSkip: true, // Ensures every tick is displayed
+                    }
+                },
+                y: {
+                    title: { display: true, text: 'Stride length (yards)' },
+                    suggestedMin: 0,
+                    suggestedMax: 2,  // Adjust based on expected values
+                    ticks: { stepSize: 0.2 }
+                }
+            },
+            onClick: (evt, activeElements) => {
+                if(activeElements.length > 0) {
+                    const index = activeElements[0].index;
+                    const label = strideChart.data.labels[index];
+                    const match = label.match(/Time: ([\d\.]+)s/);
+                    if(match) {
+                        const timestamp = parseFloat(match[1]);
+                        seekToTimestamp(timestamp);
+                    }
+                }
+            }
+        }
+    });
     
     // UPLOAD BUTTON: Only select and preview video (no uploading or height estimation)
     uploadButton.addEventListener('change', (event) => {
@@ -362,7 +451,7 @@ document.addEventListener('DOMContentLoaded', function() {
             playProcessedButton.style.display = 'none';
         }
     });
-
+    
     // -----------------------------
     // ANALYZE BUTTON: Process the temporary video file (no immediate uploading or DB save)
     analyzeButton.addEventListener('click', async (event) => {
@@ -374,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
         // Show loading overlay during processing
-        analyzingIndicator.style.display = 'block';
+        loadingOverlay.style.display = 'block';
     
         // Execute height estimation (processing step) for analysis
         const estimatedHeight = await estimateHeight(appState.videoFile);
@@ -383,12 +472,12 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Estimated height received: ${estimatedHeight}`);
         } else {
             console.error("Height estimation failed.");
-            analyzingIndicator.style.display = 'none';
+            loadingOverlay.style.display = 'none';
             return;
         }
     
         // Hide loading overlay once processing setup is complete
-        analyzingIndicator.style.display = 'none';
+        loadingOverlay.style.display = 'none';
     
         // Hide the original video element and display the processed output canvas
         videoElement.style.display = 'none';
@@ -409,6 +498,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Play Processed Video button: allow user to start/restart playback of the processed output
     playProcessedButton.addEventListener('click', () => {
         videoElement.play();
+        appState.averageJumpHeight = calculateAverageJumpHeight();
+        appState.averageStrideLength = calculateAverageStrideLength();
+        appState.peakAcceleration = calculatePeakAcceleration();
+        appState.peakDeceleration = calculatePeakDeceleration();
         playProcessedButton.style.display = 'none';
     });
 
@@ -469,6 +562,26 @@ document.addEventListener('DOMContentLoaded', function() {
             canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
         }, { once: true });
     }
+
+    function calculateAverageJumpHeight() {
+        if (!appState.jumpHeights.length) return 0;
+        const sum = appState.jumpHeights.reduce((acc, j) => acc + j.height, 0);
+        return sum / appState.jumpHeights.length;
+    }
+    
+    function calculateAverageStrideLength() {
+        if (!appState.stridelength.length) return 0;
+        const sum = appState.stridelength.reduce((acc, s) => acc + s.length, 0);
+        return sum / appState.stridelength.length;
+    }
+    
+    function calculatePeakAcceleration() {
+        return appState.accelerationData.length ? Math.max(...appState.accelerationData) : 0;
+    }
+    
+    function calculatePeakDeceleration() {
+        return appState.decelerationData.length ? Math.max(...appState.decelerationData) : 0;
+    }
     
     // -----------------------------
     // Auto Save Analytics: Once processing is complete, save the video and analytics metadata
@@ -507,14 +620,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
                 : 0;
 
-            const analyticsData = {
-                video_Id: appState.videoId,
-                userId: localStorage.getItem('user_id'),  // ✅ Ensure userId is included
-                idealHeadPercentage: appState.idealHeadAngleFrames ? 
-                    Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100) : 0,
-                averageAthleticScore: averageAthleticScore,
-                topSpeed: appState.topSpeed || 0
-            };
+                const analyticsData = {
+                    video_Id: appState.videoId,
+                    userId: localStorage.getItem('user_id'),
+                    idealHeadPercentage: idealHeadPercentage,
+                    averageAthleticScore: averageAthleticScore,
+                    topSpeed: appState.topSpeed || 0,
+                    averageJumpHeight: appState.averageJumpHeight || 0,
+                    averageStrideLength: appState.averageStrideLength || 0,
+                    peakAcceleration: appState.peakAcceleration || 0,
+                    peakDeceleration: appState.peakDeceleration || 0
+                };
     
             console.log("Sending analytics data:", analyticsData);
     
@@ -869,7 +985,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         calculateDistance(landmarks, athleteHeightInMeters);
         detectJumps(landmarks);
+        calculatestride(landmarks);
         showHeadAngleChart();
+
         const acceleration = calculateAcceleration(appState.speedData, timeElapsedSinceLastFrame);
         if (!isNaN(acceleration) && Math.abs(acceleration) > ACCELERATION_THRESHOLD) {
             appState.accelerationData.push(acceleration);
@@ -877,6 +995,15 @@ document.addEventListener('DOMContentLoaded', function() {
             accelerationChart.data.datasets[0].data.push(acceleration);
             accelerationChart.update();
         }
+
+        const deceleration = calculateDeceleration(appState.speedData, timeElapsedSinceLastFrame);
+        if (!isNaN(deceleration) && Math.abs(deceleration) > DECELERATION_THRESHOLD) {
+            appState.accelerationData.push(deceleration);
+            decelerationChart.data.labels.push(appState.currentSecond);
+            decelerationChart.data.datasets[0].data.push(deceleration);
+            decelerationChart.update();
+        }
+
         const scores = calculateAthleticScores(posture);
         console.log("Athletic scores:", scores);
         const invalidScores = scores.filter(score => isNaN(score));
@@ -906,7 +1033,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     appState.smoothedAccelerationData = movingAverage(appState.accelerationData, 10);
-    
+    appState.smoothedDecelerationData = movingAverage(appState.decelerationData, 10);
+
     function detectDrillStart(landmarks) {
         const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
         const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
@@ -930,7 +1058,7 @@ document.addEventListener('DOMContentLoaded', function() {
         appState.previousLegPosition = { x: avgAnkleX, y: avgAnkleY };
     }
     
-    function detectDrillEnd(landmarks) {
+    function detectDrillEnd() {
         appState.endTime = performance.now();
         appState.totalTime = (appState.endTime - appState.startTime) / 1000;
         appState.isDrillActive = false;
@@ -943,7 +1071,40 @@ document.addEventListener('DOMContentLoaded', function() {
         const previousSpeed = speedData[speedData.length - 2];
         return (latestSpeed - previousSpeed) / deltaTime;
     }
-    
+
+    function calculateDeceleration(speedData, deltaTime) {
+        if (speedData.length < 2 || deltaTime <= 0) return 0;
+        const latestSpeed = speedData[speedData.length - 1];
+        const previousSpeed = speedData[speedData.length - 2];
+        return (previousSpeed - latestSpeed) / deltaTime;
+    }
+
+    function calculatestride(landmarks) {
+        const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
+        const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
+        const avgAnkleX = (leftAnkle.x + rightAnkle.x) / 2;
+        const avgAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
+        const stridedistance = Math.sqrt(
+            Math.pow(avgAnkleX - appState.previousLegPosition.x, 2) +
+            Math.pow(avgAnkleY - appState.previousLegPosition.y, 2)
+        );
+
+        if (stridedistance > 1){
+
+            appState.stridelength.push({
+                time: appState.currentSecond,
+                length: stridedistance
+            });
+
+            strideChart.data.labels.push(`Time: ${appState.currentSecond.toFixed(2)}s`);
+            strideChart.data.datasets[0].data.push({
+                x: appState.currentSecond,
+                y: stridedistance
+            });
+            strideChart.update();
+        }
+    }
+
     function detectJumps(landmarks) {
         const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
         const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
@@ -992,9 +1153,15 @@ document.addEventListener('DOMContentLoaded', function() {
         accelerationChart.data.labels = [];
         accelerationChart.data.datasets[0].data = [];
         accelerationChart.update();
+        decelerationChart.data.labels = [];
+        decelerationChart.data.datasets[0].data = [];
+        decelerationChart.update();
         jumpHeightChart.data.labels = [];
         jumpHeightChart.data.datasets[0].data = [];
         jumpHeightChart.update();
+        strideChart.data.labels = [];
+        strideChart.data.datasets[0].data = [];
+        strideChart.update();
     }
     
     function resetAnalysisData() {
@@ -1013,8 +1180,10 @@ document.addEventListener('DOMContentLoaded', function() {
         appState.headAnglePerSecond = [];
         appState.currentSecond = 0;
         appState.accelerationData = [];
+        appState.decelerationData = [];
         appState.reactionTimeData = [];
         appState.jumpHeights = [];
+        appState.stridelength = [];
         appState.agilityData = [];
         appState.balanceScore = [];
         console.log("Analysis data and charts reset");
