@@ -29,6 +29,8 @@
       <form id="videoForm">
         <label for="uploadButton">Upload Video:</label>
         <input type="file" id="uploadButton" accept="video/*">
+        <label for="uploadDate">Set Upload Date (optional):</label>
+        <input type="datetime-local" id="uploadDate" name="uploadDate">
       </form>
       <!-- Preview video element (visible initially) -->
       <video id="uploaded-video" controls style="display: block;"></video>
@@ -41,6 +43,7 @@
         <div id="timeDisplay">Time: 0 seconds</div>
         <div id="distanceDisplay">Distance: 0 yards</div>
         <div id="postureDisplay">Posture: N/A</div>
+        <div id="stepCounterDisplay">Total Steps: 0</div>
       </div>
       <!-- Analyze button -->
       <button id="analyzeButton" type="button">Analyze Video</button>
@@ -60,6 +63,8 @@
         <div class="chart-container"><canvas id="headAngleLineChart" class="chart"></canvas></div>
         <div class="chart-container"><canvas id="speedHistogramChart" class="chart"></canvas></div>
         <div class="chart-container"><canvas id="accelerationChart" class="chart"></canvas></div>
+        <div class="chart-container"><canvas id="decelerationDisplay" class="chart"></canvas></div>
+        <div class="chart-container"><canvas id="strideLengthDisplay" class="chart"></canvas></div>
         <div class="chart-container"><canvas id="jumpHeightChart" class="chart"></canvas></div>
       </div>
     </div>
