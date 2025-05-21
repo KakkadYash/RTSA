@@ -91,7 +91,9 @@ body {
 
 #headAngleLineChart, 
 #speedHistogramChart, 
-#accelerationChart, 
+#accelerationChart,
+#decelerationDisplay,
+#strideLengthDisplay, 
 #jumpHeightChart {
     height: 240px !important; /* Increase height */
     max-height: 400px !important; /* Prevents excessive stretching */
