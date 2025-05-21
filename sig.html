@@ -58,7 +58,7 @@
                 return;
             }
         
-            fetch('http://localhost:5000/signup', {
+            fetch('https://uploaded-data-443715.uc.r.appspot.com/signup', {
                 method: 'POST',  // ✅ Change this from 'OPTIONS' to 'POST'
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, username, email, password }),
