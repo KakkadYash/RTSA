@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         try {
-            const response = await fetch(`http://127.0.0.1:5000/profile?userId=${userId}`);
+            const response = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/profile?userId=${userId}`);
             const data = await response.json();
     
             if (data.error) {
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const loadProgressDashboard = async () => {
         try {
             const userId = localStorage.getItem("user_id");
-            const response = await fetch(`http://127.0.0.1:5000/history?userId=${userId}`);
+            const response = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/history?userId=${userId}`);
             const historyData = await response.json();
     
             if (!Array.isArray(historyData.history)) {
@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("User ID not found.");
                 return;
             }
-            const response = await fetch(`http://127.0.0.1:5000/get-total-uploads?userId=${userId}`); // API call to Flask backend
+            const response = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/get-total-uploads?userId=${userId}`); // API call to Flask backend
             if (!response.ok) throw new Error("Failed to fetch total uploads");
             const data = await response.json();
             document.getElementById('uploadCounter').textContent = data.total_uploads;
@@ -202,7 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fetch and populate history data
     const loadHistory = async () => {
         try {
-            const response = await fetch(`http://127.0.0.1:5000/history?userId=${userId}`);
+            const response = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/history?userId=${userId}`);
             const historyData = await response.json();
     
             console.log("History API Response:", historyData); // Debugging log
@@ -293,7 +293,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
     
         try {
-            const response = await fetch("http://127.0.0.1:5000/updateProfile", {
+            const response = await fetch("https://uploaded-data-443715.uc.r.appspot.com/updateProfile", {
                 method: "OPTIONS",
                 headers: {
                     "Content-Type": "application/json",
