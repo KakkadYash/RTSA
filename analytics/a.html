@@ -3,53 +3,225 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reaction Technologies - Sports Analytics</title>
-  <link rel="stylesheet" href="b.css">
+  <title>Analytics</title>
+  <link rel="main stylesheet" href="../index.css">
+  <link rel="analytics stylesheet" href="b.css">
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 </head>
-<body>
-  <header class="header">
-    <div class="logo-container">
-      <img src="./Reaction-Technologies-Logo-white.png" alt="Company Logo" class="logo">
+<body class="sb-expanded">
+  <!-- Side Bar -->
+  <aside>
+    <nav>
+      <div class="logo-container">
+        <a href="../Home/home.html"> 
+          <img src="../assests/Reaction Technologies logo samples bw-02.png" alt="Company Logo" class="logo">
+        </a>
+      </div>
+      <ul>
+        <li>
+          <div class="links">
+            <a href="../profile.html">
+              <span>PROFILE</span> <img src="../assests/arrow white rt.png" alt="Arrow" class="arrow">
+            </a>
+            <img src="../assests/white line rt.png" alt="Line" class="line"> 
+          </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="../Dashboard/dashboard.html">
+              <span>DASHBOARD</span> <img src="../assests/arrow white rt.png" alt="Arrow" class="arrow">
+            </a>
+            <img src="../assests/white line rt.png" alt="Line" class="line">
+          </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="#" class="active">
+              <span>ANALYTICS</span> <img src="../assests/arrow white rt.png" alt="Arrow" class="arrow">
+            </a>
+            <img src="../assests/white line rt.png" alt="Line" class="line">
+          </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="../analytics/history.html">
+              <span>HISTORY</span> <img src="../assests/arrow white rt.png" alt="Arrow" class="arrow">
+              </a>
+              <img src="../assests/white line rt.png" alt="Line" class="line">
+          </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="../Drill Catalog/drillCatalog.html">
+              <span>DRILL CATALOG</span> <img src="../assests/arrow white rt.png" alt="Arrow" class="arrow">
+            </a>
+            <img src="../assests/white line rt.png" alt="Line" class="line">
+          </div>
+        </li>
+        <li>
+          <div class="footer">
+            <div class="socials">
+              <div class="social-box">
+                <a href="https://www.instagram.com/reactiontech/"><img src= "../assests/icons8-instagram-50.png" alt="insta" class="icons"></a>
+              </div>
+              <div class="social-box">
+                <a href="https://www.facebook.com/ReactionTech/"><img src= "../assests/icons8-facebook-64.png" alt="facebook" class="icons"></a>
+              </div>
+              <div class="social-box">
+                <a href=" https://www.linkedin.com/company/reaction-technologies/"><img src= "../assests/icons8-linkedin-50.png" alt="linkedin" class="icons"></a>
+              </div>
+            </div>
+            <div class="logOut">
+              <span>LOG OUT</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+  <!-- Main Content -->
+  <main>
+    <header class="header">
+      <h2 class="title">ANALYTICS</h2>
+    </header>
+    <div id="bg">
+      <!-- Stats -->
+      <div class="stats">
+        <div class="box">
+          <div id="drillTime">DRILL TIME</div>
+          <div id="value">8 SECS</div>
+        </div>
+        <div class="box">
+          <div id="distance">DISTANCE </div>
+          <div id="value">55 YARDS</div>
+        </div>
+        <div class="box">
+          <div id="steps">STEPS</div>
+          <div id="value">65</div>
+        </div>
+        <div class="box">
+          <div id="atleticScore">ATHLETIC SCORE</div>
+          <div id="value">98%</div>
+        </div>
+      </div>
     </div>
-    <h1>Reaction Technologies</h1>
-    <h2>Sports Analytics</h2>
-  </header>
-  <!-- Loading overlay (hidden initially) -->
-  <div id="loadingOverlayHEML" class="loading-overlay">
-    <div class="loading-spinner"></div>
-  </div>
-  <div class="main-container">
+      <!-- Loading overlay (hidden initially) -->
+    <div id="loadingOverlayHEML" class="loading-overlay">
+      <div class="loading-spinner"></div>
+    </div>
     <!-- Video Section -->
     <div class="video-section">
-      <h3>Video Playback & Analysis</h3>
-      <form id="videoForm">
-        <label for="uploadButton">Upload Video:</label>
-        <input type="file" id="uploadButton" accept="video/*">
-      </form>
-      <!-- Preview video element (visible initially) -->
-      <video id="uploaded-video" controls style="display: block;"></video>
-      <!-- Canvas output for processed video (hidden initially) -->
-      <canvas id="output_canvas" style="display: none;"></canvas>
-      <!-- Button to start processed playback (revealed after analysis) -->
-      <button id="playProcessedButton" type="button" controls style="display: none;">Play Processed Video</button>
-      <div id="video-info">
-        <div id="speedDisplay">Speed: 0 yards/second</div>
-        <div id="timeDisplay">Time: 0 seconds</div>
-        <div id="distanceDisplay">Distance: 0 yards</div>
-        <div id="postureDisplay">Posture: N/A</div>
+      <div class="vid-chart">
+        <!-- Preview video element (visible initially) -->
+        <video id="uploaded-video" controls style="display: block;"></video>
+        <!-- Canvas output for processed video (hidden initially) -->
+        <canvas id="output_canvas" style="display: none;"></canvas>
+        <canvas id="myChart2"></canvas>
+     </div>
+     <form id="videoForm">
+       <label for="uploadButton">
+         <img src="../assests/Add.png" alt="add">
+         <input type="file" id="uploadButton" accept="video/*">
+       </label>
+     </form>
+        <!-- <label for="uploadDate">Set Upload Date (optional):</label>
+        <input type="datetime-local" id="uploadDate" name="uploadDate"> -->
+    </div>
+    <!-- Button to start processed playback (revealed after analysis) -->
+    <button id="playProcessedButton" type="button" controls style="display: none;">Play Processed Video</button>
+    <!-- Analyze button -->
+    <div class="btns">
+      <button id="analyzeButton" type="button">ANALYZE VIDEO</button>
+      <button id="showMetrics" type="button" onclick="this.classList.toggle('is-flipped')">SHOW ALL METRICS</button>
+    </div>
+    <!-- Analyzing indicator (hidden initially) -->
+    <div id="analyzingIndicator" style="display: none; margin-top: 10px;">
+      <span class="small-spinner"></span> Analyzing...
+    </div>
+    <div id="stats-container">
+      <div class="card-container">
+        <div class="card" onclick="this.classList.toggle('is-flipped')">
+          <div class="card-face card-front">
+            <p>TECHNIQUE</p>
+            <canvas id="myChart"></canvas>
+            <div class="description">
+                <span>Description</span>
+            </div>
+          </div>
+          <div class="card-face card-back">
+            <h1>TECHNIQUE</h1>
+          </div>
+        </div>
       </div>
-      <!-- Analyze button -->
-      <button id="analyzeButton" type="button">Analyze Video</button>
-      <!-- Analyzing indicator (hidden initially) -->
-      <div id="analyzingIndicator" style="display: none; margin-top: 10px;">
-         <span class="small-spinner"></span> Analyzing...
+      <div class="card-container">
+        <div class="card" onclick="this.classList.toggle('is-flipped')">
+          <div class="card-face card-front">
+            <p>SPEED & MOVEMENT</p>
+            <div class="sliderHead">
+              <label for="speed">SPEED</label> <div class="speed">0</div>
+            </div>
+            <div class="slideContainer"> 
+              <input type="range" class="slider" id="speed" min="0" max="100">
+            </div>
+            <div class="sliderHead">
+              <label for="acceleration">PEAK ACCELERATION</label> <div class="acceleration">50</div>
+            </div>
+            <div class="slideContainer"> 
+              <input type="range" class="slider" id="acceleration" min="0" max="100">
+            </div>
+            <div class="sliderHead">
+              <label for="range">PEAK DECELERATION</label> <div class="value1">50</div>
+            </div>
+            <div class="slideContainer"> 
+              <input type="range" class="slider" id="range" min="0" max="100">
+            </div>
+            <div class="description">
+              <span>Description</span>
+            </div>
+          </div>
+          <div class="card-face card-back2">
+            <h1>SPEED & MOVEMENT</h1>
+          </div>
+        </div>
+      </div>
+      <div class="card-container">
+        <div class="card" onclick="this.classList.toggle('is-flipped')">
+          <div class="card-face card-front">
+            <p>FOOTWORK</p>
+            <div class="sliderHead">
+              <label for="range">AVG JUMP HEIGHT</label> <div class="value">0</div>
+            </div>
+            <div class="slideContainer"> 
+              <input type="range" class="slider" id="range" min="0" max="100">
+            </div>
+            <div class="sliderHead">
+              <label for="range">AVG STRIDE LENGTH</label> <div class="value1">50</div>
+            </div>
+            <div class="slideContainer"> 
+              <input type="range" class="slider" id="range" min="0" max="100">
+            </div>
+            <div class="sliderHead">
+              <label for="range">CUTS</label> <div class="value1">50</div>
+            </div>
+            <div class="slideContainer"> 
+              <input type="range" class="slider" id="range" min="0" max="100">
+            </div>
+            <div class="description">
+              <span>Description</span>
+            </div>
+          </div>
+          <div class="card-face card-back3">
+            <h1>FOOTWORK</h1>
+          </div>
+        </div>
       </div>
     </div>
+  </main>
 
+  <div class="main-container">
     <!-- Charts Section -->
     <div class="charts-section">
       <h3>Analytics Dashboard</h3>
@@ -60,10 +232,95 @@
         <div class="chart-container"><canvas id="headAngleLineChart" class="chart"></canvas></div>
         <div class="chart-container"><canvas id="speedHistogramChart" class="chart"></canvas></div>
         <div class="chart-container"><canvas id="accelerationChart" class="chart"></canvas></div>
+        <div class="chart-container"><canvas id="decelerationDisplay" class="chart"></canvas></div>
+        <div class="chart-container"><canvas id="strideLengthDisplay" class="chart"></canvas></div>
         <div class="chart-container"><canvas id="jumpHeightChart" class="chart"></canvas></div>
       </div>
     </div>
   </div>
   <script src="d.js"></script>
+  <script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['IDEAL', 'NOT IDEAL', 'RUNNING', 'STANDING', 'CROUTCHING'],
+        datasets: [
+          {
+            label: 'Outer Ring',
+            data: [0, 0, 70, 20, 10],
+            backgroundColor: ['#93D669', '#EA4940', '#75A6E2', '#5970F7', '#224A62'],
+            borderWidth: 1,
+            radius: '100%',       // Outer ring
+            cutout: '30%',
+          },
+          {
+            label: 'Inner Ring',
+            data: [70, 30],
+            backgroundColor: ['#93D669', '#EA4940'],
+            borderWidth: 1,
+            radius: '100%',        // Inner ring
+            cutout: '30%',
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+          }
+        }
+      }
+    });
+  </script>
+  <script>
+    const cttx = document.getElementById('myChart2').getContext('2d');
+    new Chart(cttx, {
+      type: 'line',
+      data: {
+        labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8'],
+        datasets: [{
+          label: 'Top Speed',
+          data: [26, 33, 33, 20, 13, 19, 30, 30, 26],
+          borderColor: '#1F43E5',
+          fill: false,
+          tension: 0.3
+        },
+        {
+          label: 'Acceleration',
+          data: [26, 15, 5, 5, 13, 23, 20, 10, 3],
+          borderColor: '#7DD859',
+          fill: false,
+          tension: 0.3
+        },
+        {
+          label: 'Deceleration',
+          data: [13, 13, 5, 5, 13, 13, 13, 13, 3],
+          borderColor: '#E93632',
+          fill: false,
+          tension: 0.3
+        }],
+        
+      },
+      options: {
+        responsive: false,
+        plugins: {
+          legend: {
+            display: true
+          },
+          title: {
+            display: true,
+            text: 'Speed & Acceleration'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
 </body>
 </html>

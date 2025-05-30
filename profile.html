@@ -1,209 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - Sports Analytics</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="ch.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <link rel="main stylesheet" href="index.css">
+  <link rel="profile stylesheet" href="profile.css">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 </head>
-<body>
-    <!-- Profile Page -->
-    <div id="profilePage" class="vh-100">
-        <!-- Top navigation bar with menu button -->
-        <nav class="navbar navbar-light bg-light">
-            <div class="container-fluid">
-                <button id="menuButton" class="btn">
-                    <i id="menuIcon" class="fas fa-bars"></i>
-                </button>
-                <h3 class="ms-3">Profile Page</h3>
-                
-                <!-- Log Out Button -->
-                <button id="logoutButton" class="btn btn-danger ms-auto">Log Out</button>
-            </div>
-        </nav>
 
-        <!-- Sidebar Menu -->
-        <div id="sideMenu" class="bg-light position-fixed vh-100">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-tab="profile">User Profile</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-tab="progress">Progress Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-tab="history">History</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-tab="subscription">View and Manage Subscription</a>
-                </li>
-                <li class="nav-item">
-                    <a href="./analytics/a.html" target="_blank" class="nav-link" id="newAnalyticsLink">New Analytics</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-tab="catalog">Drills Catalog  </a>
-                </li>
-            </ul>
+<body class="sb-expanded">
+  <!-- Side Bar -->
+  <aside>
+    <nav>
+      <div class="logo-container">
+        <a href="./Home/home.html"> 
+            <img src="./assests/Reaction Technologies logo samples bw-02.png" alt="Company Logo" class="logo">
+        </a>
+      </div>
+      <ul>
+        <li>
+          <div class="links">
+            <a href="#" class="active">
+              <span>PROFILE</span> <img src="./assests/arrow white rt.png" alt="Arrow" class="arrow">
+            </a>
+            <img src="./assests/white line rt.png" alt="Line" class="line"> 
+          </div>
+        </li>
+        <li>
+         <div class="links">
+          <a href="./Dashboard/dashboard.html">
+            <span>DASHBOARD</span> <img src="./assests/arrow white rt.png" alt="Arrow" class="arrow">
+          </a>
+          <img src="./assests/white line rt.png" alt="Line" class="line">
+         </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="./analytics/a.html">
+              <span>ANALYTICS</span> <img src="./assests/arrow white rt.png" alt="Arrow" class="arrow">
+            </a>
+            <img src="./assests/white line rt.png" alt="Line" class="line">
+          </div>
+        </li>
+        <li>
+            <div class="links">
+                <a href="./analytics/history.html">
+                <span>HISTORY</span> <img src="./assests/arrow white rt.png" alt="Arrow" class="arrow">
+                </a>
+                <img src="./assests/white line rt.png" alt="Line" class="line">
+            </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="./Drill Catalog/drillCatalog.html">
+              <span>DRILL CATALOG</span> <img src="./assests/arrow white rt.png" alt="Arrow" class="arrow">
+            </a>
+            <img src="./assests/white line rt.png" alt="Line" class="line">
+          </div> 
+        </li>
+        <li>
+          <div class="footer">
+            <div class="socials">
+              <div class="social-box">
+                <a href="https://www.instagram.com/reactiontech/"><img src= "./assests/icons8-instagram-50.png" alt="insta" class="icons"></a>
+              </div>
+              <div class="social-box">
+                <a href="https://www.facebook.com/ReactionTech/"><img src= "./assests/icons8-facebook-64.png" alt="facebook" class="icons"></a>
+              </div>
+              <div class="social-box">
+                <a href=" https://www.linkedin.com/company/reaction-technologies/"><img src= "./assests/icons8-linkedin-50.png" alt="linkedin" class="icons"></a>
+              </div>
+            </div>
+            <div class="logOut">
+              <span>LOG OUT</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+   </aside>
+
+   <!-- Main Content -->
+   <main>
+    <header class="header">
+      <h1 class="title">PROFILE</h1>
+    </header>
+    <div id="bg">
+      <div class="userData">
+        <div class="profileHead">
+            <div class="avatar">
+                <label for="file-input">
+                  <input type="file" id="file-input">
+                  <img src="./assests/profilepic.png" id="img-preview" alt="ProfilePic" width="510px" height="450px">
+                </label>
+            </div>
+            <div class="user">
+                <h2>PLAYER INFO</h2>
+                <div class="small-box">
+                    <div class="info">NAME: <div id=nameInfo></div> </div>
+                    <div class="info">SPORT: <div id=sportInfo></div></div>
+                </div>
+            </div>
         </div>
-
-        <!-- Main Content Area -->
-        <div id="contentArea" class="container mt-3">
-            <div id="profile" class="tab-content d-none">
-                <h2>User Profile</h2>
-                <form id="userProfileForm" class="mt-4">
-                    <!-- Name -->
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" id="name" class="form-control" required>
-                    </div>
-            
-                    <!-- Email -->
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" id="email" class="form-control" required>
-                    </div>
-            
-                    <!-- Username -->
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" id="username" class="form-control" required>
-                    </div>
-            
-                    <!-- Password -->
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" id="password" class="form-control" required>
-                    </div>
-            
-                    <!-- Age -->
-                    <div class="mb-3">
-                        <label for="age" class="form-label">Age of the Athlete</label>
-                        <input type="number" id="age" class="form-control" placeholder="Enter your age" max="999" required>
-                    </div>
-            
-                    <!-- State of Residence -->
-                    <div class="mb-3">
-                        <label for="state" class="form-label">State of Residence</label>
-                        <select id="state" class="form-select" required>
-                            <option value="" selected disabled>Choose your state</option>
-                            <!-- Add all US states -->
-                            <option value="Alabama">Alabama</option>
-                            <option value="Alaska">Alaska</option>
-                            <option value="Arizona">Arizona</option>
-                            <option value="Arkansas">Arkansas</option>
-                            <option value="California">California</option>
-                            <option value="Colorado">Colorado</option>
-                            <option value="Connecticut">Connecticut</option>
-                            <option value="Delaware">Delaware</option>
-                            <option value="Florida">Florida</option>
-                            <option value="Georgia">Georgia</option>
-                            <option value="Hawaii">Hawaii</option>
-                            <option value="Idaho">Idaho</option>
-                            <option value="Illinois">Illinois</option>
-                            <option value="Indiana">Indiana</option>
-                            <option value="Iowa">Iowa</option>
-                            <option value="Kansas">Kansas</option>
-                            <option value="Kentucky">Kentucky</option>
-                            <option value="Louisiana">Louisiana</option>
-                            <option value="Maine">Maine</option>
-                            <option value="Maryland">Maryland</option>
-                            <option value="Massachusetts">Massachusetts</option>
-                            <option value="Michigan">Michigan</option>
-                            <option value="Minnesota">Minnesota</option>
-                            <option value="Mississippi">Mississippi</option>
-                            <option value="Missouri">Missouri</option>
-                            <option value="Montana">Montana</option>
-                            <option value="Nebraska">Nebraska</option>
-                            <option value="Nevada">Nevada</option>
-                            <option value="New Hampshire ">New Hampshire</option>
-                            <option value="New Jersey">New Jersey</option>
-                            <option value="New Mexico">New Mexico</option>
-                            <option value="New York">New York</option>
-                            <option value="North Carolina">North Carolina</option>
-                            <option value="Ohio">Ohio</option>
-                            <option value="Oklahoma">Oklahoma</option>
-                            <option value="Oregon">Oregon</option>
-                            <option value="Pennsylvania">Pennsylvania</option>
-                            <option value="Rhode Island">Rhode Island</option>
-                            <option value="South Carolina">South Carolina</option>
-                            <option value="South Dakota">South Dakota</option>
-                            <option value="Tennessee">Tennessee</option>
-                            <option value="Texas">Texas</option>
-                            <option value="Utah">Utah</option>
-                            <option value="Vermont">Vermont</option>
-                            <option value="Virginia">Virginia</option>
-                            <option value="Washington">Washington</option>
-                            <option value="West Virginia">West Virginia</option>
-                            <option value="Wisconsin">Wisconsin</option>
-                            <option value="Wyoming">Wyoming</option>
-                        </select>
-                    </div>
-            
-                    <!-- Sports Interests -->
-                    <div class="mb-3">
-                        <label for="sports" class="form-label">Sports Interests (select up to 3)</label>
-                        <select id="sports" class="form-select" multiple size="5" required>
-                            <option value="Football">Football</option>
-                            <option value="Basketball">Basketball</option>
-                            <option value="Baseball">Baseball</option>
-                            <option value="Soccer">Soccer</option>
-                            <option value="Tennis">Tennis</option>
-                            <option value="Swimming">Swimming</option>
-                            <option value="Track and Field">Track and Field</option>
-                            <option value="Hockey">Hockey</option>
-                        </select>
-                    </div>
-            
-                    <!-- Save Button -->
-                    <button type="submit" class="btn btn-primary">Save Profile</button>
-                </form>
-            </div>
-            <div id="progress" class="tab-content d-none">
-                <h2>Progress Dashboard</h2>
-                <div class="counter-box">
-                    <h4>Total Uploads</h4>
-                    <p id="uploadCounter">0</p>
+        <div class="main-box">
+          <div class="subHeader">
+            <h3>PERSONAL INFORMATION</h3> 
+            <button type="submit" id="saveButton">SAVE <img src= "./assests/save.png" alt="save" class="save"></button> 
+          </div>
+            <form id="userProfileForm">
+              <div class="data">
+                <label for="name" class="form-label">FULL NAME</label> <input type="text" id="name" class="form-control" required>
+              </div>
+              <div class="data">
+                <label for="email" class="form-label">EMAIL</label> <input type="text" id="email" class="form-control" required>
+              </div>
+              <div class="data">
+                <label for="username" class="form-label">USERNAME</label> <input type="text" id="username" class="form-control" required>
+              </div>
+              <div class="data">
+                <label for="password" class="form-label">PASSWORD</label> <input type="text" id="password" class="form-control" required>
+              </div>
+              <div class="data">
+                <label for="age" class="form-label">AGE OF ATHELETE</label> <input type="text" id="age" class="form-control" required required autocomplete="age">
+              </div>
+              <div class="data">
+                <label for="state" class="form-label">STATE OF RESIDENCE</label> <input type="text" id="state" class="form-control" required required autocomplete="state">
+              </div>
+              <div class="data">
+                <label for="sports">SPORTS INTREST </label> 
+                <select id="sports" name="sports">
+                  <option value="" disabled selected>Select Sport</option>
+                  <option value="feature1">Football</option>
+                  <option value="feature2">basketball</option>
+                  <option value="feature3">Baseball</option>
+                  <option value="feature4">Soccer</option>
+                  <option value="feature5">Tennis</option>
+                  <option value="feature6">Swimming</option>
+                  <option value="feature7">Track and Field</option>
+                  <option value="feature8">Hockey</option>
+                </select>
+              </div>
+            </form>
+        </div>
+        <div class="subscription">
+          <span>SUBSCRIPTIONS</span>
+          <img src="./assests/white line rt.png" alt="Line" class="subLine"> 
+          <div class="subscriptionBoxs">
+            <div class="sub-box">
+                <h4>INDIVIDUAL</h4>
+                <div class="check">
+                  <img src="./assests/checkBox.png" alt="chrck" class="checkBox"> 
+                  <img src="./assests/checkBox.png" alt="chrck" class="checkBox"> 
+                  <img src="./assests/checkBox.png" alt="chrck" class="checkBox"> 
                 </div>
-                <div style="max-height: 250px; overflow: hidden;"></div>
-                    <canvas id="headAngleChart" width="400" max-height="200"></canvas>
-                    <canvas id="topSpeedChart" width="400" max-height="200"></canvas>
-                    <canvas id="athleticScoreChart" width="400" max-height="200"></canvas>  
+                <button id="individul">START NOW</button> 
+            </div>
+            <div class="sub-box">
+                <h4>ORGANIZATION</h4>
+                <div class="check">
+                  <img src="./assests/checkBox.png" alt="chrck" class="checkBox"> 
+                  <img src="./assests/checkBox.png" alt="chrck" class="checkBox"> 
+                  <img src="./assests/checkBox.png" alt="chrck" class="checkBox"> 
                 </div>
-                  
+                <button id="organization">START NOW</button>
             </div>
-            <div id="history" class="tab-content d-none">
-                <h2>History</h2>
-                <table id="history-table" class="table">
-                    <thead>
-                        <tr>
-                            <th>Sr.No.</th>
-                            <th>Video Link</th>
-                            <th>Thumbnail</th>
-                            <th>Upload Date</th>
-                            <th>Ideal Head %</th>
-                            <th>Top Speed</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-table-body">
-                        <!-- Rows will be dynamically populated -->
-                    </tbody>
-                </table>
+            <div class="sub-box">
+                <h4>SCHOOL</h4>
+                <div class="check">
+                  <img src="./assests/checkBox.png" alt="chrck" class="checkBox"> 
+                  <img src="./assests/checkBox.png" alt="chrck" class="checkBox"> 
+                  <img src="./assests/checkBox.png" alt="chrck" class="checkBox"> 
+                </div>
+                <button id="school">START NOW</button>
             </div>
-            <div id="subscription" class="tab-content d-none">
-                <h2>View and Manage Subscription</h2>
-            </div>
-            <div id="analytics" class="tab-content d-none">
-                <h2>New Analytics</h2>
-                <!-- Load existing sports analytics page content here -->
-            </div>
-            <div id="catalog" class="tab-content d-none">
-                <h2>Drills Catalog</h2>
-            </div>
+        </div>
         </div>
     </div>
-    <script src="sp.js"></script>
+    </div>
+   </main>
+   <script src="profile.js"></script>
+   <script src="sp.js"></script>
 </body>
 </html>

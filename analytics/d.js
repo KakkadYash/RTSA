@@ -1189,3 +1189,28 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Analysis data and charts reset");
     }
 });
+
+let slider = document.getElementById("speed");
+let value = document.querySelector(".speed");
+let slider2 = document.getElementById("acceleration");
+let value2 = document.querySelector(".acceleration");
+value.innerHTML = slider.value
+value2.innerHTML = slider2.value2
+
+function calcValue() {
+    valuePercentage = (slider.value / slider.max)*100;
+      slider.style.background = `linear-gradient(to right, red ${0}%, yellow ${valuePercentage}%, green ${valuePercentage}%, white ${valuePercentage}%)`;
+    valuePercentage2 = (slider2.value2 / slider2.max)*100;
+        slider2.style.background = `linear-gradient(to right, red ${0}%, yellow ${valuePercentage}%, green ${valuePercentage}%, white ${valuePercentage}%)`;
+  }
+
+  slider.addEventListener('input', function(){
+    calcValue();
+    value.textContent = this.value; 
+  })
+  slider2.addEventListener('input', function(){
+    calcValue();
+    value2.textContent = this.value2; 
+  })
+  
+  calcValue();
