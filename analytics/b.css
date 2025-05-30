@@ -327,12 +327,23 @@ canvas {
     visibility: hidden;
 }
 
+
 /* Smaller, fixed-size squares for the charts */
 .chart-square {
     max-height: 350px;  
     max-width: 350px; 
     border: 2px solid #000000;
     background-color: #FFFFFF;
+}
+
+#headAngleLineChart, 
+#speedHistogramChart, 
+#accelerationChart,
+#decelerationDisplay,
+#strideLengthDisplay, 
+#jumpHeightChart {
+    height: 240px !important; /* Increase height */
+    max-height: 400px !important; /* Prevents excessive stretching */
 }
 
 /* Hidden class to toggle visibility */

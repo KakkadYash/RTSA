@@ -12,11 +12,12 @@ const LEFT_EYE_INDEX = 1;         // Landmark index for left eye
 const MAX_SPEED = 5;
 const ACCELERATION_THRESHOLD = 0.5; // Threshold for acceleration changes
 const DECELERATION_THRESHOLD = 0.5;
-const JUMP_HEIGHT_BASELINE = 0.01; // Minimum height change to detect a jump
+const JUMP_HEIGHT_BASELINE = 0.05; // Minimum height change to detect a jump
        
 // Encapsulating variables in an object to avoid global scope
 const appState = {
     videoFile: null,
+    uploadDate: '',
     previousLegPosition: { x: 0, y: 0 },
     idealHeadAngleFrames: 0,
     totalFrames: 0,
@@ -343,13 +344,13 @@ document.addEventListener('DOMContentLoaded', function() {
         },
     });
 
-    // Chart for jump height visualization with click-to-seek
+    // Chart for Jump Height visualization with correct time axis
     const jumpHeightChart = new Chart(document.getElementById('jumpHeightChart').getContext('2d'), {
         type: 'bar',
         data: {
             datasets: [{
                 label: 'Jump Height (yards)',
-                data: [],
+                data: [],  // { x: second, y: jumpHeight }
                 backgroundColor: 'blue',
                 borderColor: 'blue',
                 borderWidth: 1
@@ -360,42 +361,33 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             scales: {
                 x: {
+                    type: 'linear',  // ⬅️ Important: force a linear time axis
                     title: { display: true, text: 'Time (seconds)' },
+                    min: 0,
                     ticks: {
+                        stepSize: 1,
                         callback: function(value, index, values) {
-                            return Math.round(value);  // Only whole numbers
-                        },
-                        stepSize: 1, // Ensures only 1, 2, 3, ... appear
-                        autoSkip: true, // Ensures every tick is displayed
+                            return value.toFixed(0); // Only whole seconds
+                        }
                     }
                 },
                 y: {
                     title: { display: true, text: 'Jump Height (yards)' },
                     suggestedMin: 0,
-                    suggestedMax: 2,  // Adjust based on expected values
+                    suggestedMax: 2,
                     ticks: { stepSize: 0.2 }
-                }
-            },
-            onClick: (evt, activeElements) => {
-                if(activeElements.length > 0) {
-                    const index = activeElements[0].index;
-                    const label = jumpHeightChart.data.labels[index];
-                    const match = label.match(/Time: ([\d\.]+)s/);
-                    if(match) {
-                        const timestamp = parseFloat(match[1]);
-                        seekToTimestamp(timestamp);
-                    }
                 }
             }
         }
     });
-    // Chart for Stride length visualization with click-to-seek
+
+    // Chart for Stride Length visualization with correct time axis
     const strideChart = new Chart(document.getElementById('strideLengthDisplay').getContext('2d'), {
         type: 'bar',
         data: {
             datasets: [{
                 label: 'Stride Length (yards)',
-                data: [],
+                data: [],  // { x: second, y: strideLength }
                 backgroundColor: 'orange',
                 borderColor: 'orange',
                 borderWidth: 1
@@ -406,35 +398,26 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             scales: {
                 x: {
+                    type: 'linear',  // ⬅️ Important: force a linear time axis
                     title: { display: true, text: 'Time (seconds)' },
+                    min: 0,
                     ticks: {
+                        stepSize: 1,
                         callback: function(value, index, values) {
-                            return Math.round(value);  // Only whole numbers
-                        },
-                        stepSize: 1, // Ensures only 1, 2, 3, ... appear
-                        autoSkip: true, // Ensures every tick is displayed
+                            return value.toFixed(0); // Only whole seconds
+                        }
                     }
                 },
                 y: {
-                    title: { display: true, text: 'Stride length (yards)' },
+                    title: { display: true, text: 'Stride Length (yards)' },
                     suggestedMin: 0,
-                    suggestedMax: 2,  // Adjust based on expected values
+                    suggestedMax: 2,
                     ticks: { stepSize: 0.2 }
-                }
-            },
-            onClick: (evt, activeElements) => {
-                if(activeElements.length > 0) {
-                    const index = activeElements[0].index;
-                    const label = strideChart.data.labels[index];
-                    const match = label.match(/Time: ([\d\.]+)s/);
-                    if(match) {
-                        const timestamp = parseFloat(match[1]);
-                        seekToTimestamp(timestamp);
-                    }
                 }
             }
         }
     });
+
     
     // UPLOAD BUTTON: Only select and preview video (no uploading or height estimation)
     uploadButton.addEventListener('change', (event) => {
@@ -443,6 +426,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const videoURL = URL.createObjectURL(appState.videoFile);
             videoElement.src = videoURL;
             videoElement.style.display = 'block';
+            const uploadDateInput = document.getElementById('uploadDate').value;
+
+            // Convert '2023-08-15T10:30' to '2023-08-15 10:30:00'
+            if (uploadDateInput) {
+                const date = new Date(uploadDateInput);
+                appState.uploadDate = date.getFullYear() + '-' +
+                                    String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                                    String(date.getDate()).padStart(2, '0') + ' ' +
+                                    String(date.getHours()).padStart(2, '0') + ':' +
+                                    String(date.getMinutes()).padStart(2, '0') + ':00';
+            }
+
             // Reset charts and analysis data for new video upload
             resetCharts();
             resetAnalysisData();
@@ -498,10 +493,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Play Processed Video button: allow user to start/restart playback of the processed output
     playProcessedButton.addEventListener('click', () => {
         videoElement.play();
-        appState.averageJumpHeight = calculateAverageJumpHeight();
-        appState.averageStrideLength = calculateAverageStrideLength();
-        appState.peakAcceleration = calculatePeakAcceleration();
-        appState.peakDeceleration = calculatePeakDeceleration();
         playProcessedButton.style.display = 'none';
     });
 
@@ -590,11 +581,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData();
             formData.append('video', appState.videoFile);
             formData.append('userId', localStorage.getItem('user_id'));
+            if (appState.uploadDate){
+                formData.append('uploadDate', appState.uploadDate);
+            }
             // ✅ Ensure thumbnail exists before appending
             if (appState.thumbnailFile) {
                 formData.append('thumbnail', appState.thumbnailFile); // ✅ Fixed spelling
             }
-            const uploadResponse = await fetch('http://127.0.0.1:5000/upload', {
+            const uploadResponse = await fetch('https://uploaded-data-443715.uc.r.appspot.com/upload', {
                 method: 'POST',
                 body: formData,
             });
@@ -619,22 +613,25 @@ document.addEventListener('DOMContentLoaded', function() {
             const averageAthleticScore = scores.length > 0 
                 ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
                 : 0;
-
-                const analyticsData = {
-                    video_Id: appState.videoId,
-                    userId: localStorage.getItem('user_id'),
-                    idealHeadPercentage: idealHeadPercentage,
-                    averageAthleticScore: averageAthleticScore,
-                    topSpeed: appState.topSpeed || 0,
-                    averageJumpHeight: appState.averageJumpHeight || 0,
-                    averageStrideLength: appState.averageStrideLength || 0,
-                    peakAcceleration: appState.peakAcceleration || 0,
-                    peakDeceleration: appState.peakDeceleration || 0
-                };
+            appState.averageStrideLength = calculateAverageStrideLength();
+            appState.peakAcceleration = calculatePeakAcceleration();
+            appState.peakDeceleration = calculatePeakDeceleration();
+            appState.averageJumpHeight = calculateAverageJumpHeight(); 
+            const analyticsData = {
+                video_Id: appState.videoId,
+                userId: localStorage.getItem('user_id'),
+                idealHeadPercentage: idealHeadPercentage,
+                averageAthleticScore: averageAthleticScore,
+                topSpeed: appState.topSpeed || 0,
+                averageJumpHeight: appState.averageJumpHeight || 0,
+                averageStrideLength: appState.averageStrideLength || 0,
+                peakAcceleration: appState.peakAcceleration || 0,
+                peakDeceleration: appState.peakDeceleration || 0
+            };
     
             console.log("Sending analytics data:", analyticsData);
     
-            const analyticsResponse = await fetch('http://127.0.0.1:5000/saveAnalytics', {
+            const analyticsResponse = await fetch('https://uploaded-data-443715.uc.r.appspot.com/saveAnalytics', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(analyticsData),
@@ -889,7 +886,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData();
         formData.append('video', videoFile);
         try {
-            const response = await fetch('http://127.0.0.1:5000/estimate_height', {
+            const response = await fetch('https://uploaded-data-443715.uc.r.appspot.com/estimate_height', {
                 method: 'POST',
                 body: formData
             });
@@ -1088,53 +1085,50 @@ document.addEventListener('DOMContentLoaded', function() {
             Math.pow(avgAnkleX - appState.previousLegPosition.x, 2) +
             Math.pow(avgAnkleY - appState.previousLegPosition.y, 2)
         );
-
-        if (stridedistance > 1){
-
-            appState.stridelength.push({
-                time: appState.currentSecond,
-                length: stridedistance
-            });
-
-            strideChart.data.labels.push(`Time: ${appState.currentSecond.toFixed(2)}s`);
-            strideChart.data.datasets[0].data.push({
-                x: appState.currentSecond,
-                y: stridedistance
-            });
-            strideChart.update();
+    
+        let strideValue = 0;
+        if (stridedistance > 0.5) {
+            strideValue = stridedistance;
         }
+    
+        appState.stridelength.push({
+            time: appState.currentSecond,
+            length: strideValue
+        });
+    
+        strideChart.data.datasets[0].data.push({ x: appState.currentSecond, y: strideValue });
+        strideChart.data.datasets[0].data.push(strideValue);
+        strideChart.update();
+    
+        appState.previousLegPosition = { x: avgAnkleX, y: avgAnkleY };
     }
-
+    
     function detectJumps(landmarks) {
         const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
         const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
         const averageAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
     
-        if (!appState.previousAnkleY) {
+        if (typeof appState.previousAnkleY !== "number") {
             appState.previousAnkleY = averageAnkleY;
             return;
         }
     
         const jumpHeight = appState.previousAnkleY - averageAnkleY;
     
+        let jumpValue = 0;
         if (jumpHeight > JUMP_HEIGHT_BASELINE) {
-            if (typeof appState.currentSecond !== "number") {
-                console.error("Current time (appState.currentSecond) is invalid.");
-                return;
-            }
-    
-            appState.jumpHeights.push({
-                time: appState.currentSecond,
-                height: jumpHeight
-            });
-    
-            jumpHeightChart.data.labels.push(`Time: ${appState.currentSecond.toFixed(2)}s`);
-            jumpHeightChart.data.datasets[0].data.push({
-                x: appState.currentSecond,
-                y: jumpHeight
-            });
-            jumpHeightChart.update();
+            jumpValue = jumpHeight;
         }
+    
+        appState.jumpHeights.push({
+            time: appState.currentSecond,
+            height: jumpValue
+        });
+    
+        jumpHeightChart.data.datasets[0].data.push({ x: appState.currentSecond, y: jumpValue });
+        jumpHeightChart.data.datasets[0].data.push(jumpValue);
+        jumpHeightChart.update();
+    
         appState.previousAnkleY = averageAnkleY;
     }
     
