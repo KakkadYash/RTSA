@@ -26,6 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error(data.error);
             } else {
                 // Populate the form fields with fetched data
+                document.getElementById("nameInfo").innerHTML = data.name || '';
+                document.getElementById("sportInfo").innerHTML = data.sports || '';
                 document.getElementById("name").value = data.name || '';
                 document.getElementById("email").value = data.email || '';
                 document.getElementById("username").value = data.username || '';
@@ -261,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // New Analytics Link
     newAnalyticsLink.addEventListener("click", function(event) {
         event.preventDefault();
-        window.open("./analytics/a.html", "_blank");
+        window.open("./analytics/analytics.html", "_blank");
     });
 
     // Tab Navigation
@@ -279,7 +281,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Logout
     logoutButton.addEventListener("click", () => {
         localStorage.clear();
-        window.location.href = "lo.html";
+        window.location.href = "login.html";
     });
 
     document.getElementById("userProfileForm").addEventListener("submit", async (e) => {
