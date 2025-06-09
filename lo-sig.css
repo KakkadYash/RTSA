@@ -55,7 +55,7 @@ p {
     line-height: 1;
 } 
 
-#loginForm, #forgotPasswordLink {
+#loginForm {
     font-family: SCHABO-Condensed;
     width: 300px;
     height: 400px;
@@ -85,7 +85,7 @@ label {
     justify-content: space-between;
 }
 
-#loginForm, #forgotPasswordLink span {
+#loginForm span {
     font-family: FutraLight;
     text-decoration: underline;
     color: #fff;
