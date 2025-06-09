@@ -85,7 +85,7 @@ label {
     justify-content: space-between;
 }
 
-#loginForm span {
+#loginForm, , #forgotPasswordLink span {
     font-family: FutraLight;
     text-decoration: underline;
     color: #fff;
