@@ -296,7 +296,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
         try {
             const response = await fetch("https://uploaded-data-443715.uc.r.appspot.com/updateProfile", {
-                method: "OPTIONS",
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
