@@ -38,6 +38,7 @@
             <div class="remember">
               <input type="checkbox" id="remember" name="remember" value="remember"><label for="remember">REMEMBER ME</label>
             </div>
+            <span id="forgotPasswordLink" style="cursor: pointer; color: #007bff;">FORGOT YOUR PASSWORD?</span>
           </div>
           <div class="buttons">
             <button type="submit" class="button">SIGN IN <img src="./assests/arrow black rt.png" alt="arrow" class="arrow"></button>
@@ -51,6 +52,7 @@
       </div> 
     </div>
   </main>
+
     <!-- Forgot Password Modal -->
     <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -74,6 +76,7 @@
         </div>
       </div>
     </div>
+  
     <script>
       // Open modal on forgot password click
       document.getElementById("forgotPasswordLink").addEventListener("click", function () {
