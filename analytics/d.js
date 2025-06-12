@@ -16,6 +16,11 @@ const JUMP_HEIGHT_BASELINE = 0.05; // Minimum height change to detect a jump
        
 // Encapsulating variables in an object to avoid global scope
 const appState = {
+    postureCounts: {
+        Running: 0,
+        'Upright Standing': 0,
+        Crouching: 0,
+    },
     videoFile: null,
     uploadDate: '',
     previousLegPosition: { x: 0, y: 0 },
@@ -125,6 +130,12 @@ document.addEventListener('DOMContentLoaded', function() {
            });
        }
     initializeUnifiedChart(); // 👈 Initialize as soon as DOM loads
+    function filterUnifiedChart(metricIndices) {
+        unifiedChart.data.datasets.forEach((dataset, index) => {
+            dataset.hidden = !metricIndices.includes(index);
+        });
+        unifiedChart.update();
+    }
 
     // Custom plugin to draw text in the center of the doughnut chart
     const centerLabelPlugin = {
@@ -411,6 +422,26 @@ document.addEventListener('DOMContentLoaded', function() {
             },
         },
     });
+       
+    document.querySelectorAll('.card').forEach((card, index) => {
+        card.addEventListener('click', () => {
+             // Small delay to wait for flip animation (optional)
+             setTimeout(() => {
+                 if (card.classList.contains('is-flipped')) {
+                    if (index === 0) {
+                        // Technique card: head angle only
+                        filterUnifiedChart([0]);
+                    } else if (index === 1) {
+                        // Speed & Movement card: speed, acceleration, deceleration
+                        filterUnifiedChart([1, 2, 3]);
+                    } else if (index === 2) {
+                        // Footwork card: stride, jump height
+                        filterUnifiedChart([4, 5]);
+                    }
+                }
+            }, 200);
+        });
+    });
 
     // Chart for Jump Height visualization with correct time axis
     // const jumpHeightChart = new Chart(document.getElementById('jumpHeightChart').getContext('2d'), {
@@ -485,6 +516,10 @@ document.addEventListener('DOMContentLoaded', function() {
     //         }
     //     }
     // });
+    document.getElementById('showMetrics').addEventListener('click', () => {
+        filterUnifiedChart([0, 1, 2, 3, 4, 5]);
+        document.querySelectorAll('.card').forEach(card => card.classList.add('is-flipped'));
+    });
 
     
     // UPLOAD BUTTON: Only select and preview video (no uploading or height estimation)
@@ -562,6 +597,7 @@ document.addEventListener('DOMContentLoaded', function() {
     playProcessedButton.addEventListener('click', () => {
         videoElement.play();
         playProcessedButton.style.display = 'none';
+        updatePostureChart();
     });
 
     // Initialize MediaPipe Pose (added to fix "pose is not defined")
@@ -733,6 +769,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 appState.landmarkHistory.shift();
             }
             const posture = detectPosture(results.poseLandmarks);
+            if (['Running', 'Upright Standing', 'Crouching'].includes(posture)) {
+                appState.postureCounts[posture]++;
+            }
             document.getElementById("postureDisplay").textContent = `Posture: ${posture}`;
     
             const currentBoundingBox = calculateBoundingBox(results.poseLandmarks);
@@ -816,7 +855,26 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("No landmarks detected");
         }
     }
-    
+    function updatePostureChart() {
+        const totalFrames = appState.postureCounts['Running'] + appState.postureCounts['Upright Standing'] + appState.postureCounts['Crouching'];
+        if (totalFrames === 0) return;
+
+        const runningPercent = Math.round((appState.postureCounts['Running'] / totalFrames) * 100);
+        const standingPercent = Math.round((appState.postureCounts['Upright Standing'] / totalFrames) * 100);
+        const crouchingPercent = Math.round((appState.postureCounts['Crouching'] / totalFrames) * 100);
+
+        const chart = Chart.getChart('myChart'); // Get existing chart instance
+        if (chart) {
+            chart.data.datasets[0].data = [
+                0, 0,  // Ideal / Not Ideal (outer ring skipped)
+                runningPercent,
+                standingPercent,
+                crouchingPercent
+            ];
+            chart.update();
+        }
+    }
+
     function lockOnAthlete(landmarks) {
         appState.athleteBoundingBox = calculateBoundingBox(landmarks);
         appState.athleteLocked = true;
@@ -1263,6 +1321,11 @@ document.addEventListener('DOMContentLoaded', function() {
         appState.stridelength = [];
         appState.agilityData = [];
         appState.balanceScore = [];
+        appState.postureCounts = {
+            Running: 0,
+            'Upright Standing': 0,
+            Crouching: 0,
+        };
         console.log("Analysis data and charts reset");
     }
 });
