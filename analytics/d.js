@@ -1148,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', function() {
             appState.accelerationData.push(acceleration);
             accelerationChart.data.labels.push(appState.currentSecond);
             accelerationChart.data.datasets[0].data.push(acceleration);
-            accelerationChart.update();
+            // accelerationChart.update();
         }
 
         const deceleration = calculateDeceleration(appState.speedData, timeElapsedSinceLastFrame);
@@ -1156,7 +1156,7 @@ document.addEventListener('DOMContentLoaded', function() {
             appState.accelerationData.push(deceleration);
             decelerationChart.data.labels.push(appState.currentSecond);
             decelerationChart.data.datasets[0].data.push(deceleration);
-            decelerationChart.update();
+            // decelerationChart.update();
         }
 
         const scores = calculateAthleticScores(posture);
@@ -1169,7 +1169,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (scores.every(score => !isNaN(score))) {
             appState.score = scores;
             atheleticscorechart.data.datasets[0].data = scores;
-            atheleticscorechart.update();
+            // atheleticscorechart.update();
         } else {
             console.error("Invalid athletic scores, skipping chart update.");
         }
@@ -1239,28 +1239,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
         const avgAnkleX = (leftAnkle.x + rightAnkle.x) / 2;
         const avgAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
+       
         const stridedistance = Math.sqrt(
             Math.pow(avgAnkleX - appState.previousLegPosition.x, 2) +
             Math.pow(avgAnkleY - appState.previousLegPosition.y, 2)
         );
-    
+       
         let strideValue = 0;
-        if (stridedistance > 0.5) {
+        if (stridedistance > 0.01) { // reduce threshold to capture smaller valid strides
             strideValue = stridedistance;
         }
-    
+       
+        // 🟢 Save to appState (for analysis + chart)
         appState.stridelength.push({
             time: appState.currentSecond,
             length: strideValue
         });
-    
-        strideChart.data.datasets[0].data.push({ x: appState.currentSecond, y: strideValue });
-        strideChart.data.datasets[0].data.push(strideValue);
-        strideChart.update();
-    
+       
+        // 🟢 Update unified chart only (since we removed individual strideChart)
+        if (unifiedChart) {
+            // Update dataset index 4 (Stride Length)
+            const strideDataset = unifiedChart.data.datasets[4];
+            if (strideDataset) {
+                strideDataset.data.push(strideValue);
+            }
+        }
+       
         appState.previousLegPosition = { x: avgAnkleX, y: avgAnkleY };
     }
-    
+
     function detectJumps(landmarks) {
         const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
         const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
@@ -1285,7 +1292,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         jumpHeightChart.data.datasets[0].data.push({ x: appState.currentSecond, y: jumpValue });
         jumpHeightChart.data.datasets[0].data.push(jumpValue);
-        jumpHeightChart.update();
+        // jumpHeightChart.update();
     
         appState.previousAnkleY = averageAnkleY;
     }
