@@ -598,6 +598,11 @@ document.addEventListener('DOMContentLoaded', function() {
         videoElement.play();
         playProcessedButton.style.display = 'none';
         updatePostureChart();
+        updateSlider("speed", ".speed", appState.topSpeed, 0, 15);                // SPEED
+        updateSlider("acceleration", ".acceleration", appState.peakAcceleration, 0, 10);   // ACCELERATION
+        updateSlider("deceleration", ".value1", appState.peakDeceleration, 0, 10);                 // DECELERATION (same slider ID as footwork — be cautious)
+        updateSlider("jumpheight", ".value", appState.averageJumpHeight, 0, 2);                   // JUMP HEIGHT
+        updateSlider("strideleng", ".value1", appState.averageStrideLength, 0, 2);                // STRIDE LENGTH
     });
 
     // Initialize MediaPipe Pose (added to fix "pose is not defined")
@@ -855,6 +860,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("No landmarks detected");
         }
     }
+       
     function updatePostureChart() {
         const totalFrames = appState.postureCounts['Running'] + appState.postureCounts['Upright Standing'] + appState.postureCounts['Crouching'];
         if (totalFrames === 0) return;
@@ -873,6 +879,22 @@ document.addEventListener('DOMContentLoaded', function() {
             ];
             chart.update();
         }
+    }
+       
+    function updateSlider(sliderId, labelSelector, value, min = 0, max = 100) {
+        const slider = document.getElementById(sliderId);
+        const label = document.querySelector(labelSelector);
+
+        if (!slider || !label) return;
+
+        // Clamp and set slider value
+        const normalized = Math.min(Math.max(value, min), max);
+        slider.value = normalized;
+        label.textContent = normalized.toFixed(1);
+
+        // Gradient color background
+        const percent = ((normalized - min) / (max - min)) * 100;
+        slider.style.background = `linear-gradient(to right, red 0%, yellow ${percent}%, green ${percent}%, white ${percent}%)`;
     }
 
     function lockOnAthlete(landmarks) {
