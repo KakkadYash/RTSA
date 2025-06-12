@@ -576,7 +576,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingOverlay.style.display = 'none';
             return;
         }
-    
+        await pose.initialize();
         // Hide loading overlay once processing setup is complete
         loadingOverlay.style.display = 'none';
     
