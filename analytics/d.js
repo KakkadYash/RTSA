@@ -532,18 +532,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const videoURL = URL.createObjectURL(appState.videoFile);
             videoElement.src = videoURL;
             videoElement.style.display = 'block';
-            const uploadDateInput = document.getElementById('uploadDate').value;
-
-            // Convert '2023-08-15T10:30' to '2023-08-15 10:30:00'
-            if (uploadDateInput) {
-                const date = new Date(uploadDateInput);
-                appState.uploadDate = date.getFullYear() + '-' +
-                                    String(date.getMonth() + 1).padStart(2, '0') + '-' +
-                                    String(date.getDate()).padStart(2, '0') + ' ' +
-                                    String(date.getHours()).padStart(2, '0') + ':' +
-                                    String(date.getMinutes()).padStart(2, '0') + ':00';
-            }
-
             // Reset charts and analysis data for new video upload
             resetCharts();
             resetAnalysisData();
@@ -1129,10 +1117,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`Top Speed: ${appState.topSpeed.toFixed(2)} yards/s`);
         console.log(`Distance: ${(appState.totalDistance * 1.09361).toFixed(2)} yards`);
         console.log(`Time: ${timeElapsedSinceStart.toFixed(2)} seconds`);
-    
-        document.getElementById("speedDisplay").textContent = `Average Speed: ${averageSpeed.toFixed(2)} yards/second`;
-        document.getElementById("distanceDisplay").textContent = `Distance: ${appState.totalDistance.toFixed(2)} yards`;
-        document.getElementById("timeDisplay").textContent = `Time: ${timeElapsedSinceStart.toFixed(2)} seconds`;
     }
    
     function analyzeFrame(landmarks, athleteHeightInMeters, timeElapsedSinceLastFrame, posture) {
