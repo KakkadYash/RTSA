@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const unifiedChartCtx = document.getElementById('myChart2').getContext('2d');
 
     function initializeUnifiedChart() {
-               if (Chart.getChart("myChart2")) {
+           if (Chart.getChart("myChart2")) {
                Chart.getChart("myChart2").destroy();
            }
            unifiedChart = new Chart(unifiedChartCtx, {
