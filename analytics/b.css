@@ -83,12 +83,19 @@
   align-items: center;
 }
 
+#myChart2 {
+    background-color: #A7A7A7;
+    width: 500px;
+    height: 500px;
+    position: relative;
+}
+
 #videoForm {
     position: absolute;
-    top: 280px;
-    right: 630px;
-    z-index: 10;
-} 
+    top: 250px;
+    left: 55%;
+    transform: translateX(-50%);
+}
 
 #uploadButton {
     position: absolute;
@@ -103,6 +110,7 @@
 .btns{
     display: flex;
     flex-direction: row;
+    justify-content: center;
     gap: 30px;
 }
 
@@ -133,7 +141,7 @@ button{
     margin-top: 100px; 
 }
 
-.stats #value {
+.stats #timeDisplay, #distanceDisplay, #value, #averageAthleticScore {
     margin-left: auto;
     margin-right: 0;
 }
@@ -182,6 +190,7 @@ button{
 
 .card-front {
     background-color: #202020;
+    transform: rotateY(180deg);
 }
 
 .card-front:hover{
@@ -190,31 +199,33 @@ button{
 
 .card-back {
     background-color: #202020;
-    transform: rotateY(180deg);
-    background-image: url(../assests/redScuff.png);
+    background-image: url(../assests/redScuff_rotated.png);
     background-position: -200px -150px;
     background-repeat: no-repeat;
-    background-attachment:fixed;
+    background-attachment:initial;
     background-size: 600px 500px;
 }
 
 .card-back2 {
     background-color: #202020;
-    transform: rotateY(180deg);
 }
 
 .card-back3 {
     background-color: #202020;
-    transform: rotateY(180deg);
     background-image: url(../assests/redScuff.png);
     background-position: -100px 160px;
     background-repeat: no-repeat;
-    background-attachment:fixed;
+    background-attachment:initial;
     background-size: 600px 500px;
 }
 
 p {
     text-decoration: underline;
+}
+
+.charts {
+    display: flex;
+    flex-direction: column;
 }
 
 h1 {
@@ -267,11 +278,11 @@ h1 {
     cursor: pointer; 
 } 
 
-.main-container{
+/* .main-container{
     visibility: hidden;
     height: 1px;
     width: 1px;
-}
+} */
 
 #video-container {
     display: flex;
@@ -332,23 +343,12 @@ canvas {
     visibility: hidden;
 }
 
-
 /* Smaller, fixed-size squares for the charts */
 .chart-square {
     max-height: 350px;  
     max-width: 350px; 
     border: 2px solid #000000;
     background-color: #FFFFFF;
-}
-
-#headAngleLineChart, 
-#speedHistogramChart, 
-#accelerationChart,
-#decelerationDisplay,
-#strideLengthDisplay, 
-#jumpHeightChart {
-    height: 240px !important; /* Increase height */
-    max-height: 400px !important; /* Prevents excessive stretching */
 }
 
 /* Hidden class to toggle visibility */
@@ -389,4 +389,49 @@ canvas {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+
+    /* Video and Canvas: stack vertically */
+    .vid-chart {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Video */
+    video, canvas {
+        width: 80vw;
+        height: auto;
+    }
+
+    /* Charts Container: stack vertically */
+    #charts-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Stats: stack vertically */
+    .stats {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .box {
+        width: 80vw;
+    }
+
+    /* Buttons: stack or shrink gap */
+    .btns {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    /* Adjust #videoForm if necessary */
+    #videoForm {
+        position: static;
+        margin-top: 20px;
+        right: auto;
+    }
 }
