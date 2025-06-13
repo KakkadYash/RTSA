@@ -128,6 +128,13 @@ document.addEventListener('DOMContentLoaded', function() {
                        y: {
                            beginAtZero: true
                        }
+                   },
+                   onClick: (evt, activeElements) => {
+                       if (activeElements.length > 0) {
+                           const pointIndex = activeElements[0].index;
+                           const timestamp = unifiedChart.data.labels[pointIndex];
+                           seekToTimestamp(timestamp);
+                       }
                    }
                }
            });
@@ -240,29 +247,48 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     const headAngleChart = new Chart(document.getElementById('headMovementChart').getContext('2d'), {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [0, 100],
-                backgroundColor: ['#00ff00', '#FF2429']
-            }],
-            labels: ['Ideal Head Angle', 'Not Ideal Head Angle']
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: (tooltipItem) => {
-                            return tooltipItem.label + ': ' + Math.round(tooltipItem.raw) + '%';
-                        }
-                    }
-                }
-            }
-        }
-    });
+           type: 'doughnut',
+           data: {
+               datasets: [
+                   // Outer ring: Posture Distribution
+                   {
+                       data: [0, 0, 0], // Running, Standing, Crouching
+                       backgroundColor: ['#1E90FF', '#FFD700', '#A52A2A'],
+                       borderWidth: 0
+                   },
+                   // Inner ring: Head Angle
+                   {
+                       data: [0, 100],
+                       backgroundColor: ['#00ff00', '#FF2429'],
+                       borderWidth: 0
+                   }
+               ],
+               labels: [
+                   'Running',
+                   'Standing',
+                   'Crouching',
+                   'Ideal Head Angle',
+                   'Not Ideal Head Angle'
+               ]
+           },
+           options: {
+               responsive: true,
+               maintainAspectRatio: false,
+               cutout: '70%',
+               plugins: {
+                   tooltip: {
+                       callbacks: {
+                           label: function (tooltipItem) {
+                               const label = tooltipItem.label || '';
+                               const value = Math.round(tooltipItem.raw || 0);
+                               return `${label}: ${value}%`;
+                           }
+                       }
+                   }
+               }
+           }
+       });
+
        
     // Initialize the line chart for head angle tracking with click-to-seek functionality
     // const headAngleLineChart = new Chart(document.getElementById('headAngleLineChart').getContext('2d'), {
@@ -589,12 +615,6 @@ document.addEventListener('DOMContentLoaded', function() {
         videoElement.play();
         playProcessedButton.style.display = 'none';
         processVideo(videoElement);
-        updatePostureChart();
-        updateSlider("speed", ".speed", appState.topSpeed, 0, 15);                // SPEED
-        updateSlider("acceleration", ".acceleration", appState.peakAcceleration, 0, 10);   // ACCELERATION
-        updateSlider("deceleration", ".value1", appState.peakDeceleration, 0, 10);                 // DECELERATION (same slider ID as footwork — be cautious)
-        updateSlider("jumpheight", ".value", appState.averageJumpHeight, 0, 2);                   // JUMP HEIGHT
-        updateSlider("strideleng", ".value1", appState.averageStrideLength, 0, 2);                // STRIDE LENGTH
     });
 
     // Initialize MediaPipe Pose (added to fix "pose is not defined")
@@ -685,9 +705,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (appState.uploadDate){
                 formData.append('uploadDate', appState.uploadDate);
             }
-            // ✅ Ensure thumbnail exists before appending
             if (appState.thumbnailFile) {
-                formData.append('thumbnail', appState.thumbnailFile); // ✅ Fixed spelling
+                formData.append('thumbnail', appState.thumbnailFile); 
             }
             const uploadResponse = await fetch('https://uploaded-data-443715.uc.r.appspot.com/upload', {
                 method: 'POST',
@@ -850,24 +869,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
        
-    function updatePostureChart() {
-        const totalFrames = appState.postureCounts['Running'] + appState.postureCounts['Upright Standing'] + appState.postureCounts['Crouching'];
-        if (totalFrames === 0) return;
-
-        const runningPercent = Math.round((appState.postureCounts['Running'] / totalFrames) * 100);
-        const standingPercent = Math.round((appState.postureCounts['Upright Standing'] / totalFrames) * 100);
-        const crouchingPercent = Math.round((appState.postureCounts['Crouching'] / totalFrames) * 100);
-
-        const chart = Chart.getChart('myChart'); // Get existing chart instance
-        if (chart) {
-            chart.data.datasets[0].data = [
-                0, 0,  // Ideal / Not Ideal (outer ring skipped)
-                runningPercent,
-                standingPercent,
-                crouchingPercent
-            ];
-            chart.update();
-        }
+    function updateDoughnutChart() {
+        const doughnut = Chart.getChart("myChart");
+        if (!doughnut) return;
+       
+        // INNER RING: Head angle (ideal vs not ideal)
+        const idealPercentage = Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100);
+        doughnut.data.datasets[1].data = [
+           idealPercentage,
+           100 - idealPercentage
+        ];
+       
+        // OUTER RING: Posture distribution
+        const totalPosture = Object.values(appState.postureCounts).reduce((a, b) => a + b, 0) || 1;
+        const running = Math.round((appState.postureCounts["Running"] || 0) / totalPosture * 100);
+        const standing = Math.round((appState.postureCounts["Upright Standing"] || 0) / totalPosture * 100);
+        const crouching = Math.round((appState.postureCounts["Crouching"] || 0) / totalPosture * 100);
+       
+        doughnut.data.datasets[0].data = [0, 0, running, standing, crouching];
+        doughnut.update();
     }
        
     function updateSlider(sliderId, labelSelector, value, min = 0, max = 100) {
@@ -926,15 +946,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         return headAngle;
     }
-    
-    function showHeadAngleChart() {
-        const idealPercentage = Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100);
-        headAngleChart.data.datasets[0].data[0] = idealPercentage;
-        headAngleChart.data.datasets[0].data[1] = 100 - idealPercentage;
-        headAngleChart.update();
-        console.log("Head angle analysis complete");
-    }
-    
+       
     function calculateAngle(pointA, pointB, pointC) {
         const vectorAB = { x: pointB.x - pointA.x, y: pointB.y - pointA.y };
         const vectorBC = { x: pointC.x - pointB.x, y: pointC.y - pointB.y };
@@ -1126,8 +1138,13 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateDistance(landmarks, athleteHeightInMeters);
         detectJumps(landmarks);
         calculatestride(landmarks);
-        showHeadAngleChart();
-
+        updateDoughnutChart();
+        updateSlider("speed", ".speed", appState.topSpeed, 0, 15);                // SPEED
+        updateSlider("acceleration", ".acceleration", appState.peakAcceleration, 0, 10);   // ACCELERATION
+        updateSlider("deceleration", ".value1", appState.peakDeceleration, 0, 10);                 // DECELERATION (same slider ID as footwork — be cautious)
+        updateSlider("jumpheight", ".value", appState.averageJumpHeight, 0, 2);                   // JUMP HEIGHT
+        updateSlider("strideleng", ".value1", appState.averageStrideLength, 0, 2);                // STRIDE LENGTH
+           
         const acceleration = calculateAcceleration(appState.speedData, timeElapsedSinceLastFrame);
         if (!isNaN(acceleration) && Math.abs(acceleration) > ACCELERATION_THRESHOLD) {
             appState.accelerationData.push(acceleration);
