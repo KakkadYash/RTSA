@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>History</title>
   <link rel="main stylesheet" href="../index.css">
-  <link rel="history stylesheet" href="../Analytics/history.css">
+  <link rel="history stylesheet" href="../analytics/history.css">
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 </head>
 
-<body class="sb-expanded">
+<body class="sb-expanded" onload="loadHistory()">
   <!-- Side Bar -->
   <aside>
     <nav>
@@ -76,7 +76,7 @@
               </div>
             </div>
             <div class="logOut">
-              <span>LOG OUT</span>
+              <span id="logoutButton">LOG OUT</span>
             </div>
           </div>
         </li>
@@ -94,13 +94,6 @@
     </header>
     <div class="bg">
       <div class="library">
-        <!-- <div class="sort">
-            <button id="sortButton" onclick="myFunction()">SORT BY </button>
-            <div id="myDropdown" class="dropdown-content">
-              <a href="#">DATE</a>
-              <a href="#">NAME</a>
-            </div>
-        </div> -->
         <div class="dropdown">
           <button id="sortButton" onclick="myFunction()">SORT BY </button>
           <div id="myDropdown" class="dropdown-content">
@@ -208,6 +201,6 @@
     </div>
    </main>
    <script src="history.js"></script>
-   <!-- <script src="../sp.js"></script> -->
+   <script src="../sp.js"></script>
 </body>
 </html>
