@@ -812,24 +812,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 appState.currentSecond = currentVideoTime;
                 appState.headAnglePerSecond.push(headAngle);
                 // Update unified chart with all metrics
-                unifiedChart.data.labels.push(appState.currentSecond);
-                unifiedChart.data.datasets[0].data.push(headAngle); // Head Angle
-                unifiedChart.data.datasets[1].data.push(appState.smoothedSpeed); // Speed
+                if (unifiedChart?.data?.datasets?.length >= 6) {
+                  unifiedChart.data.labels.push(appState.currentSecond);
+                  unifiedChart.data.datasets[0].data.push(appState.headAnglePerSecond);
+                  unifiedChart.data.datasets[1].data.push(appState.smoothedSpeed);
               
-                // Initialize values in case we don’t have others yet
-                const acc = appState.accelerationData.at(-1) || 0;
-                const dec = appState.decelerationData.at(-1) || 0;
-                const jump = appState.jumpHeights.at(-1)?.height || 0;
-                const stride = appState.stridelength.at(-1)?.length || 0;
+                  const acc = appState.accelerationData.at(-1) || 0;
+                  const dec = appState.decelerationData.at(-1) || 0;
+                  const jump = appState.jumpHeights.at(-1)?.height || 0;
+                  const stride = appState.stridelength.at(-1)?.length || 0;
               
-                unifiedChart.data.datasets[2].data.push(acc); // Acceleration
-                unifiedChart.data.datasets[3].data.push(dec); // Deceleration
-                unifiedChart.data.datasets[4].data.push(stride); // Stride Length
-                unifiedChart.data.datasets[5].data.push(jump); // Jump Height
+                  unifiedChart.data.datasets[2].data.push(acc);
+                  unifiedChart.data.datasets[3].data.push(dec);
+                  unifiedChart.data.datasets[4].data.push(stride);
+                  unifiedChart.data.datasets[5].data.push(jump);
               
-                unifiedChart.update();
-
-    
+                  unifiedChart.update();
+                }
                 const speedThisSecond = appState.smoothedSpeed;
                 if (isNaN(speedThisSecond) || speedThisSecond < 0) {
                     console.warn("Skipping invalid speed value:", speedThisSecond);
@@ -1132,16 +1131,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const acceleration = calculateAcceleration(appState.speedData, timeElapsedSinceLastFrame);
         if (!isNaN(acceleration) && Math.abs(acceleration) > ACCELERATION_THRESHOLD) {
             appState.accelerationData.push(acceleration);
-            accelerationChart.data.labels.push(appState.currentSecond);
-            accelerationChart.data.datasets[0].data.push(acceleration);
+            // accelerationChart.data.labels.push(appState.currentSecond);
+            // accelerationChart.data.datasets[0].data.push(acceleration);
             // accelerationChart.update();
         }
 
         const deceleration = calculateDeceleration(appState.speedData, timeElapsedSinceLastFrame);
         if (!isNaN(deceleration) && Math.abs(deceleration) > DECELERATION_THRESHOLD) {
             appState.accelerationData.push(deceleration);
-            decelerationChart.data.labels.push(appState.currentSecond);
-            decelerationChart.data.datasets[0].data.push(deceleration);
+            // decelerationChart.data.labels.push(appState.currentSecond);
+            // decelerationChart.data.datasets[0].data.push(deceleration);
             // decelerationChart.update();
         }
 
@@ -1154,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         if (scores.every(score => !isNaN(score))) {
             appState.score = scores;
-            atheleticscorechart.data.datasets[0].data = scores;
+            // atheleticscorechart.data.datasets[0].data = scores;
             // atheleticscorechart.update();
         } else {
             console.error("Invalid athletic scores, skipping chart update.");
@@ -1235,22 +1234,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (stridedistance > 0.01) { // reduce threshold to capture smaller valid strides
             strideValue = stridedistance;
         }
-       
-        // 🟢 Save to appState (for analysis + chart)
+
         appState.stridelength.push({
             time: appState.currentSecond,
             length: strideValue
         });
-       
-        // 🟢 Update unified chart only (since we removed individual strideChart)
-        if (unifiedChart) {
-            // Update dataset index 4 (Stride Length)
-            const strideDataset = unifiedChart.data.datasets[4];
-            if (strideDataset) {
-                strideDataset.data.push(strideValue);
-            }
-        }
-       
         appState.previousLegPosition = { x: avgAnkleX, y: avgAnkleY };
     }
 
@@ -1276,8 +1264,8 @@ document.addEventListener('DOMContentLoaded', function() {
             height: jumpValue
         });
     
-        jumpHeightChart.data.datasets[0].data.push({ x: appState.currentSecond, y: jumpValue });
-        jumpHeightChart.data.datasets[0].data.push(jumpValue);
+        // jumpHeightChart.data.datasets[0].data.push({ x: appState.currentSecond, y: jumpValue });
+        // jumpHeightChart.data.datasets[0].data.push(jumpValue);
         // jumpHeightChart.update();
     
         appState.previousAnkleY = averageAnkleY;
