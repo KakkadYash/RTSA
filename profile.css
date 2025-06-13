@@ -84,8 +84,8 @@ h2 {
     align-items: start;
     justify-content: center;
     padding: 20px;
-    width: 510px;
-    height: 300px;
+    width: 410px;
+    height: 200px;
     gap: 10px;
     border: 1px solid #FFFFFF;
 }
@@ -162,15 +162,6 @@ button {
     display: flex;
     flex-direction: row;
 }
-/* #nameInfo, #sportInfo {
-    color: #FFFFFF;
-    font-size: 60px;
-    line-height: 50px;
-    background-color: #000000;
-    width: 300px;
-    border: none;
-    font-family: SCHABO-Condensed;
-} */
 
 #sports {
     float: right;

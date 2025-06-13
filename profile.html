@@ -76,7 +76,7 @@
               </div>
             </div>
             <div class="logOut">
-              <span>LOG OUT</span>
+              <span id="logoutButton">LOG OUT</span>
             </div>
           </div>
         </li>
@@ -92,12 +92,12 @@
     <div id="bg">
       <div class="userData">
         <div class="profileHead">
-            <div class="avatar">
-                <label for="file-input">
-                  <input type="file" id="file-input">
-                  <img src="./assests/profilepic.png" id="img-preview" alt="ProfilePic" width="510px" height="450px">
-                </label>
-            </div>
+          <div class="avatar">
+            <label for="file-input">
+              <input type="file" id="file-input" accept="image/*" />
+              <img src="./assests/profilepic.png" id="img-preview" alt="ProfilePic" width="510px" height="450px" />
+            </label>
+          </div>
             <div class="user">
                 <h2>PLAYER INFO</h2>
                 <div class="small-box">
@@ -109,7 +109,7 @@
         <div class="main-box">
           <div class="subHeader">
             <h3>PERSONAL INFORMATION</h3> 
-            <button type="submit" id="saveButton">SAVE <img src= "./assests/save.png" alt="save" class="save"></button> 
+            <button type="submit" id="saveButton" form="userProfileForm">SAVE <img src= "./assests/save.png" alt="save" class="save"></button> 
           </div>
             <form id="userProfileForm">
               <div class="data">
