@@ -729,7 +729,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 peakAcceleration: appState.peakAcceleration || 0,
                 peakDeceleration: appState.peakDeceleration || 0
             };
-    
+
+            document.getElementById("averageAthleticScore").innerHTML = appState.averageAthleticScore + "%" || '';
+
             console.log("Sending analytics data:", analyticsData);
     
             const analyticsResponse = await fetch('https://uploaded-data-443715.uc.r.appspot.com/saveAnalytics', {
@@ -1117,6 +1119,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`Top Speed: ${appState.topSpeed.toFixed(2)} yards/s`);
         console.log(`Distance: ${(appState.totalDistance * 1.09361).toFixed(2)} yards`);
         console.log(`Time: ${timeElapsedSinceStart.toFixed(2)} seconds`);
+        document.getElementById("totalDistance").innerHTML = (appState.totalDistance * 1.09361).toFixed(2) + " YARDS" || '';
     }
    
     function analyzeFrame(landmarks, athleteHeightInMeters, timeElapsedSinceLastFrame, posture) {
@@ -1204,6 +1207,7 @@ document.addEventListener('DOMContentLoaded', function() {
         appState.totalTime = (appState.endTime - appState.startTime) / 1000;
         appState.isDrillActive = false;
         console.log(`Drill Time: ${appState.totalTime}, Start Time: ${appState.startTime}`);
+        document.getElementById("totalTime").innerHTML = appState.totalTime + " SECS" || '';
     }
     
     function calculateAcceleration(speedData, deltaTime) {
@@ -1345,3 +1349,63 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+const ctx = document.getElementById('myChart').getContext('2d');
+new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    labels: ['IDEAL', 'NOT IDEAL', 'RUNNING', 'STANDING', 'CROUTCHING'],
+    datasets: [
+      {
+        label: 'Outer Ring',
+        data: [0, 0, 70, 20, 10],
+        backgroundColor: ['#93D669', '#EA4940', '#75A6E2', '#5970F7', '#224A62'],
+        borderWidth: 1,
+        radius: '100%',       // Outer ring
+        cutout: '30%',
+      },
+      {
+        label: 'Inner Ring',
+        data: [0, 100],
+        backgroundColor: ['#93D669', '#EA4940'],
+        borderWidth: 1,
+        radius: '100%',        // Inner ring
+        cutout: '30%',
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+      }
+    }
+  }
+});
+
+
+let slider = document.getElementById("speed");
+let value = document.querySelector(".speed");
+let slider2 = document.getElementById("acceleration");
+let acceleeration = document.querySelector(".acceleration");
+value.innerHTML = slider.value
+value2.innerHTML = slider2.value2
+
+function calcValue() {
+    valuePercentage = (slider.value / slider.max)*100;
+      slider.style.background = `linear-gradient(to right, red ${0}%, yellow ${valuePercentage}%, green ${valuePercentage}%, white ${valuePercentage}%)`;
+    valuePercentage2 = (slider2.value2 / slider2.max)*100;
+        slider2.style.background = `linear-gradient(to right, red ${0}%, yellow ${valuePercentage}%, green ${valuePercentage}%, white ${valuePercentage}%)`;
+  }
+
+  slider.addEventListener('input', function(){
+    calcValue();
+    value.textContent = this.value; 
+  })
+  slider2.addEventListener('input', function(){
+    calcValue();
+    value2.textContent = this.value2; 
+  })
+  
+  calcValue();

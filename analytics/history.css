@@ -40,8 +40,9 @@ div.library a {
   padding-left: 900px;
 }
 
-#video-container {
+#history-table-body {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 20px;
@@ -49,12 +50,19 @@ div.library a {
   margin-top: 30px;
 }
 
+.drill-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 16px;
+}
+
 video, canvas {
   width: 25vw; /* Relative width based on the viewport */
   height: 25vw; /* Maintain aspect ratio */
   border-radius: 10%;
   background-color: #000000;
-  border: 1px solid #FFFF; /* Red border for emphasis */
+  border: 1px solid #FFFF;
 }
 
 .drill{
