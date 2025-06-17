@@ -217,19 +217,36 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Error: historyData is not an array", historyData);
                 return;
             }
-    
-            historyData.history.forEach((item, index) => {
-                const row = `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td><a href="${item.video_url}" target="_blank">${item.video_name}</a></td>
-                        <td><img src="${item.thumbnail_url}" alt="Thumbnail" width="100"></td>
-                        <td>${new Date(item.upload_date).toLocaleDateString()}</td>
-                        <td>${item.ideal_head_angle_percentage || 'N/A'}%</td>
-                        <td>${item.top_speed || 'N/A'} km/h</td>
-                    </tr>`;
-                tableBody.innerHTML += row;
-            });
+
+            const currentRow = tableBody.lastElementChild;
+
+            const drillDiv = document.createElement('div');
+            drillDiv.className = 'drill';
+            drillDiv.innerHTML = `
+              <video width="320" height="240" controls>
+                <source src="${item.video_url}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <div class="description">
+                <span>${item.video_name}</span>
+                <span>${new Date(item.upload_date).toLocaleDateString()}</span>
+                <span>${item.top_speed || 'N/A'} km/h</span>
+              </div>
+            `;
+      
+            currentRow.appendChild(drillDiv);
+            // historyData.history.forEach((item, index) => {
+            //     const row = `
+            //         <tr>
+            //             <td>${index + 1}</td>
+            //             <td><a href="${item.video_url}" target="_blank">${item.video_name}</a></td>
+            //             <td><img src="${item.thumbnail_url}" alt="Thumbnail" width="100"></td>
+            //             <td>${new Date(item.upload_date).toLocaleDateString()}</td>
+            //             <td>${item.ideal_head_angle_percentage || 'N/A'}%</td>
+            //             <td>${item.top_speed || 'N/A'} km/h</td>
+            //         </tr>`;
+            //     tableBody.innerHTML += row;
+            // });
         } catch (error) {
             console.error('Error loading history:', error);
         }
@@ -281,7 +298,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Logout
     logoutButton.addEventListener("click", () => {
         localStorage.clear();
-        window.location.href = "login.html";
+        window.location.href = "lo.html";
     });
 
     document.getElementById("userProfileForm").addEventListener("submit", async (e) => {

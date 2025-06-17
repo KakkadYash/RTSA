@@ -48,3 +48,58 @@ function filterFunction() {
     }
   }
 }
+
+const userId = localStorage.getItem("user_id"); // get user ID from localStorage
+const logoutButton = document.getElementById("logoutButton");
+  
+const loadHistory = async () => {
+  try {
+    const response = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/history?userId=${userId}`);
+    const historyData = await response.json();
+
+    console.log("History API Response:", historyData); // Debugging log
+
+    const tableBody = document.getElementById('history-table-body');
+    tableBody.innerHTML = ''; // Clear previous rows
+
+    // Ensure historyData is an array before using .forEach()
+    if (!Array.isArray(historyData.history)) {
+      console.error("Error: historyData is not an array", historyData);
+      return;
+    }
+
+    historyData.history.forEach((item, index) => {
+      // Create a new row every 3 items
+      if (index % 3 === 0) {
+        const newRow = document.createElement('div');
+        newRow.className = 'drill-row';
+        tableBody.appendChild(newRow);
+      }
+
+      const currentRow = tableBody.lastElementChild;
+
+      const drillDiv = document.createElement('div');
+      drillDiv.className = 'drill';
+      drillDiv.innerHTML = `
+        <video width="320" height="240" controls>
+          <source src="${item.video_url}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <div class="description">
+          <span>${item.video_name}</span>
+          <span>${new Date(item.upload_date).toLocaleDateString()}</span>
+          <span>${item.top_speed || 'N/A'} km/h</span>
+        </div>
+      `;
+
+      currentRow.appendChild(drillDiv);
+    });
+  } catch (error) {
+      console.error('Error loading history:', error);
+  }
+};
+
+logoutButton.addEventListener("click", () => {
+  localStorage.clear();
+  window.location.href = "../lo.html";
+});
