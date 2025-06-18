@@ -728,11 +728,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ? Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100) 
             : 0;
 
-            // Compute the average athletic score
-            const scores = calculateAthleticScores();
-            const averageAthleticScore = scores.length > 0 
-                ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
-                : 0;
+            // Update the metric values to be saved
             appState.averageStrideLength = calculateAverageStrideLength();
             appState.peakAcceleration = calculatePeakAcceleration();
             appState.peakDeceleration = calculatePeakDeceleration();
@@ -1132,7 +1128,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`Time: ${timeElapsedSinceStart.toFixed(2)} seconds`);
         document.getElementById("totalDistance").innerHTML = (appState.totalDistance * 1.09361).toFixed(2) + " YARDS" || '';
     }
-   
+
     function analyzeFrame(landmarks, athleteHeightInMeters, timeElapsedSinceLastFrame, posture) {
         if (!landmarks || landmarks.length === 0 || !athleteHeightInMeters) {
             console.log("No landmarks or height data available.");
@@ -1147,7 +1143,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSlider("deceleration", ".value1", appState.peakDeceleration, 0, 10);                 // DECELERATION (same slider ID as footwork — be cautious)
         updateSlider("jumpheight", ".value", appState.averageJumpHeight, 0, 2);                   // JUMP HEIGHT
         updateSlider("strideleng", ".value1", appState.averageStrideLength, 0, 2);                // STRIDE LENGTH
-           
+        
         const acceleration = calculateAcceleration(appState.speedData, timeElapsedSinceLastFrame);
         if (!isNaN(acceleration) && Math.abs(acceleration) > ACCELERATION_THRESHOLD) {
             appState.accelerationData.push(acceleration);
@@ -1173,11 +1169,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
         if (scores.every(score => !isNaN(score))) {
             appState.score = scores;
+            averageAthleticScore = scores.length > 0 
+                ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
+                : 0;
             // atheleticscorechart.data.datasets[0].data = scores;
             // atheleticscorechart.update();
         } else {
             console.error("Invalid athletic scores, skipping chart update.");
         }
+                   
+        document.getElementById('drillTimeValue').textContent = `${currentVideoTime.toFixed(1)} SECS`;
+        document.getElementById('distanceValue').textContent = `${distanceCovered.toFixed(1)} YARDS`;
+        document.getElementById('stepsValue').textContent = `${totalSteps}`; 
+        document.getElementById('athleticScoreValue').textContent = `${averageAthleticScore.toFixed(1)}%`;
     }
     
     function movingAverage(data, windowSize) {
