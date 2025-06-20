@@ -1,10 +1,10 @@
 @font-face {
     font-family: FutraLight;
-    src: url(../Futura-Light-font.ttf);
+    src: url(/public/fonts/Futura-Light-font.ttf);
 }
 
 .library {
-    background-image: url(../assests/Dashes.png);
+    background-image: url(/public/assets/Dashes.png);
     background-position: right center;
     background-repeat: no-repeat;
     background-attachment: scroll;
