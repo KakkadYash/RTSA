@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup</title>
-    <link rel="stylesheet" href="index.css">
-    <link rel="login stylesheet" href="lo-sig.css">
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="login stylesheet" href="../css/lo-sig.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
@@ -17,14 +17,14 @@
 <body>   
     <main>
         <div class="rt">
-          <img src="./assests/RT-Logo.png" alt="RT" class="rtLogo">
+          <img src="RTSA-MVP\public\assets\RT-Logo.pngp" alt="RT" class="rtLogo">
         </div>
         <!-- sign up Page -->
         <div id="signUpPage" class="container vh-100 d-flex justify-content-center align-items-center">
           <div class="signUp-box">
             <header>
                 <span class="text-center">GET STARTED</span>
-                <img src="./assests/white line rt.png" alt="Line" class="line">
+                <img src="public\assets\white line rt.png" alt="Line" class="line">
                 <p>CREATE AN ACCOUNT</p>
             </header>
             <form id="signUpForm">
@@ -53,9 +53,9 @@
               <footer>
                 <div class="log">
                   <span>ALREADY HAVE AN ACCOUNT?</span>
-                  <a href="lo.html">LOG IN</a>
+                  <a href="./login.html">LOG IN</a>
                 </div>
-                <button type="submit" class="button">SIGN UP <img src="./assests/arrow black rt.png" alt="arrow" class="arrow"></button>
+                <button type="submit" class="button">SIGN UP <img src="public\assets\arrow black rt.png" alt="arrow" class="arrow"></button>
               </footer>
             </form>
           </div> 
@@ -89,7 +89,7 @@
                     alert(data.error);
                 } else {
                     alert('Sign-up successful! You can now log in.');
-                    window.location.href = 'lo.html'; // Redirect to login page
+                    window.location.href = 'src/pages/login.html'; // Redirect to login page
                 }
             })
             .catch(error => {

@@ -1,6 +1,6 @@
 @font-face {
     font-family: SCHABO-Condensed;
-    src: url(SCHABO-Condensed.otf);
+    src: url(/public/fonts/SCHABO-Condensed.otf);
 }
 
 body {
@@ -10,7 +10,7 @@ body {
     background-color: #383838;
     text-align: center;
     padding-bottom: 50px;
-    background-image: url('./assests/Main-Background.png');
+    background-image: url('/public/assets/Main-Background.png');
     background-repeat: no-repeat;
     background-attachment: scroll;  
     background-size: cover;

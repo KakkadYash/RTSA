@@ -128,6 +128,13 @@ document.addEventListener('DOMContentLoaded', function() {
                        y: {
                            beginAtZero: true
                        }
+                   },
+                   onClick: (evt, activeElements) => {
+                       if (activeElements.length > 0) {
+                           const pointIndex = activeElements[0].index;
+                           const timestamp = unifiedChart.data.labels[pointIndex];
+                           seekToTimestamp(timestamp);
+                       }
                    }
                }
            });
@@ -164,240 +171,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Register the custom plugin
     Chart.register(centerLabelPlugin);
-
-    // Initialize the histogram with a frequency polygon for speed
-    // const speedHistogramChart = new Chart(document.getElementById('speedHistogramChart').getContext('2d'), {
-    //     type: 'bar',
-    //     data: {
-    //         labels: [],  // X-axis labels (seconds)
-    //         datasets: [
-    //             {
-    //                 label: 'Speed Frequency',  // Histogram data
-    //                 data: [],
-    //                 backgroundColor: 'rgba(0, 123, 255, 0.5)',
-    //                 borderWidth: 1
-    //             },
-    //             {
-    //                 label: 'Speed Trend',  // Frequency polygon overlay
-    //                 data: [],
-    //                 type: 'line',
-    //                 borderColor: '#FF5733',
-    //                 fill: false,
-    //                 tension: 0.1,
-    //                 pointRadius: 0
-    //             }
-    //         ]
-    //     },
-    //     options: {
-    //         responsive: true,
-    //         maintainAspectRatio: false,
-    //         scales: {
-    //             x: {
-    //                 title: { display: true, text: 'Time (seconds)' },
-    //                 ticks: { autoSkip: false, maxTicksLimit: 10 } // More clickable labels
-    //             },
-    //             y: {
-    //                 title: { display: true, text: 'Speed (yards/sec)' },
-    //                 suggestedMin: 0,
-    //                 suggestedMax: 10,  // Adjust this based on your data
-    //                 ticks: { stepSize: 1 } // Avoids excessive zoom
-    //             }
-    //         },
-    //         onClick: (evt, activeElements) => {
-    //             if(activeElements.length > 0) {
-    //                 const index = activeElements[0].index;
-    //                 const timestamp = speedHistogramChart.data.labels[index];
-    //                 seekToTimestamp(timestamp);
-    //             }
-    //         }
-    //     }
-    // });
-
-    // Chart.js setup for the speed Progress Chart
-    const speedProgressChart = new Chart(document.getElementById('speedometerChart').getContext('2d'), {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [0, MAX_SPEED],
-                backgroundColor: ['#00ff00', '#D3D3D3']
-            }],
-            labels: ['Top Speed', 'Range']
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: (tooltipItem) => {
-                            return tooltipItem.label + ': ' + Math.round(tooltipItem.raw) + ' yards/sec';
-                        }
-                    }
-                }
-            }
-        }
-    });
     
     const headAngleChart = new Chart(document.getElementById('headMovementChart').getContext('2d'), {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [0, 100],
-                backgroundColor: ['#00ff00', '#FF2429']
-            }],
-            labels: ['Ideal Head Angle', 'Not Ideal Head Angle']
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: (tooltipItem) => {
-                            return tooltipItem.label + ': ' + Math.round(tooltipItem.raw) + '%';
-                        }
-                    }
-                }
-            }
-        }
-    });
-       
-    // Initialize the line chart for head angle tracking with click-to-seek functionality
-    // const headAngleLineChart = new Chart(document.getElementById('headAngleLineChart').getContext('2d'), {
-    //     type: 'line',
-    //     data: {
-    //         labels: [], // X-axis labels (seconds)
-    //         datasets: [{
-    //             label: 'Head Angle (degrees)',
-    //             data: [],
-    //             borderColor: '#00ff00',
-    //             fill: false,
-    //             tension: 0.1
-    //         }]
-    //     },
-    //     options: {
-    //         responsive: true,
-    //         maintainAspectRatio: false,
-    //         scales: {
-    //             x: {
-    //                 title: { display: true, text: 'Time (seconds)' },
-    //                 ticks: { autoSkip: false, maxTicksLimit: 10 } // Ensures clickable points
-    //             },
-    //             y: {
-    //                 title: { display: true, text: 'Head Angle (degrees)' },
-    //                 suggestedMin: 0,
-    //                 suggestedMax: 180,
-    //                 ticks: { stepSize: 10 } // Adjusts label spacing for clarity
-    //             }
-    //         },
-    //         plugins: {
-    //             annotation: {
-    //                 annotations: {
-    //                     idealLine: {
-    //                         type: 'line',
-    //                         yMin: 45,
-    //                         yMax: 45,
-    //                         borderColor: 'red',
-    //                         borderWidth: 2,
-    //                         label: {
-    //                             content: 'Ideal Head Angle',
-    //                             enabled: true,
-    //                             position: 'start',
-    //                             backgroundColor: 'rgba(255, 0, 0, 0.2)',
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         },
-    //         onClick: (evt, activeElements) => {
-    //             if(activeElements.length > 0) {
-    //                 const index = activeElements[0].index;
-    //                 const timestamp = headAngleLineChart.data.labels[index];
-    //                 seekToTimestamp(timestamp);
-    //             }
-    //         }
-    //     }
-    // });
-
-    // Additional chart for acceleration visualization with click-to-seek
-    // const accelerationChart = new Chart(document.getElementById('accelerationChart').getContext('2d'), {
-    //     type: 'scatter',
-    //     data: {
-    //         datasets: [{
-    //             label: 'Acceleration (yards/s²)',
-    //             data: appState.smoothedAccelerationData.map((y, i) => ({ x: i, y })),
-    //             backgroundColor: 'yellow',
-    //             borderColor: 'orange',
-    //             pointRadius: 2,
-    //             borderWidth: 2,
-    //             showLine: true,
-    //         }]
-    //     },
-    //     options: {
-    //         responsive: true,
-    //         maintainAspectRatio: false,
-    //         scales: {
-    //             x: { 
-    //                 title: { display: true, text: 'Time (seconds)' },
-    //                 ticks: { autoSkip: false, maxTicksLimit: 10 } 
-    //             },
-    //             y: { 
-    //                 title: { display: true, text: 'Acceleration (yards/s²)' },
-    //                 suggestedMin: -5,
-    //                 suggestedMax: 10,
-    //                 ticks: { stepSize: 1 } // Makes values easier to read
-    //             }
-    //         },
-    //         onClick: (evt, activeElements) => {
-    //             if(activeElements.length > 0) {
-    //                 const index = activeElements[0].index;
-    //                 const timestamp = accelerationChart.data.labels[index];
-    //                 seekToTimestamp(timestamp);
-    //             }
-    //         }
-    //     }
-    // });
-
-    // // Additional chart for deceleration visualization with click-to-seek
-    // const decelerationChart = new Chart(document.getElementById('decelerationDisplay').getContext('2d'), {
-    //     type: 'scatter',
-    //     data: {
-    //         datasets: [{
-    //             label: 'Deceleration (yards/s²)',
-    //             data: appState.smoothedAccelerationData.map((y, i) => ({ x: i, y })),
-    //             backgroundColor: 'blue',
-    //             borderColor: 'green',
-    //             pointRadius: 2,
-    //             borderWidth: 2,
-    //             showLine: true,
-    //         }]
-    //     },
-    //     options: {
-    //         responsive: true,
-    //         maintainAspectRatio: false,
-    //         scales: {
-    //             x: { 
-    //                 title: { display: true, text: 'Time (seconds)' },
-    //                 ticks: { autoSkip: false, maxTicksLimit: 10 } 
-    //             },
-    //             y: { 
-    //                 title: { display: true, text: 'Deceleration (yards/s²)' },
-    //                 suggestedMin: -5,
-    //                 suggestedMax: 10,
-    //                 ticks: { stepSize: 1 } // Makes values easier to read
-    //             }
-    //         },
-    //         onClick: (evt, activeElements) => {
-    //             if(activeElements.length > 0) {
-    //                 const index = activeElements[0].index;
-    //                 const timestamp = accelerationChart.data.labels[index];
-    //                 seekToTimestamp(timestamp);
-    //             }
-    //         }
-    //     }
-    // });
+           type: 'doughnut',
+           data: {
+               datasets: [
+                   // Outer ring: Posture Distribution
+                   {
+                       data: [0, 0, 0], // Running, Standing, Crouching
+                       backgroundColor: ['#1E90FF', '#FFD700', '#A52A2A'],
+                       borderWidth: 0
+                   },
+                   // Inner ring: Head Angle
+                   {
+                       data: [0, 100],
+                       backgroundColor: ['#00ff00', '#FF2429'],
+                       borderWidth: 0
+                   }
+               ],
+               labels: [
+                   'Running',
+                   'Standing',
+                   'Crouching',
+                   'Ideal Head Angle',
+                   'Not Ideal Head Angle'
+               ]
+           },
+           options: {
+               responsive: true,
+               maintainAspectRatio: false,
+               cutout: '70%',
+               plugins: {
+                   tooltip: {
+                       callbacks: {
+                           label: function (tooltipItem) {
+                               const label = tooltipItem.label || '';
+                               const value = Math.round(tooltipItem.raw || 0);
+                               return `${label}: ${value}%`;
+                           }
+                       }
+                   }
+               }
+           }
+       });
 
     const atheleticscorechart = new Chart(document.getElementById('athleticScoreChart').getContext('2d'), {
         type: 'radar',
@@ -446,79 +262,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Chart for Jump Height visualization with correct time axis
-    // const jumpHeightChart = new Chart(document.getElementById('jumpHeightChart').getContext('2d'), {
-    //     type: 'bar',
-    //     data: {
-    //         datasets: [{
-    //             label: 'Jump Height (yards)',
-    //             data: [],  // { x: second, y: jumpHeight }
-    //             backgroundColor: 'blue',
-    //             borderColor: 'blue',
-    //             borderWidth: 1
-    //         }]
-    //     },
-    //     options: {
-    //         responsive: true,
-    //         maintainAspectRatio: false,
-    //         scales: {
-    //             x: {
-    //                 type: 'linear',  // ⬅️ Important: force a linear time axis
-    //                 title: { display: true, text: 'Time (seconds)' },
-    //                 min: 0,
-    //                 ticks: {
-    //                     stepSize: 1,
-    //                     callback: function(value, index, values) {
-    //                         return value.toFixed(0); // Only whole seconds
-    //                     }
-    //                 }
-    //             },
-    //             y: {
-    //                 title: { display: true, text: 'Jump Height (yards)' },
-    //                 suggestedMin: 0,
-    //                 suggestedMax: 2,
-    //                 ticks: { stepSize: 0.2 }
-    //             }
-    //         }
-    //     }
-    // });
-
-    // // Chart for Stride Length visualization with correct time axis
-    // const strideChart = new Chart(document.getElementById('strideLengthDisplay').getContext('2d'), {
-    //     type: 'bar',
-    //     data: {
-    //         datasets: [{
-    //             label: 'Stride Length (yards)',
-    //             data: [],  // { x: second, y: strideLength }
-    //             backgroundColor: 'orange',
-    //             borderColor: 'orange',
-    //             borderWidth: 1
-    //         }]
-    //     },
-    //     options: {
-    //         responsive: true,
-    //         maintainAspectRatio: false,
-    //         scales: {
-    //             x: {
-    //                 type: 'linear',  // ⬅️ Important: force a linear time axis
-    //                 title: { display: true, text: 'Time (seconds)' },
-    //                 min: 0,
-    //                 ticks: {
-    //                     stepSize: 1,
-    //                     callback: function(value, index, values) {
-    //                         return value.toFixed(0); // Only whole seconds
-    //                     }
-    //                 }
-    //             },
-    //             y: {
-    //                 title: { display: true, text: 'Stride Length (yards)' },
-    //                 suggestedMin: 0,
-    //                 suggestedMax: 2,
-    //                 ticks: { stepSize: 0.2 }
-    //             }
-    //         }
-    //     }
-    // });
     document.getElementById('showMetrics').addEventListener('click', () => {
         filterUnifiedChart([0, 1, 2, 3, 4, 5]);
         document.querySelectorAll('.card').forEach(card => card.classList.add('is-flipped'));
@@ -589,12 +332,6 @@ document.addEventListener('DOMContentLoaded', function() {
         videoElement.play();
         playProcessedButton.style.display = 'none';
         processVideo(videoElement);
-        updatePostureChart();
-        updateSlider("speed", ".speed", appState.topSpeed, 0, 15);                // SPEED
-        updateSlider("acceleration", ".acceleration", appState.peakAcceleration, 0, 10);   // ACCELERATION
-        updateSlider("deceleration", ".value1", appState.peakDeceleration, 0, 10);                 // DECELERATION (same slider ID as footwork — be cautious)
-        updateSlider("jumpheight", ".value", appState.averageJumpHeight, 0, 2);                   // JUMP HEIGHT
-        updateSlider("strideleng", ".value1", appState.averageStrideLength, 0, 2);                // STRIDE LENGTH
     });
 
     // Initialize MediaPipe Pose (added to fix "pose is not defined")
@@ -685,9 +422,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (appState.uploadDate){
                 formData.append('uploadDate', appState.uploadDate);
             }
-            // ✅ Ensure thumbnail exists before appending
             if (appState.thumbnailFile) {
-                formData.append('thumbnail', appState.thumbnailFile); // ✅ Fixed spelling
+                formData.append('thumbnail', appState.thumbnailFile); 
             }
             const uploadResponse = await fetch('https://uploaded-data-443715.uc.r.appspot.com/upload', {
                 method: 'POST',
@@ -709,11 +445,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ? Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100) 
             : 0;
 
-            // Compute the average athletic score
-            const scores = calculateAthleticScores();
-            const averageAthleticScore = scores.length > 0 
-                ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
-                : 0;
+            // Update the metric values to be saved
             appState.averageStrideLength = calculateAverageStrideLength();
             appState.peakAcceleration = calculatePeakAcceleration();
             appState.peakDeceleration = calculatePeakDeceleration();
@@ -814,24 +546,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 appState.currentSecond = currentVideoTime;
                 appState.headAnglePerSecond.push(headAngle);
                 // Update unified chart with all metrics
-                unifiedChart.data.labels.push(appState.currentSecond);
-                unifiedChart.data.datasets[0].data.push(headAngle); // Head Angle
-                unifiedChart.data.datasets[1].data.push(appState.smoothedSpeed); // Speed
+                if (unifiedChart?.data?.datasets?.length >= 6) {
+                  unifiedChart.data.labels.push(appState.currentSecond);
+                  unifiedChart.data.datasets[0].data.push(appState.headAnglePerSecond);
+                  unifiedChart.data.datasets[1].data.push(appState.smoothedSpeed);
               
-                // Initialize values in case we don’t have others yet
-                const acc = appState.accelerationData.at(-1) || 0;
-                const dec = appState.decelerationData.at(-1) || 0;
-                const jump = appState.jumpHeights.at(-1)?.height || 0;
-                const stride = appState.stridelength.at(-1)?.length || 0;
+                  const acc = appState.accelerationData.at(-1) || 0;
+                  const dec = appState.decelerationData.at(-1) || 0;
+                  const jump = appState.jumpHeights.at(-1)?.height || 0;
+                  const stride = appState.stridelength.at(-1)?.length || 0;
               
-                unifiedChart.data.datasets[2].data.push(acc); // Acceleration
-                unifiedChart.data.datasets[3].data.push(dec); // Deceleration
-                unifiedChart.data.datasets[4].data.push(stride); // Stride Length
-                unifiedChart.data.datasets[5].data.push(jump); // Jump Height
+                  unifiedChart.data.datasets[2].data.push(acc);
+                  unifiedChart.data.datasets[3].data.push(dec);
+                  unifiedChart.data.datasets[4].data.push(stride);
+                  unifiedChart.data.datasets[5].data.push(jump);
               
-                unifiedChart.update();
-
-    
+                  unifiedChart.update();
+                }
                 const speedThisSecond = appState.smoothedSpeed;
                 if (isNaN(speedThisSecond) || speedThisSecond < 0) {
                     console.warn("Skipping invalid speed value:", speedThisSecond);
@@ -853,24 +584,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
        
-    function updatePostureChart() {
-        const totalFrames = appState.postureCounts['Running'] + appState.postureCounts['Upright Standing'] + appState.postureCounts['Crouching'];
-        if (totalFrames === 0) return;
-
-        const runningPercent = Math.round((appState.postureCounts['Running'] / totalFrames) * 100);
-        const standingPercent = Math.round((appState.postureCounts['Upright Standing'] / totalFrames) * 100);
-        const crouchingPercent = Math.round((appState.postureCounts['Crouching'] / totalFrames) * 100);
-
-        const chart = Chart.getChart('myChart'); // Get existing chart instance
-        if (chart) {
-            chart.data.datasets[0].data = [
-                0, 0,  // Ideal / Not Ideal (outer ring skipped)
-                runningPercent,
-                standingPercent,
-                crouchingPercent
-            ];
-            chart.update();
-        }
+    function updateDoughnutChart() {
+        const doughnut = Chart.getChart("myChart");
+        if (!doughnut) return;
+       
+        // INNER RING: Head angle (ideal vs not ideal)
+        const idealPercentage = Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100);
+        doughnut.data.datasets[1].data = [
+           idealPercentage,
+           100 - idealPercentage
+        ];
+       
+        // OUTER RING: Posture distribution
+        const totalPosture = Object.values(appState.postureCounts).reduce((a, b) => a + b, 0) || 1;
+        const running = Math.round((appState.postureCounts["Running"] || 0) / totalPosture * 100);
+        const standing = Math.round((appState.postureCounts["Upright Standing"] || 0) / totalPosture * 100);
+        const crouching = Math.round((appState.postureCounts["Crouching"] || 0) / totalPosture * 100);
+       
+        doughnut.data.datasets[0].data = [0, 0, running, standing, crouching];
+        doughnut.update();
     }
        
     function updateSlider(sliderId, labelSelector, value, min = 0, max = 100) {
@@ -929,15 +661,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         return headAngle;
     }
-    
-    function showHeadAngleChart() {
-        const idealPercentage = Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100);
-        headAngleChart.data.datasets[0].data[0] = idealPercentage;
-        headAngleChart.data.datasets[0].data[1] = 100 - idealPercentage;
-        headAngleChart.update();
-        console.log("Head angle analysis complete");
-    }
-    
+       
     function calculateAngle(pointA, pointB, pointC) {
         const vectorAB = { x: pointB.x - pointA.x, y: pointB.y - pointA.y };
         const vectorBC = { x: pointC.x - pointB.x, y: pointC.y - pointB.y };
@@ -1121,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`Time: ${timeElapsedSinceStart.toFixed(2)} seconds`);
         document.getElementById("totalDistance").innerHTML = (appState.totalDistance * 1.09361).toFixed(2) + " YARDS" || '';
     }
-   
+
     function analyzeFrame(landmarks, athleteHeightInMeters, timeElapsedSinceLastFrame, posture) {
         if (!landmarks || landmarks.length === 0 || !athleteHeightInMeters) {
             console.log("No landmarks or height data available.");
@@ -1130,22 +854,22 @@ document.addEventListener('DOMContentLoaded', function() {
         calculateDistance(landmarks, athleteHeightInMeters);
         detectJumps(landmarks);
         calculatestride(landmarks);
-        showHeadAngleChart();
-
+        updateDoughnutChart();
+        updateSlider("speed", ".speed", appState.topSpeed, 0, 15);                // SPEED
+        updateSlider("acceleration", ".acceleration", appState.peakAcceleration, 0, 10);   // ACCELERATION
+        updateSlider("deceleration", ".value1", appState.peakDeceleration, 0, 10);                 // DECELERATION (same slider ID as footwork — be cautious)
+        updateSlider("jumpheight", ".value", appState.averageJumpHeight, 0, 2);                   // JUMP HEIGHT
+        updateSlider("strideleng", ".value1", appState.averageStrideLength, 0, 2);                // STRIDE LENGTH
+        
         const acceleration = calculateAcceleration(appState.speedData, timeElapsedSinceLastFrame);
         if (!isNaN(acceleration) && Math.abs(acceleration) > ACCELERATION_THRESHOLD) {
             appState.accelerationData.push(acceleration);
-            accelerationChart.data.labels.push(appState.currentSecond);
-            accelerationChart.data.datasets[0].data.push(acceleration);
-            // accelerationChart.update();
+
         }
 
         const deceleration = calculateDeceleration(appState.speedData, timeElapsedSinceLastFrame);
         if (!isNaN(deceleration) && Math.abs(deceleration) > DECELERATION_THRESHOLD) {
             appState.accelerationData.push(deceleration);
-            decelerationChart.data.labels.push(appState.currentSecond);
-            decelerationChart.data.datasets[0].data.push(deceleration);
-            // decelerationChart.update();
         }
 
         const scores = calculateAthleticScores(posture);
@@ -1157,11 +881,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
         if (scores.every(score => !isNaN(score))) {
             appState.score = scores;
-            atheleticscorechart.data.datasets[0].data = scores;
+            averageAthleticScore = scores.length > 0 
+                ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
+                : 0;
+            // atheleticscorechart.data.datasets[0].data = scores;
             // atheleticscorechart.update();
         } else {
             console.error("Invalid athletic scores, skipping chart update.");
         }
+                   
+        document.getElementById('drillTimeValue').textContent = `${currentVideoTime.toFixed(1)} SECS`;
+        document.getElementById('distanceValue').textContent = `${distanceCovered.toFixed(1)} YARDS`;
+        document.getElementById('stepsValue').textContent = `${totalSteps}`; 
+        document.getElementById('athleticScoreValue').textContent = `${averageAthleticScore.toFixed(1)}%`;
     }
     
     function movingAverage(data, windowSize) {
@@ -1239,22 +971,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (stridedistance > 0.01) { // reduce threshold to capture smaller valid strides
             strideValue = stridedistance;
         }
-       
-        // 🟢 Save to appState (for analysis + chart)
+
         appState.stridelength.push({
             time: appState.currentSecond,
             length: strideValue
         });
-       
-        // 🟢 Update unified chart only (since we removed individual strideChart)
-        if (unifiedChart) {
-            // Update dataset index 4 (Stride Length)
-            const strideDataset = unifiedChart.data.datasets[4];
-            if (strideDataset) {
-                strideDataset.data.push(strideValue);
-            }
-        }
-       
         appState.previousLegPosition = { x: avgAnkleX, y: avgAnkleY };
     }
 
@@ -1280,10 +1001,6 @@ document.addEventListener('DOMContentLoaded', function() {
             height: jumpValue
         });
     
-        jumpHeightChart.data.datasets[0].data.push({ x: appState.currentSecond, y: jumpValue });
-        jumpHeightChart.data.datasets[0].data.push(jumpValue);
-        // jumpHeightChart.update();
-    
         appState.previousAnkleY = averageAnkleY;
     }
     
@@ -1294,23 +1011,17 @@ document.addEventListener('DOMContentLoaded', function() {
         headAngleChart.update();
         headAngleLineChart.data.labels = [];
         headAngleLineChart.data.datasets[0].data = [];
-        // headAngleLineChart.update();
         speedHistogramChart.data.labels = [];
         speedHistogramChart.data.datasets[0].data = [];
         speedHistogramChart.data.datasets[1].data = [];
-        // speedHistogramChart.update();
         accelerationChart.data.labels = [];
         accelerationChart.data.datasets[0].data = [];
-        // accelerationChart.update();
         decelerationChart.data.labels = [];
         decelerationChart.data.datasets[0].data = [];
-        // decelerationChart.update();
         jumpHeightChart.data.labels = [];
         jumpHeightChart.data.datasets[0].data = [];
-        // jumpHeightChart.update();
         strideChart.data.labels = [];
         strideChart.data.datasets[0].data = [];
-        // strideChart.update();
         if (unifiedChart) {
             unifiedChart.data.labels = [];
             unifiedChart.data.datasets.forEach(ds => ds.data = []);

@@ -1,11 +1,11 @@
 /* Login  */
 @font-face {
     font-family: FutraLight;
-    src: url(./Futura-Light-font.ttf);
+    src: url(/public/fonts/Futura-Light-font.ttf);
 }
 
 body {
-    background-image: url('./assests/login-bkg.png');
+    background-image: url('/public/assets/login-bkg.png');
     background-repeat: no-repeat;
     background-attachment: scroll;  
     background-size: cover;
@@ -131,6 +131,61 @@ button {
 
 .log a {
     color: #fff;
+}
+/* Forgot Password Modal Styling */
+.modal-content {
+  background-color: #000000;
+  color: #dddddd;
+  border: 2px solid #D02720;
+  border-radius: 12px;
+  font-family: FutraLight;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.modal-header,
+.modal-body,
+.modal-footer {
+  border: none;
+}
+
+.modal-title {
+  font-family: SCHABO-Condensed;
+  color: #D02720;
+  font-size: 24px;
+}
+
+.modal .form-label {
+  color: #dddddd;
+  font-size: 16px;
+  font-family: FutraLight;
+}
+
+.modal input[type="email"] {
+  background-color: #1c1c1c;
+  color: #ffffff;
+  border: 1px solid #555;
+  border-radius: 6px;
+}
+
+.modal input[type="email"]::placeholder {
+  color: #888;
+}
+
+.modal .btn-primary {
+  background-color: #D02720;
+  border: none;
+  font-family: SCHABO-Condensed;
+  font-size: 16px;
+}
+
+.modal .btn-primary:hover {
+  background-color: #a11d1a;
+}
+
+#forgotPasswordMessage {
+  font-size: 14px;
+  color: #00cc66; /* success green */
+  font-family: FutraLight;
 }
 
 .buttons {

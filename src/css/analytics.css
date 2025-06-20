@@ -1,6 +1,6 @@
 @font-face {
     font-family: FutraLight;
-    src: url(../Futura-Light-font.ttf);
+    src: url(/public/fonts/Futura-Light-font.ttf);
 }
 
 /* Stats */
@@ -200,7 +200,7 @@ button{
 
 .card-back {
     background-color: #202020;
-    background-image: url(../assests/redScuff_rotated.png);
+    background-image: url(/public/assets/redScuff_rotated.png);
     background-position: -200px -150px;
     background-repeat: no-repeat;
     background-attachment:initial;
@@ -213,7 +213,7 @@ button{
 
 .card-back3 {
     background-color: #202020;
-    background-image: url(../assests/redScuff.png);
+    background-image: url(/public/assets/redScuff.png);
     background-position: -100px 160px;
     background-repeat: no-repeat;
     background-attachment:initial;

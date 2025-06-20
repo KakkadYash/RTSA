@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Splash Screen</title>
+  <link rel="Splash Screen stylesheet" href="../src/css/splashScreen.css">
+</head>
+
+<body>   
+    <main>
+      <div class="splash">
+        <img src="../public/assets/Reaction Technologies logo samples bw-02.png" alt="RT" class="splashLogo"> 
+        <img src="../public/assets/football3.png" alt="splash" class="splashScreen">
+      </div>
+    </main>
+</body> 
+
+<script>
+    var splashScreen = document.querySelector('.splash');
+    splashScreen.addEventListener('click',()=>{
+        splashScreen.style.opacity = 0;
+        window.location.href = "./pages/login.html";
+        setTimeout(()=>{
+            splashScreen.classList.add('hidden')
+        },610)
+    })
+</script>
+</html>

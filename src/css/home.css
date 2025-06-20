@@ -1,6 +1,6 @@
 @font-face {
     font-family: FutraLight;
-    src: url(../Futura-Light-font.ttf);
+    src: url(/public/fonts/Futura-Light-font.ttf);
 }
 
 main {
@@ -36,7 +36,8 @@ p {
 }
 
 .logo {
-    visibility: hidden;
+    height: auto;
+    width: 200px;
 }
 
 input::placeholder{

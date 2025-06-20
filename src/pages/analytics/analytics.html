@@ -1,89 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Analytics</title>
-  <link rel="main stylesheet" href="../index.css">
-  <link rel="analytics stylesheet" href="b.css">
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
-</head>
-<body class="sb-expanded">
-  <!-- Side Bar -->
-  <aside>
-    <nav>
-      <div class="logo-container">
-        <a href="../Home/home.html"> 
-          <img src="../assests/Reaction Technologies logo samples bw-02.png" alt="Company Logo" class="logo">
-        </a>
-      </div>
-      <ul>
-        <li>
-          <div class="links">
-            <a href="../profile.html">
-              <span>PROFILE</span> <img src="../assests/arrow white rt.png" alt="Arrow" class="arrow">
-            </a>
-            <img src="../assests/white line rt.png" alt="Line" class="line"> 
-          </div>
-        </li>
-        <li>
-          <div class="links">
-            <a href="../Dashboard/dashboard.html">
-              <span>DASHBOARD</span> <img src="../assests/arrow white rt.png" alt="Arrow" class="arrow">
-            </a>
-            <img src="../assests/white line rt.png" alt="Line" class="line">
-          </div>
-        </li>
-        <li>
-          <div class="links">
-            <a href="#" class="active">
-              <span>ANALYTICS</span> <img src="../assests/arrow white rt.png" alt="Arrow" class="arrow">
-            </a>
-            <img src="../assests/white line rt.png" alt="Line" class="line">
-          </div>
-        </li>
-        <li>
-          <div class="links">
-            <a href="../analytics/history.html">
-              <span>HISTORY</span> <img src="../assests/arrow white rt.png" alt="Arrow" class="arrow">
-              </a>
-              <img src="../assests/white line rt.png" alt="Line" class="line">
-          </div>
-        </li>
-        <li>
-          <div class="links">
-            <a href="../Drill Catalog/drillCatalog.html">
-              <span>DRILL CATALOG</span> <img src="../assests/arrow white rt.png" alt="Arrow" class="arrow">
-            </a>
-            <img src="../assests/white line rt.png" alt="Line" class="line">
-          </div>
-        </li>
-        <li>
-          <div class="footer">
-            <div class="socials">
-              <div class="social-box">
-                <a href="https://www.instagram.com/reactiontech/"><img src= "../assests/icons8-instagram-50.png" alt="insta" class="icons"></a>
-              </div>
-              <div class="social-box">
-                <a href="https://www.facebook.com/ReactionTech/"><img src= "../assests/icons8-facebook-64.png" alt="facebook" class="icons"></a>
-              </div>
-              <div class="social-box">
-                <a href=" https://www.linkedin.com/company/reaction-technologies/"><img src= "../assests/icons8-linkedin-50.png" alt="linkedin" class="icons"></a>
-              </div>
-            </div>
-            <div class="logOut">
-              <span id="logoutButton">LOG OUT</span>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </nav>
-  </aside>
-  <!-- Main Content -->
-  <main>
     <header class="header">
       <h2 class="title">ANALYTICS</h2>
     </header>
@@ -92,19 +6,19 @@
       <div class="stats">
         <div class="box">
           <div id="drillTime">DRILL TIME</div>
-          <div id="totalTime">0 SECS</div>
+          <div id="drillTimeValue">--</div>
         </div>
         <div class="box">
-          <div id="distance">DISTANCE </div>
-          <div id="totalDistance">0 YARDS</div>
+          <div id="distance">DISTANCE</div>
+          <div id="distanceValue">--</div>
         </div>
         <div class="box">
           <div id="steps">STEPS</div>
-          <div id="value">0</div>
+          <div id="stepsValue">--</div>
         </div>
         <div class="box">
-          <div id="atleticScore">ATHLETIC SCORE</div>
-          <div id="averageAthleticScore">0%</div>
+          <div id="athleticScore">ATHLETIC SCORE</div>
+          <div id="athleticScoreValue">--</div>
         </div>
       </div>
     </div>
@@ -125,7 +39,7 @@
      </div>
      <form id="videoForm">
        <label for="uploadButton">
-         <img src="../assests/Add.png" alt="add">
+         <img src="/public/assets/Add.png" alt="add">
          <input type="file" id="uploadButton" accept="video/*">
        </label>
      </form>
@@ -221,25 +135,9 @@
         </div>
       </div>
     </div>
-  </main>
-  <div class="main-container">
-    <!-- Charts Section -->
-    <div class="charts-section">
-      <h3>Analytics Dashboard</h3>
-      <div class="charts-grid">
-        <div class="chart-container"><canvas id="headMovementChart" class="chart"></canvas></div>
-        <div class="chart-container"><canvas id="speedometerChart" class="chart"></canvas></div>
-        <div class="chart-container"><canvas id="athleticScoreChart" class="chart"></canvas></div>
-        <div class="chart-container"><canvas id="headAngleLineChart" class="chart"></canvas></div>
-        <div class="chart-container"><canvas id="speedHistogramChart" class="chart"></canvas></div>
-        <div class="chart-container"><canvas id="accelerationChart" class="chart"></canvas></div>
-        <div class="chart-container"><canvas id="decelerationDisplay" class="chart"></canvas></div>
-        <div class="chart-container"><canvas id="strideLengthDisplay" class="chart"></canvas></div>
-        <div class="chart-container"><canvas id="jumpHeightChart" class="chart"></canvas></div>
-      </div>
-    </div>
-  </div>
 
+
+<!-- 
   </div>
   <script src="d.js"></script>
   <script>
@@ -254,4 +152,4 @@
 }
   </script>
 </body>
-</html>
+</html> -->
