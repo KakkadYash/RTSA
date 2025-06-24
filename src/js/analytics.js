@@ -1,60 +1,63 @@
-// Constants for magic numbers
-const OVERLAP_THRESHOLD = 0.5;    // Minimum overlap required to continue tracking
-const HEAD_ANGLE_MIN = 40;        // Minimum ideal head angle
-const HEAD_ANGLE_MAX = 120;       // Maximum ideal head angle
-const LEFT_SHOULDER_INDEX = 11;   // Landmark index for left shoulder
-const LEFT_KNEE_INDEX = 25;       // Landmark index for left knee
-const LEFT_HIP_INDEX = 23;        // Landmark index for left Hip
-const LEFT_ANKLE_INDEX = 27;      // Landmark index for left ankle
-const RIGHT_HIP_INDEX = 24;       // Landmark index for Right Hip
-const RIGHT_ANKLE_INDEX = 28;     // Landmark index for right ankle
-const LEFT_EYE_INDEX = 1;         // Landmark index for left eye
-const MAX_SPEED = 5;
-const ACCELERATION_THRESHOLD = 0.5; // Threshold for acceleration changes
-const DECELERATION_THRESHOLD = 0.5;
-const JUMP_HEIGHT_BASELINE = 0.05; // Minimum height change to detect a jump
-       
-// Encapsulating variables in an object to avoid global scope
-const appState = {
-    postureCounts: {
-        Running: 0,
-        'Upright Standing': 0,
-        Crouching: 0,
-    },
-    videoFile: null,
-    uploadDate: '',
-    previousLegPosition: { x: 0, y: 0 },
-    idealHeadAngleFrames: 0,
-    totalFrames: 0,
-    totalDistance: 0,
-    isDrillActive: false,
-    athleteLocked: false,
-    athleteBoundingBox: null,
-    startTime: null,
-    endTime: null,
-    totalTime: 0,
-    previousFrameTime: null,
-    speedData: [],
-    headAnglePerSecond: [], // Store head angles for each second
-    currentSecond: 0, // Track the current second
-    smoothedSpeed: 0,
-    accelerationData: [],
-    smoothedAccelerationData: [],
-    decelerationData: [],
-    smoothedDecelerationData: [],
-    reactionTimeData: [],
-    jumpHeights: [],
-    stridelength: [],
-    agilityData: [],
-    balanceScore: [],
-    landmarkHistory: [],
-    score: 0,
-    athleteHeightInMeters: null,
-    topSpeed: 0,
-};
+function loadAnalytics() {
+    // Constants for magic numbers
+    const OVERLAP_THRESHOLD = 0.5;    // Minimum overlap required to continue tracking
+    const HEAD_ANGLE_MIN = 40;        // Minimum ideal head angle
+    const HEAD_ANGLE_MAX = 120;       // Maximum ideal head angle
+    const LEFT_SHOULDER_INDEX = 11;   // Landmark index for left shoulder
+    const LEFT_KNEE_INDEX = 25;       // Landmark index for left knee
+    const LEFT_HIP_INDEX = 23;        // Landmark index for left Hip
+    const LEFT_ANKLE_INDEX = 27;      // Landmark index for left ankle
+    const RIGHT_SHOULDER_INDEX = 12; 
+    const RIGHT_KNEE_INDEX = 26;
+    const RIGHT_HIP_INDEX = 24;       // Landmark index for Right Hip
+    const RIGHT_ANKLE_INDEX = 28;     // Landmark index for right ankle
+    const LEFT_EYE_INDEX = 1;         // Landmark index for left eye
+    const MAX_SPEED = 5;
+    const ACCELERATION_THRESHOLD = 0.5; // Threshold for acceleration changes
+    const DECELERATION_THRESHOLD = 0.5;
+    const JUMP_HEIGHT_BASELINE = 0.05; // Minimum height change to detect a jump
+        
+    // Encapsulating variables in an object to avoid global scope
+    const appState = {
+        postureCounts: {
+            Running: 0,
+            'Upright Standing': 0,
+            Crouching: 0,
+        },
+        lastFootY: 0,
+        stepCount: 0,
+        videoFile: null,
+        uploadDate: '',
+        previousLegPosition: { x: 0, y: 0 },
+        idealHeadAngleFrames: 0,
+        totalFrames: 0,
+        totalDistance: 0,
+        isDrillActive: false,
+        athleteLocked: false,
+        athleteBoundingBox: null,
+        startTime: null,
+        endTime: null,
+        totalTime: 0,
+        previousFrameTime: null,
+        speedData: [],
+        headAnglePerSecond: [], // Store head angles for each second
+        currentSecond: 0, // Track the current second
+        smoothedSpeed: 0,
+        accelerationData: [],
+        smoothedAccelerationData: [],
+        decelerationData: [],
+        smoothedDecelerationData: [],
+        reactionTimeData: [],
+        jumpHeights: [],
+        stridelength: [],
+        agilityData: [],
+        balanceScore: [],
+        landmarkHistory: [],
+        score: [],
+        athleteHeightInMeters: null,
+        topSpeed: 0,
+    };
 
-// Wait for the DOM to load
-document.addEventListener('DOMContentLoaded', function() {
     const uploadButton = document.getElementById('uploadButton');
     const analyzeButton = document.getElementById('analyzeButton');
     const videoElement = document.getElementById('uploaded-video');
@@ -62,89 +65,116 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvasCtx = canvasElement.getContext('2d');
     const playProcessedButton = document.getElementById('playProcessedButton');
     const loadingOverlay = document.getElementById('analyzingIndicator');
-    let unifiedChart = null;
-    const unifiedChartCtx = document.getElementById('myChart2').getContext('2d');
+    let currentChart = null; // Holds the active Chart instance
+    let chartType = "radar"; // "radar" for pentagon, "line" for metrics
+    
+    function showPentagonChart() {
+        const ctx = document.getElementById('myChart2').getContext('2d');
+        if (currentChart) currentChart.destroy();
 
-    function initializeUnifiedChart() {
-           if (Chart.getChart("myChart2")) {
-               Chart.getChart("myChart2").destroy();
-           }
-           unifiedChart = new Chart(unifiedChartCtx, {
-               type: 'line',
-               data: {
-                   labels: [],
-                   datasets: [
-                       {
-                           label: 'Head Angle (°)',
-                           data: [],
-                           borderColor: '#FF8C00',
-                           fill: false,
-                           tension: 0.3
-                       },
-                       {
-                           label: 'Speed (yards/sec)',
-                           data: [],
-                           borderColor: '#1F43E5',
-                           fill: false,
-                           tension: 0.3
-                       },
-                       {
-                           label: 'Acceleration (yards/s²)',
-                           data: [],
-                           borderColor: '#7DD859',
-                           fill: false,
-                           tension: 0.3
-                       },
-                       {
-                           label: 'Deceleration (yards/s²)',
-                           data: [],
-                           borderColor: '#E93632',
-                           fill: false,
-                           tension: 0.3
-                       },
-                       {
-                           label: 'Stride Length (yards)',
-                           data: [],
-                           borderColor: '#FFA500',
-                           fill: false,
-                           tension: 0.3
-                       },
-                       {
-                           label: 'Jump Height (yards)',
-                           data: [],
-                           borderColor: '#800080',
-                           fill: false,
-                           tension: 0.3
-                       }
-                   ]
-               },
-               options: {
-                   responsive: true,
-                   maintainAspectRatio: false,
-                   scales: {
-                       x: {
-                           title: { display: true, text: 'Time (seconds)' }
-                       },
-                       y: {
-                           beginAtZero: true
-                       }
-                   },
-                   onClick: (evt, activeElements) => {
-                       if (activeElements.length > 0) {
-                           const pointIndex = activeElements[0].index;
-                           const timestamp = unifiedChart.data.labels[pointIndex];
-                           seekToTimestamp(timestamp);
-                       }
-                   }
-               }
-           });
-       }
-    initializeUnifiedChart(); // 👈 Initialize as soon as DOM loads
-    function filterUnifiedChart(metricIndices) {
-        unifiedChart.data.datasets.forEach((dataset, index) => {
+        const data = [
+            appState.footworkScore || 0,
+            appState.speedScore || 0,
+            appState.accelerationScore || 0,
+            appState.headAngleScore || 0,
+            appState.postureScore || 0
+        ];
+
+        currentChart = new Chart(ctx, {
+            type: "radar",
+            data: {
+                labels: ["Footwork", "Speed", "Acceleration", "Head Angle", "Posture"],
+                datasets: [{
+                    label: "Athletic Scores",
+                    data: data,
+                    backgroundColor: "rgba(0, 123, 255, 0.2)",
+                    borderColor: "#007bff",
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        chartType = "radar";
+    }
+
+    function showUnifiedChart(metricIndices = []) {
+        const ctx = document.getElementById('myChart2').getContext('2d');
+        if (currentChart) currentChart.destroy();
+
+        currentChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: appState.chartLabels || [],
+                datasets: [
+                    {
+                        label: 'Head Angle (°)',
+                        data: appState.headAngleData || [],
+                        borderColor: '#FF8C00',
+                        fill: false
+                    },
+                    {
+                        label: 'Speed (yards/sec)',
+                        data: appState.speedData || [],
+                        borderColor: '#1F43E5',
+                        fill: false
+                    },
+                    {
+                        label: 'Acceleration (yards/s²)',
+                        data: appState.accelerationData || [],
+                        borderColor: '#7DD859',
+                        fill: false
+                    },
+                    {
+                        label: 'Deceleration (yards/s²)',
+                        data: appState.decelerationData || [],
+                        borderColor: '#E93632',
+                        fill: false
+                    },
+                    {
+                        label: 'Stride Length (yards)',
+                        data: appState.strideData || [],
+                        borderColor: '#FFA500',
+                        fill: false
+                    },
+                    {
+                        label: 'Jump Height (yards)',
+                        data: appState.jumpData || [],
+                        borderColor: '#800080',
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                onClick: (evt, activeElements) => {
+                    if (activeElements.length > 0) {
+                        const pointIndex = activeElements[0].index;
+                        const timestamp = currentChart.data.labels[pointIndex];
+                        seekToTimestamp(timestamp);
+                    }
+                }
+            }
+        });
+
+        chartType = "line";
+
+        // Apply metric filter
+        currentChart.data.datasets.forEach((dataset, index) => {
             dataset.hidden = !metricIndices.includes(index);
         });
-        unifiedChart.update();
+
+        currentChart.update();
     }
 
     // Custom plugin to draw text in the center of the doughnut chart
@@ -172,19 +202,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Register the custom plugin
     Chart.register(centerLabelPlugin);
     
-    const headAngleChart = new Chart(document.getElementById('headMovementChart').getContext('2d'), {
+    const doughnutChart = new Chart(document.getElementById('myChart').getContext('2d'), {
            type: 'doughnut',
            data: {
                datasets: [
                    // Outer ring: Posture Distribution
                    {
-                       data: [0, 0, 0], // Running, Standing, Crouching
+                       data: [], // Running, Standing, Crouching
                        backgroundColor: ['#1E90FF', '#FFD700', '#A52A2A'],
                        borderWidth: 0
                    },
                    // Inner ring: Head Angle
                    {
-                       data: [0, 100],
+                       data: [],
                        backgroundColor: ['#00ff00', '#FF2429'],
                        borderWidth: 0
                    }
@@ -215,59 +245,23 @@ document.addEventListener('DOMContentLoaded', function() {
            }
        });
 
-    const atheleticscorechart = new Chart(document.getElementById('athleticScoreChart').getContext('2d'), {
-        type: 'radar',
-        data: {
-            labels: ['Footwork', 'Speed', 'Acceleration', 'Head Angle', 'Posture'],
-            datasets: [{
-                label: 'Athletic Score',
-                data: [],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 2,
-            }],
-        },
-        options: {
-            responsive: true,
-            scales: {
-                r: {
-                    angleLines: { display: true },
-                    suggestedMin: 0,
-                    suggestedMax: 100,
-                },
-            },
-            plugins: {
-                legend: { display: false },
-            },
-        },
-    });
-       
     document.querySelectorAll('.card').forEach((card, index) => {
         card.addEventListener('click', () => {
-             // Small delay to wait for flip animation (optional)
-             setTimeout(() => {
-                 if (card.classList.contains('is-flipped')) {
-                    if (index === 0) {
-                        // Technique card: head angle only
-                        filterUnifiedChart([0]);
-                    } else if (index === 1) {
-                        // Speed & Movement card: speed, acceleration, deceleration
-                        filterUnifiedChart([1, 2, 3]);
-                    } else if (index === 2) {
-                        // Footwork card: stride, jump height
-                        filterUnifiedChart([4, 5]);
-                    }
-                }
+            setTimeout(() => {
+            if (card.classList.contains('is-flipped')) {
+                if (index === 0) showUnifiedChart([0]); // Technique
+                if (index === 1) showUnifiedChart([1, 2, 3]); // Speed & Movement
+                if (index === 2) showUnifiedChart([4, 5]); // Footwork
+            }
             }, 200);
         });
     });
 
     document.getElementById('showMetrics').addEventListener('click', () => {
-        filterUnifiedChart([0, 1, 2, 3, 4, 5]);
+        showPentagonChart();
         document.querySelectorAll('.card').forEach(card => card.classList.add('is-flipped'));
     });
 
-    
     // UPLOAD BUTTON: Only select and preview video (no uploading or height estimation)
     uploadButton.addEventListener('change', (event) => {
         appState.videoFile = event.target.files[0];
@@ -440,9 +434,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
             appState.videoId = uploadResult.video_id;
 
-            // Compute ideal head angle percentage
             const idealHeadPercentage = appState.idealHeadAngleFrames 
             ? Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100) 
+            : 0;
+            const allscores = appState.score.flat();
+            const averageAthleticScore = allscores.length > 0
+            ? allscores.reduce((sum, val) => sum + val, 0) / allscores.length
             : 0;
 
             // Update the metric values to be saved
@@ -461,8 +458,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 peakAcceleration: appState.peakAcceleration || 0,
                 peakDeceleration: appState.peakDeceleration || 0
             };
-
-            document.getElementById("averageAthleticScore").innerHTML = appState.averageAthleticScore + "%" || '';
 
             console.log("Sending analytics data:", analyticsData);
     
@@ -535,34 +530,44 @@ document.addEventListener('DOMContentLoaded', function() {
     
             drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: 'white', lineWidth: lineWidth });
             drawLandmarks(canvasCtx, results.poseLandmarks, { color: 'red', lineWidth: landmarkRadius });
-    
+            
             const headAngle = calculateHeadAngle(results.poseLandmarks);
             console.log("Head angle data:", headAngle);
             if (headAngle >= 5) {
                 appState.totalFrames++;
             }
+            // Compute ideal head angle percentage
+            const scores = appState.score || [];
+            const averageAthleticScore = scores.length > 0
+            ? scores.reduce((sum, val) => sum + val, 0) / scores.length
+            : 0;
             const currentVideoTime = Math.floor(videoElement.currentTime);
             if (currentVideoTime > appState.currentSecond) {
                 appState.currentSecond = currentVideoTime;
                 appState.headAnglePerSecond.push(headAngle);
-                // Update unified chart with all metrics
-                if (unifiedChart?.data?.datasets?.length >= 6) {
-                  unifiedChart.data.labels.push(appState.currentSecond);
-                  unifiedChart.data.datasets[0].data.push(appState.headAnglePerSecond);
-                  unifiedChart.data.datasets[1].data.push(appState.smoothedSpeed);
-              
-                  const acc = appState.accelerationData.at(-1) || 0;
-                  const dec = appState.decelerationData.at(-1) || 0;
-                  const jump = appState.jumpHeights.at(-1)?.height || 0;
-                  const stride = appState.stridelength.at(-1)?.length || 0;
-              
-                  unifiedChart.data.datasets[2].data.push(acc);
-                  unifiedChart.data.datasets[3].data.push(dec);
-                  unifiedChart.data.datasets[4].data.push(stride);
-                  unifiedChart.data.datasets[5].data.push(jump);
-              
-                  unifiedChart.update();
-                }
+                showPentagonChart();
+                // Update Line chart with all metrics
+                if (!appState.chartLabels) appState.chartLabels = [];
+                if (!appState.headAngleData) appState.headAngleData = [];
+                if (!appState.speedData) appState.speedData = [];
+                if (!appState.accelerationData) appState.accelerationData = [];
+                if (!appState.decelerationData) appState.decelerationData = [];
+                if (!appState.strideData) appState.strideData = [];
+                if (!appState.jumpData) appState.jumpData = [];
+
+                appState.chartLabels.push(appState.currentSecond);
+                appState.headAngleData.push(appState.headAnglePerSecond);
+                appState.speedData.push(appState.smoothedSpeed);
+
+                const acc = appState.accelerationDataRaw?.at(-1) || 0;
+                const dec = appState.decelerationDataRaw?.at(-1) || 0;
+                const jump = appState.jumpHeights?.at(-1)?.height || 0;
+                const stride = appState.stridelength?.at(-1)?.length || 0;
+
+                appState.accelerationData.push(acc);
+                appState.decelerationData.push(dec);
+                appState.strideData.push(stride);
+                appState.jumpData.push(jump);
                 const speedThisSecond = appState.smoothedSpeed;
                 if (isNaN(speedThisSecond) || speedThisSecond < 0) {
                     console.warn("Skipping invalid speed value:", speedThisSecond);
@@ -574,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
     
             if (results.poseLandmarks[LEFT_ANKLE_INDEX] && results.poseLandmarks[LEFT_EYE_INDEX]) {
-                analyzeFrame(results.poseLandmarks, appState.athleteHeightInMeters, timeElapsedSinceLastFrame, posture);
+                analyzeFrame(results.poseLandmarks, appState.athleteHeightInMeters, timeElapsedSinceLastFrame, posture, currentVideoTime, appState.totalDistance);
             }
     
             detectDrillStart(results.poseLandmarks);
@@ -585,12 +590,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
        
     function updateDoughnutChart() {
-        const doughnut = Chart.getChart("myChart");
-        if (!doughnut) return;
+        if (!doughnutChart) return;
        
         // INNER RING: Head angle (ideal vs not ideal)
         const idealPercentage = Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100);
-        doughnut.data.datasets[1].data = [
+        doughnutChart.data.datasets[1].data = [
            idealPercentage,
            100 - idealPercentage
         ];
@@ -601,24 +605,33 @@ document.addEventListener('DOMContentLoaded', function() {
         const standing = Math.round((appState.postureCounts["Upright Standing"] || 0) / totalPosture * 100);
         const crouching = Math.round((appState.postureCounts["Crouching"] || 0) / totalPosture * 100);
        
-        doughnut.data.datasets[0].data = [0, 0, running, standing, crouching];
-        doughnut.update();
+        doughnutChart.data.datasets[0].data = [0, 0, running, standing, crouching];
+        doughnutChart.update();
     }
        
-    function updateSlider(sliderId, labelSelector, value, min = 0, max = 100) {
-        const slider = document.getElementById(sliderId);
-        const label = document.querySelector(labelSelector);
+    function updateMetricSliders() {
+        const speed = Math.round(appState.smoothedSpeed) || 0;
+        const accel = Math.round(appState.peakAcceleration) || 0;
+        const decel = Math.round(appState.peakDeceleration) || 0;
+        const jump = Math.round(calculateAverageJumpHeight()) || 0;
+        const stride = Math.round(calculateAverageStrideLength()) || 0;
 
-        if (!slider || !label) return;
+        // SPEED & MOVEMENT
+        document.getElementById("speedValue").innerText = speed;
+        document.getElementById("speed").value = speed;
 
-        // Clamp and set slider value
-        const normalized = Math.min(Math.max(value, min), max);
-        slider.value = normalized;
-        label.textContent = normalized.toFixed(1);
+        document.getElementById("accelerationValue").innerText = accel;
+        document.getElementById("acceleration").value = accel;
 
-        // Gradient color background
-        const percent = ((normalized - min) / (max - min)) * 100;
-        slider.style.background = `linear-gradient(to right, red 0%, yellow ${percent}%, green ${percent}%, white ${percent}%)`;
+        document.getElementById("decelerationValue").innerText = decel;
+        document.getElementById("deceleration").value = decel;
+
+        // FOOTWORK
+        document.querySelector(".value").innerText = jump;
+        document.getElementById("jumpheight").value = jump;
+
+        document.querySelector(".value1").innerText = stride;
+        document.getElementById("strideleng").value = stride;
     }
 
     function lockOnAthlete(landmarks) {
@@ -674,34 +687,71 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function detectPosture(landmarks) {
-        const kneeAngle = calculateAngle(
-            landmarks[LEFT_HIP_INDEX], 
-            landmarks[LEFT_KNEE_INDEX], 
+        if (!landmarks) return "Unknown";
+
+        // Helper to average angle between left and right sides
+        const avgAngle = (left, right) => (left + right) / 2;
+
+        const leftKnee = calculateAngle(
+            landmarks[LEFT_HIP_INDEX],
+            landmarks[LEFT_KNEE_INDEX],
             landmarks[LEFT_ANKLE_INDEX]
         );
-        const hipAngle = calculateAngle(
-            landmarks[LEFT_SHOULDER_INDEX], 
-            landmarks[LEFT_HIP_INDEX], 
+        const rightKnee = calculateAngle(
+            landmarks[RIGHT_HIP_INDEX],
+            landmarks[RIGHT_KNEE_INDEX],
+            landmarks[RIGHT_ANKLE_INDEX]
+        );
+        const kneeAngle = avgAngle(leftKnee, rightKnee);
+
+        const leftHip = calculateAngle(
+            landmarks[LEFT_SHOULDER_INDEX],
+            landmarks[LEFT_HIP_INDEX],
             landmarks[LEFT_KNEE_INDEX]
         );
-        const torsoAngle = calculateAngle(
-            landmarks[LEFT_HIP_INDEX], 
-            landmarks[LEFT_SHOULDER_INDEX], 
+        const rightHip = calculateAngle(
+            landmarks[RIGHT_SHOULDER_INDEX],
+            landmarks[RIGHT_HIP_INDEX],
+            landmarks[RIGHT_KNEE_INDEX]
+        );
+        const hipAngle = avgAngle(leftHip, rightHip);
+
+        const leftTorso = calculateAngle(
+            landmarks[LEFT_HIP_INDEX],
+            landmarks[LEFT_SHOULDER_INDEX],
             { x: landmarks[LEFT_SHOULDER_INDEX].x, y: landmarks[LEFT_SHOULDER_INDEX].y - 1 }
         );
-    
-        if (kneeAngle < 10 && torsoAngle > 80) {
-            return "Upright Standing";
-        } else if (kneeAngle >= 25 && kneeAngle <= 45 && torsoAngle >= 10 && torsoAngle <= 40) {
+        const rightTorso = calculateAngle(
+            landmarks[RIGHT_HIP_INDEX],
+            landmarks[RIGHT_SHOULDER_INDEX],
+            { x: landmarks[RIGHT_SHOULDER_INDEX].x, y: landmarks[RIGHT_SHOULDER_INDEX].y - 1 }
+        );
+        const torsoAngle = avgAngle(leftTorso, rightTorso);
+
+        // === Decision logic ===
+        if (
+            kneeAngle >= 30 && kneeAngle <= 45 &&
+            hipAngle >= 20 && hipAngle <= 30 &&
+            torsoAngle >= 10 && torsoAngle <= 20
+        ) {
             return "Crouching";
-        } else if (kneeAngle >= 15 && kneeAngle <= 20 && torsoAngle >= 85 && torsoAngle <= 90) {
-            return "Throwing Stance";
-        } else if (kneeAngle >= 20 && kneeAngle <= 30 && torsoAngle >= 5 && torsoAngle <= 10) {
-            return "Reactive Stance";
-        } else {
+        }
+        if (
+            kneeAngle >= 20 && kneeAngle <= 30 &&
+            hipAngle >= 15 && hipAngle <= 25 &&
+            torsoAngle >= 5 && torsoAngle <= 15
+        ) {
             return "Running";
         }
+        if (
+            kneeAngle >= 10 && kneeAngle <= 25 &&
+            torsoAngle >= 75 && torsoAngle <= 90
+        ) {
+            return "Standing";
+        }
+        return "Running"; // fallback
     }
+
     
     function normalize(value, min, max) {
         return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
@@ -710,7 +760,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function calculateAthleticScores(posture) {
         const footworkScore = calculateFootworkScore();
         const speedScore = normalize(appState.smoothedSpeed, 0, 15);
-        const accelerationScore = normalize(appState.smoothedAccelerationData, -5, 20);
+        const accelArray = appState.smoothedAccelerationData || [];
+        const avgAccel = accelArray.length ? accelArray.reduce((a, b) => a + b, 0) / accelArray.length : 0;
+        const accelerationScore = normalize(avgAccel, -5, 20);
         const headAngleScore = normalize(appState.idealHeadAngleFrames, 45, 90);
         const postureScore = posture === "Crouching" ? 90 : posture === "Upright Standing" ? 80 : 50;
         return [footworkScore, speedScore, accelerationScore, headAngleScore, postureScore];
@@ -834,19 +886,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
         appState.topSpeed = Math.max(appState.topSpeed || 0, speed); 
         const averageSpeed = appState.totalDistance / appState.totalTime;
-    
-        speedProgressChart.data.datasets[0].data[0] = averageSpeed;
-        speedProgressChart.update();
-    
         const timeElapsedSinceStart = (currentTime - appState.startTime) / 1000;
-        console.log(`Speed: ${speed.toFixed(2)} yards/s`);
+        console.log(`Speed: ${averageSpeed.toFixed(2)} yards/s`);
         console.log(`Top Speed: ${appState.topSpeed.toFixed(2)} yards/s`);
         console.log(`Distance: ${(appState.totalDistance * 1.09361).toFixed(2)} yards`);
         console.log(`Time: ${timeElapsedSinceStart.toFixed(2)} seconds`);
-        document.getElementById("totalDistance").innerHTML = (appState.totalDistance * 1.09361).toFixed(2) + " YARDS" || '';
     }
 
-    function analyzeFrame(landmarks, athleteHeightInMeters, timeElapsedSinceLastFrame, posture) {
+    function analyzeFrame(landmarks, athleteHeightInMeters, timeElapsedSinceLastFrame, posture, currentVideoTime, distanceCovered) {
         if (!landmarks || landmarks.length === 0 || !athleteHeightInMeters) {
             console.log("No landmarks or height data available.");
             return;
@@ -855,12 +902,8 @@ document.addEventListener('DOMContentLoaded', function() {
         detectJumps(landmarks);
         calculatestride(landmarks);
         updateDoughnutChart();
-        updateSlider("speed", ".speed", appState.topSpeed, 0, 15);                // SPEED
-        updateSlider("acceleration", ".acceleration", appState.peakAcceleration, 0, 10);   // ACCELERATION
-        updateSlider("deceleration", ".value1", appState.peakDeceleration, 0, 10);                 // DECELERATION (same slider ID as footwork — be cautious)
-        updateSlider("jumpheight", ".value", appState.averageJumpHeight, 0, 2);                   // JUMP HEIGHT
-        updateSlider("strideleng", ".value1", appState.averageStrideLength, 0, 2);                // STRIDE LENGTH
-        
+        updateMetricSliders();
+        calculateSteps(landmarks);
         const acceleration = calculateAcceleration(appState.speedData, timeElapsedSinceLastFrame);
         if (!isNaN(acceleration) && Math.abs(acceleration) > ACCELERATION_THRESHOLD) {
             appState.accelerationData.push(acceleration);
@@ -873,6 +916,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const scores = calculateAthleticScores(posture);
+        [
+            appState.footworkScore,
+            appState.speedScore,
+            appState.accelerationScore,
+            appState.headAngleScore,
+            appState.postureScore
+        ] = scores;
+
         console.log("Athletic scores:", scores);
         const invalidScores = scores.filter(score => isNaN(score));
         if (invalidScores.length > 0) {
@@ -880,19 +931,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     
         if (scores.every(score => !isNaN(score))) {
-            appState.score = scores;
-            averageAthleticScore = scores.length > 0 
-                ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
-                : 0;
-            // atheleticscorechart.data.datasets[0].data = scores;
-            // atheleticscorechart.update();
+            appState.score.push(scores);
         } else {
             console.error("Invalid athletic scores, skipping chart update.");
         }
-                   
+        const averageAthleticScore = scores.length > 0
+        ? scores.reduce((sum, val) => sum + val, 0) / scores.length
+        : 0;
         document.getElementById('drillTimeValue').textContent = `${currentVideoTime.toFixed(1)} SECS`;
         document.getElementById('distanceValue').textContent = `${distanceCovered.toFixed(1)} YARDS`;
-        document.getElementById('stepsValue').textContent = `${totalSteps}`; 
+        document.getElementById('stepsValue').textContent = `${appState.stepCount}`; 
         document.getElementById('athleticScoreValue').textContent = `${averageAthleticScore.toFixed(1)}%`;
     }
     
@@ -938,8 +986,7 @@ document.addEventListener('DOMContentLoaded', function() {
         appState.endTime = performance.now();
         appState.totalTime = (appState.endTime - appState.startTime) / 1000;
         appState.isDrillActive = false;
-        console.log(`Drill Time: ${appState.totalTime}, Start Time: ${appState.startTime}`);
-        document.getElementById("totalTime").innerHTML = appState.totalTime + " SECS" || '';
+        console.log(`Drill Time: ${appState.totalTime}, Start Time: ${appState.startTime}`)
     }
     
     function calculateAcceleration(speedData, deltaTime) {
@@ -955,7 +1002,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const previousSpeed = speedData[speedData.length - 2];
         return (previousSpeed - latestSpeed) / deltaTime;
     }
+    function calculateSteps(landmarks){
+        const leftFootY = landmarks[LEFT_ANKLE_INDEX].y;
+        const rightFootY = landmarks[RIGHT_ANKLE_INDEX].y;
+        const footDistance = Math.abs(leftFootY - rightFootY);
 
+        // Detect step when feet switch significantly
+        if (footDistance > 0.05 && Math.abs(footDistance - appState.lastFootY) > 0.02) {
+            appState.stepCount++;
+            appState.lastFootY = footDistance;
+        }
+    }
     function calculatestride(landmarks) {
         const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
         const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
@@ -1005,29 +1062,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function resetCharts() {
-        speedProgressChart.data.datasets[0].data[0] = 0; 
-        speedProgressChart.update();
-        headAngleChart.data.datasets[0].data[0] = 0; 
-        headAngleChart.update();
-        headAngleLineChart.data.labels = [];
-        headAngleLineChart.data.datasets[0].data = [];
-        speedHistogramChart.data.labels = [];
-        speedHistogramChart.data.datasets[0].data = [];
-        speedHistogramChart.data.datasets[1].data = [];
-        accelerationChart.data.labels = [];
-        accelerationChart.data.datasets[0].data = [];
-        decelerationChart.data.labels = [];
-        decelerationChart.data.datasets[0].data = [];
-        jumpHeightChart.data.labels = [];
-        jumpHeightChart.data.datasets[0].data = [];
-        strideChart.data.labels = [];
-        strideChart.data.datasets[0].data = [];
-        if (unifiedChart) {
-            unifiedChart.data.labels = [];
-            unifiedChart.data.datasets.forEach(ds => ds.data = []);
-            unifiedChart.update();
-           }
+        // Reset doughnut chart (posture)
+        if (typeof doughnutChart !== 'undefined' && doughnutChart) {
+            doughnutChart.data.datasets[0].data = [0, 0, 0]; // running, standing, crouching
+            doughnutChart.data.datasets[1].data = [0, 100]; // head angle
+            doughnutChart.update();
         }
+
+        // Clear all chart-related appState arrays
+        appState.chartLabels = [];
+        appState.headAngleData = [];
+        appState.speedData = [];
+        appState.accelerationData = [];
+        appState.decelerationData = [];
+        appState.strideData = [];
+        appState.jumpData = [];
+
+        // If a chart is currently rendered, clear it visually
+        if (typeof currentChart !== 'undefined' && currentChart) {
+            currentChart.destroy();
+            currentChart = null;
+        }
+    }
     
     function resetAnalysisData() {
         appState.previousLegPosition = { x: 0, y: 0 };
@@ -1058,65 +1114,10 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         console.log("Analysis data and charts reset");
     }
-});
 
+  // Done
+  console.log("Analytics module loaded");
+}
 
-const ctx = document.getElementById('myChart').getContext('2d');
-new Chart(ctx, {
-  type: 'doughnut',
-  data: {
-    labels: ['IDEAL', 'NOT IDEAL', 'RUNNING', 'STANDING', 'CROUTCHING'],
-    datasets: [
-      {
-        label: 'Outer Ring',
-        data: [0, 0, 70, 20, 10],
-        backgroundColor: ['#93D669', '#EA4940', '#75A6E2', '#5970F7', '#224A62'],
-        borderWidth: 1,
-        radius: '100%',       // Outer ring
-        cutout: '30%',
-      },
-      {
-        label: 'Inner Ring',
-        data: [0, 100],
-        backgroundColor: ['#93D669', '#EA4940'],
-        borderWidth: 1,
-        radius: '100%',        // Inner ring
-        cutout: '30%',
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'bottom',
-      }
-    }
-  }
-});
+window.loadAnalytics = loadAnalytics;
 
-
-let slider = document.getElementById("speed");
-let value = document.querySelector(".speed");
-let slider2 = document.getElementById("acceleration");
-let acceleeration = document.querySelector(".acceleration");
-value.innerHTML = slider.value
-value2.innerHTML = slider2.value2
-
-function calcValue() {
-    valuePercentage = (slider.value / slider.max)*100;
-      slider.style.background = `linear-gradient(to right, red ${0}%, yellow ${valuePercentage}%, green ${valuePercentage}%, white ${valuePercentage}%)`;
-    valuePercentage2 = (slider2.value2 / slider2.max)*100;
-        slider2.style.background = `linear-gradient(to right, red ${0}%, yellow ${valuePercentage}%, green ${valuePercentage}%, white ${valuePercentage}%)`;
-  }
-
-  slider.addEventListener('input', function(){
-    calcValue();
-    value.textContent = this.value; 
-  })
-  slider2.addEventListener('input', function(){
-    calcValue();
-    value2.textContent = this.value2; 
-  })
-  
-  calcValue();
