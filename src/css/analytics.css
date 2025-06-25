@@ -1,6 +1,11 @@
 @font-face {
     font-family: FutraLight;
-    src: url(/public/fonts/Futura-Light-font.ttf);
+    src: url(../../public/fonts/Futura-Light-font.ttf);
+}
+
+@font-face {
+    font-family: SCHABO-Condensed;
+    src: url(../../public/fonts/SCHABO-Condensed.otf);
 }
 
 /* Stats */
@@ -30,6 +35,10 @@
     width: 200px;
 }
 
+.stats #drillTimeValue, #distanceValue, #stepsValue, #athleticScoreValue {
+    margin-left: auto;
+    margin-right: 0;
+}
 /* Loading overlay styles */
 .loading-overlay {
     display: none; 
@@ -66,34 +75,37 @@
     width: 500px; 
 }
 
-#myChart {
-    max-width: 400px;
-    max-height: 400px;
+video{
+    width: 35vw; 
+    height: 35vw; 
+    height: auto; 
+    border-radius: 10%;
+    border: 2px solid #000000; 
 }
 
 .chart-wrapper {
-  width: 500px;
-  height: 250px;
-  padding: 10px;
-  background-color: transparent;
-  border-radius: 10px;
-  /* border: 1px solid #000000; */
-  border-radius: 20%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    width: 500px;
+    height: 250px;
+    padding: 10px;
+    background-color: transparent;
+    border-radius: 10px;
+    border: 1px solid #000000;
+    border-radius: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #myChart2 {
     background-color: #A7A7A7;
-    width: 400px;
-    height: 400px;
+    width: 600px;
+    height: auto;
     position: relative;
 }
 
 #videoForm {
     position: absolute;
-    top: 250px;
+    top: 270px;
     left: 55%;
     transform: translateX(-50%);
 }
@@ -108,6 +120,10 @@
     cursor: pointer;
 }
 
+#playProcessedButton {
+    display: none;
+}
+
 .btns{
     display: flex;
     flex-direction: row;
@@ -115,7 +131,7 @@
     gap: 30px;
 }
 
-button{
+#analyzeButton, #showMetrics {
     font-family: SCHABO-Condensed;
     background-color: #000000;
     border-radius: 25px;
@@ -140,11 +156,6 @@ button{
     width: fit-content; 
     height: 350px;
     margin-top: 100px; 
-}
-
-.stats #totalTime, #totalDistance, #value, #averageAthleticScore {
-    margin-left: auto;
-    margin-right: 0;
 }
 
 .card-container {
@@ -183,15 +194,10 @@ button{
     transition: transform 0.6s;
 }
 
-.redScuff{
-    height: 300px;
-    width: auto;
-    z-index: -1;
-}
-
 .card-front {
     background-color: #202020;
     transform: rotateY(180deg);
+    justify-content: space-between;
 }
 
 .card-front:hover{
@@ -200,7 +206,7 @@ button{
 
 .card-back {
     background-color: #202020;
-    background-image: url(/public/assets/redScuff_rotated.png);
+    background-image: url(../../public/assets/redScuff_rotated.png);
     background-position: -200px -150px;
     background-repeat: no-repeat;
     background-attachment:initial;
@@ -213,7 +219,7 @@ button{
 
 .card-back3 {
     background-color: #202020;
-    background-image: url(/public/assets/redScuff.png);
+    background-image: url(../../public/assets/redScuff.png);
     background-position: -100px 160px;
     background-repeat: no-repeat;
     background-attachment:initial;
@@ -222,15 +228,14 @@ button{
 
 p {
     text-decoration: underline;
+    align-self: start;
+    font-family: SCHABO-Condensed;
+    padding-left: 10px;
 }
 
-.charts {
-    display: flex;
-    flex-direction: column;
-}
-
-h1 {
-    font-size: 70px;
+#myChart {
+    max-width: 400px;
+    max-height: 400px;
 }
 
 .description {
@@ -247,37 +252,94 @@ h1 {
     width: 200px;
 }
 
-.slider {
-    appearance: none;
-    width: 100%;
-    height: 25px;
-    background: #ebe9e7;
-    outline: none;
-    border-radius: 5px;
+h1 {
+    font-size: 70px;
 }
 
-.slideHead {
+.sliderHead {
     display: flex;
     flex-direction: row;
+    gap: 200px;
 }
 
-.slider::-webkit-slider-thumb {
-    appearance: none; 
-    width: 0px; 
-    height: 20px; 
-    background: #8758FF;
-    border-radius: 50%;
-    cursor: pointer; 
-}
+.slideContainer progress {
+    width: 100%;
+    height: 16px;
+    appearance: none;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #FFFFFF;
+  }
+  
+  progress::-webkit-progress-bar {
+    background-color: linear-gradient(to right, red, yellow, green);
+  }
+  
+  progress::-webkit-progress-value {
+    background-color: linear-gradient(to right, red, yellow, green);
+  }
+  
+  progress::-moz-progress-bar {
+    background-color: linear-gradient(to right, red, yellow, green);
+  }
+  
+  .progressWrapper {
+    width: 100%;
+    height: 20px;
+    background-color: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .progressFill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A); /* gradient fill */
+    transition: width 0.3s ease;
+  }
 
-.slider::-moz-range-thumb {
-    appearance: none; 
-    width: 20px; 
-    height: 20px; 
-    background: #8758FF; 
-    border-radius: 50%;
-    cursor: pointer; 
-} 
+@media (max-width: 768px) { 
+    /* Video and Canvas: stack vertically */
+    .vid-chart {
+        flex-direction: column;
+        align-items: center;
+    } 
+
+     video, canvas {
+        width: 80vw;
+        height: auto;
+    } 
+
+    /* Charts Container: stack vertically */
+    #charts-container {
+        flex-direction: column;
+        align-items: center;
+    } 
+
+    /* Stats: stack vertically */
+    .stats {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .box {
+        width: 80vw;
+    } */
+
+    /* Buttons: stack or shrink gap */
+    .btns {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    /* Adjust #videoForm if necessary */
+    #videoForm {
+        position: static;
+        margin-top: 20px;
+        right: auto;
+    }
+}
 
 /* .main-container{
     visibility: hidden;
@@ -285,7 +347,7 @@ h1 {
     width: 1px;
 } */
 
-#video-container {
+/* #video-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -302,27 +364,21 @@ h1 {
 #videoForm img {
     width: 40px;
     height: 40px;
-} 
+}  */
 
 /* Video and Canvas Styles */
-video{
+/* video{
     width: 35vw; 
     height: 35vw; 
     height: auto; 
     border-radius: 10%;
     border: 2px solid #000000; 
-}
+} */
 
-canvas {
-    width: 35vw; /* Relative width based on the viewport  */
-    height: 35vw; /* Maintain aspect ratio  */
-    height: auto; /* Maintain aspect ratio  */
-    border-radius: 10%;
-    border: 2px solid #000000; /* Red border for emphasis  */
-}
+
 
 /* Chart Container (aligned side by side and centered) */
- #charts-container {
+ /* #charts-container {
     display: flex;
     justify-content: center; 
     align-items: center;
@@ -342,42 +398,42 @@ canvas {
     width: fit-content; 
     margin-top: 20px; 
     visibility: hidden;
-}
+} */
 
 /* Smaller, fixed-size squares for the charts */
-.chart-square {
+/* .chart-square {
     max-height: 350px;  
     max-width: 350px; 
     border: 2px solid #000000;
     background-color: #FFFFFF;
-}
+} */
 
 /* Hidden class to toggle visibility */
-.hidden {
+/* .hidden {
     display: none;
-}
+} */
 /* Speedometer Chart Customizations */
- #speedometerChart {
+ /* #speedometerChart {
     width: 150px;
     height: 150px;
-}
+} */
 
 /* CSS for the head movement chart */
-#headMovementChart {
+/* #headMovementChart {
     width: 150px;
     height: 150px;
     position: relative;
-}
+} */
 
 /* CSS for the new head angle line chart */
-#headAngleLineChart {
+/* #headAngleLineChart {
     width: 150px;
     height: 150px;
     position: relative;
-} 
+}  */
 
 /* Loading spinner animation */
-.loading-spinner {
+/* .loading-spinner {
     border: 8px solid #f3f3f3;
     border-top: 8px solid #3498db;
     border-radius: 50%;
@@ -392,47 +448,47 @@ canvas {
     100% { transform: rotate(360deg); }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) { */
 
     /* Video and Canvas: stack vertically */
-    .vid-chart {
+    /* .vid-chart {
         flex-direction: column;
         align-items: center;
-    }
+    } */
 
     /* Video */
-    video, canvas {
+    /* video, canvas {
         width: 80vw;
         height: auto;
-    }
+    } */
 
     /* Charts Container: stack vertically */
-    #charts-container {
+    /* #charts-container {
         flex-direction: column;
         align-items: center;
-    }
+    } */
 
     /* Stats: stack vertically */
-    .stats {
+    /* .stats {
         flex-direction: column;
         align-items: center;
     }
 
     .box {
         width: 80vw;
-    }
+    } */
 
     /* Buttons: stack or shrink gap */
-    .btns {
+    /* .btns {
         flex-direction: column;
         gap: 15px;
         align-items: center;
-    }
+    } */
 
     /* Adjust #videoForm if necessary */
-    #videoForm {
+    /* #videoForm {
         position: static;
         margin-top: 20px;
         right: auto;
     }
-}
+} */

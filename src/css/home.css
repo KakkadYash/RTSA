@@ -1,6 +1,6 @@
 @font-face {
     font-family: FutraLight;
-    src: url(/public/fonts/Futura-Light-font.ttf);
+    src: url(../../public/fonts/Futura-Light-font.ttf);
 }
 
 main {
@@ -72,7 +72,7 @@ form {
     border-bottom: 2px solid #FFFFFF;
 }
 
-button {
+#submitButton {
     font-family: SCHABO-Condensed;
     background-color: #FFFF;
     color: #000000;

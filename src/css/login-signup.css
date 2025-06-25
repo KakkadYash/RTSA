@@ -1,11 +1,11 @@
 /* Login  */
 @font-face {
     font-family: FutraLight;
-    src: url(/public/fonts/Futura-Light-font.ttf);
+    src: url(../../public/fonts/Futura-Light-font.ttf);
 }
 
 body {
-    background-image: url('/public/assets/login-bkg.png');
+    background-image: url('../../public/assets/login-bkg.png');
     background-repeat: no-repeat;
     background-attachment: scroll;  
     background-size: cover;
@@ -91,7 +91,7 @@ label {
     color: #fff;
 }
 
-button {
+#signInButton, #signUpButton {
     background-color: #FFFF;
     color: #000000;
     border:2px solid #D02720;

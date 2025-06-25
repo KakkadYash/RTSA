@@ -1,6 +1,6 @@
 @font-face {
   font-family: FutraLight;
-  src: url(/public/fonts/Futura-Light-font.ttf);
+  src: url(../../public/fonts/Futura-Light-font.ttf);
 }
 
 .library {
@@ -10,7 +10,7 @@
   padding-top: 10px;
   overflow: auto;
   width: auto;
-  background-image: url(/public/assets/Dashes.png);
+  background-image: url(../../public/assets/Dashes.png);
   background-position: right center;
   background-repeat: no-repeat;
   background-attachment: scroll;
@@ -75,7 +75,7 @@ video, canvas {
   gap: 10px;
 }
 
-button {
+#sortButton {
   font-family: FutraLight;
   background-color: #FFFF;
   color: #787878;

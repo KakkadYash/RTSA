@@ -1,6 +1,6 @@
 @font-face {
     font-family: SCHABO-Condensed;
-    src: url(/public/fonts/SCHABO-Condensed.otf);
+    src: url(../../public/fonts/SCHABO-Condensed.otf);
 }
 
 body {
@@ -10,7 +10,7 @@ body {
     background-color: #383838;
     text-align: center;
     padding-bottom: 50px;
-    background-image: url('/public/assets/Main-Background.png');
+    background-image: url('../../public/assets/Main-Background.png');
     background-repeat: no-repeat;
     background-attachment: scroll;  
     background-size: cover;
@@ -206,3 +206,53 @@ main {
         margin-left: var(--sb-width);
     }
 }
+@media (max-width: 768px) {
+    aside {
+      width: 70px; /* collapse the sidebar on smaller screens */
+      padding: 0.5rem;
+    }
+  
+    .logo {
+      width: 100px;
+    }
+  
+    .line {
+      width: 100px;
+    }
+  
+    nav {
+      gap: 50px;
+    }
+  
+    nav a {
+      justify-content: center;
+      font-size: 1rem;
+    }
+  
+    nav a span {
+      display: none; /* hide text on small screens */
+    }
+  
+    .arrow,
+    .football {
+      width: 25px;
+    }
+  
+    .logOut {
+      font-size: 18px;
+    }
+  
+    .social-box {
+      width: 25px;
+      height: 25px;
+    }
+  
+    .icons {
+      width: 20px;
+      height: 20px;
+    }
+  
+    nav li:last-child {
+      margin-top: 100px;
+    }
+  }

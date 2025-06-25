@@ -1,10 +1,10 @@
 @font-face {
     font-family: FutraLight;
-    src: url(/public/fonts/Futura-Light-font.ttf);
+    src: url(../../public/fonts/Futura-Light-font.ttf);
 }
 
 #bg {
-    background-image: url(/public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(/public/assets/Dashes.png), url(/public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
+    background-image: url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
     background-position: right top, right center, right bottom;
     background-repeat: no-repeat, no-repeat, no-repeat;
     background-attachment: scroll, scroll, scroll;
@@ -121,7 +121,7 @@ h3 {
     font-size: 50px;
 }
 
-button {
+#saveButton {
     font-family: SCHABO-Condensed;
     background-color: #FFFF;
     color: #000000;
@@ -129,7 +129,7 @@ button {
     border-radius: 6%;
     text-align: center;
     text-decoration: none;
-    /* display: inline-block; */
+    display: inline-block;
     font-size: 40px;
     width: 150px;
     cursor: pointer;
@@ -211,7 +211,7 @@ select {
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     padding: 10px;
     width: 300px;
     border: 1px solid #FFFFFF;
@@ -219,20 +219,29 @@ select {
 
 h4 {
     color: #FFFFFF; 
-    display: flex;
-    align-items: start;
     font-family: FutraLight;
-    font-size: 30px;
+    font-size: 40px;
 }
 
-.check{
+p {
+    color: #FFFFFF; 
+    font-family: FutraLight;
+    font-size: 40px;
+    line-height: 1;
+}
+
+.check {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: 20px;
 }
 
-.checkBox{
+.checkBox {
     height: auto;
     width: 30px;
+}
+
+#individual, #organization, #school {
+    align-self: center;
 }

@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
         // Load HTML
-        const res = await fetch(`/src/pages/${page}/${page}.html`);
+        const res = await fetch(`../../src/pages/${page}/${page}.html`);
         if (!res.ok) throw new Error(`Page ${page} not found`);
         const html = await res.text();
         document.getElementById('content-area').innerHTML = html;
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const linkEl = document.createElement('link');
             linkEl.id = 'dynamic-page-style';
             linkEl.rel = 'stylesheet';
-            linkEl.href = `/src/css/${cssFile}`;
+            linkEl.href = `../../src/css/${cssFile}`;
             linkEl.onerror = () => console.warn(`⚠️ Failed to load CSS: ${cssFile}`);
             document.head.appendChild(linkEl);
         }
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (jsFile) {
             const scriptEl = document.createElement('script');
             scriptEl.id = 'dynamic-page-script';
-            scriptEl.src = `/src/js/${jsFile}`;
+            scriptEl.src = `../../src/js/${jsFile}`;
             scriptEl.defer = true;
             scriptEl.onerror = () => console.warn(`⚠️ Failed to load JS: ${jsFile}`);
             document.body.appendChild(scriptEl);
