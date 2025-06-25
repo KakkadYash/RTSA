@@ -77,10 +77,41 @@ canvas {
   gap: 20px;
 }
 
+.chart-container {
+  width: 1000px;
+  height: 400px; /* ✅ fixed height */
+  position: relative;
+  padding-left: 20px;
+}
+
 #myChart {
   padding-left: 20px;
-  height: auto;
-  width: 1000px;
+  width: 100%;
+  height: 100%;
+}
+
+.chart-arrows {
+  position: absolute;
+  bottom: -35px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.chart-arrows button {
+  font-size: 24px;
+  padding: 6px 12px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transform: scale(0.6); /* ✅ 50% smaller */
+}
+
+.chart-arrows button:hover {
+  background-color: #555;
 }
 
 .small-box {

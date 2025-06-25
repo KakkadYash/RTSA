@@ -1,141 +1,149 @@
-(function () {
-  let headAngleChart, topSpeedChart, athleticScoreChart;
+function loadDashboard() {
+  const userId = localStorage.getItem("user_id");
+  if (!userId) return;
+
+  const chartCanvas = document.getElementById("myChart");
+  const uploadCounter = document.getElementById("uploadCounter");
+  const prevBtn = document.getElementById("prevChart");
+  const nextBtn = document.getElementById("nextChart");
+
+  if (!chartCanvas || !uploadCounter || !prevBtn || !nextBtn) {
+    console.warn("Dashboard elements not ready");
+    return;
+  }
 
   const chartOptions = {
     responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: { beginAtZero: true }
-    }
+    maintainAspectRatio: false, // <- keep
+    animation: false,           // <- optional
   };
 
-  function average(arr) {
-    if (!arr.length) return 0;
-    return arr.reduce((a, b) => a + b, 0) / arr.length;
-  }
+  let chartInstance;
+  let currentMetricIndex = 0;
 
-  function createOrUpdateChart(chartInstance, ctx, labels, data, label, color) {
+  const metricLabels = ["Combined", "Ideal Head Angle %", "Top Speed (km/h)", "Average Athletic Score"];
+  const chartDataCache = { labels: [], headAngleData: [], topSpeedData: [], athleticScoreData: [] };
+
+  const average = arr => arr.length ? arr.reduce((a, b) => a + b, 0) : 0;
+
+  function renderChart(index) {
+    const ctx = chartCanvas.getContext("2d");
     if (chartInstance) chartInstance.destroy();
-    return new Chart(ctx, {
+
+    const { labels, headAngleData, topSpeedData, athleticScoreData } = chartDataCache;
+
+    let datasets = [];
+    if (index === 0) {
+      datasets = [
+        { label: "Ideal Head Angle %", data: headAngleData, borderColor: "blue", fill: false },
+        { label: "Top Speed (km/h)", data: topSpeedData, borderColor: "red", fill: false },
+        { label: "Average Athletic Score", data: athleticScoreData, borderColor: "green", fill: false }
+      ];
+    } else {
+      const dataMap = [null, headAngleData, topSpeedData, athleticScoreData];
+      const colorMap = [null, "blue", "red", "green"];
+      datasets = [{
+        label: metricLabels[index],
+        data: dataMap[index],
+        borderColor: colorMap[index],
+        fill: false
+      }];
+    }
+
+    chartInstance = new Chart(ctx, {
       type: "line",
-      data: {
-        labels,
-        datasets: [{
-          label,
-          data,
-          borderColor: color,
-          fill: false
-        }]
-      },
+      data: { labels, datasets },
       options: chartOptions
     });
   }
 
-  const loadProgressDashboard = async () => {
+  async function fetchUploadCount() {
     try {
-      const userId = localStorage.getItem("user_id");
-      const response = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/history?userId=${userId}`);
-      const historyData = await response.json();
+      const res = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/get-total-uploads?userId=${userId}`);
+      const data = await res.json();
+      uploadCounter.textContent = data.total_uploads || "0";
+    } catch (err) {
+      console.error("Upload count error:", err);
+    }
+  }
 
-      if (!Array.isArray(historyData.history)) {
-        console.error("Error: historyData is not an array", historyData);
-        return;
-      }
+  async function fetchHistoryData() {
+    try {
+      const res = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/history?userId=${userId}`);
+      const data = await res.json();
+      const history = data.history;
+      if (!Array.isArray(history)) return;
 
-      // Sort and extract values
-      historyData.history.sort((a, b) => new Date(a.upload_date) - new Date(b.upload_date));
-
-      const uploadDates = historyData.history.map(item => new Date(item.upload_date));
+      history.sort((a, b) => new Date(a.upload_date) - new Date(b.upload_date));
+      const uploadDates = history.map(h => new Date(h.upload_date));
       const firstDate = uploadDates[0];
       const lastDate = uploadDates[uploadDates.length - 1];
       const timeSpanDays = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24));
 
-      let labels = [];
-      let headAngleData = [], topSpeedData = [], athleticScoreData = [];
+      let labels = [], head = [], speed = [], score = [];
 
       if (timeSpanDays <= 7) {
-        // DAILY
         labels = uploadDates.map((_, i) => `Day ${i + 1}`);
-        headAngleData = historyData.history.map(item => parseFloat(item.ideal_head_angle_percentage) || 0);
-        topSpeedData = historyData.history.map(item => parseFloat(item.top_speed) || 0);
-        athleticScoreData = historyData.history.map(item => parseFloat(item.athletic_score) || 0);
+        head = history.map(h => parseFloat(h.ideal_head_angle_percentage) || 0);
+        speed = history.map(h => parseFloat(h.top_speed) || 0);
+        score = history.map(h => parseFloat(h.athletic_score) || 0);
       } else if (timeSpanDays <= 28) {
-        // WEEKLY
-        const weeklyData = {};
-        historyData.history.forEach(item => {
-          const date = new Date(item.upload_date);
-          const weekNumber = Math.ceil(((date - firstDate) / (1000 * 60 * 60 * 24)) / 7) + 1;
-          const key = `Week ${weekNumber}`;
-          if (!weeklyData[key]) weeklyData[key] = { head: [], speed: [], score: [] };
-          weeklyData[key].head.push(parseFloat(item.ideal_head_angle_percentage) || 0);
-          weeklyData[key].speed.push(parseFloat(item.top_speed) || 0);
-          weeklyData[key].score.push(parseFloat(item.athletic_score) || 0);
+        const weekly = {};
+        history.forEach(h => {
+          const week = Math.ceil((new Date(h.upload_date) - firstDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
+          const key = `Week ${week}`;
+          if (!weekly[key]) weekly[key] = { head: [], speed: [], score: [] };
+          weekly[key].head.push(parseFloat(h.ideal_head_angle_percentage) || 0);
+          weekly[key].speed.push(parseFloat(h.top_speed) || 0);
+          weekly[key].score.push(parseFloat(h.athletic_score) || 0);
         });
-
-        labels = Object.keys(weeklyData);
-        headAngleData = labels.map(key => average(weeklyData[key].head));
-        topSpeedData = labels.map(key => average(weeklyData[key].speed));
-        athleticScoreData = labels.map(key => average(weeklyData[key].score));
+        labels = Object.keys(weekly);
+        head = labels.map(k => average(weekly[k].head));
+        speed = labels.map(k => average(weekly[k].speed));
+        score = labels.map(k => average(weekly[k].score));
       } else {
-        // MONTHLY
-        const monthlyData = {};
-        historyData.history.forEach(item => {
-          const date = new Date(item.upload_date);
-          const monthNumber = (date.getFullYear() - firstDate.getFullYear()) * 12 + (date.getMonth() - firstDate.getMonth()) + 1;
-          const key = `Month ${monthNumber}`;
-          if (!monthlyData[key]) monthlyData[key] = { head: [], speed: [], score: [] };
-          monthlyData[key].head.push(parseFloat(item.ideal_head_angle_percentage) || 0);
-          monthlyData[key].speed.push(parseFloat(item.top_speed) || 0);
-          monthlyData[key].score.push(parseFloat(item.athletic_score) || 0);
+        const monthly = {};
+        history.forEach(h => {
+          const date = new Date(h.upload_date);
+          const month = (date.getFullYear() - firstDate.getFullYear()) * 12 + date.getMonth() - firstDate.getMonth() + 1;
+          const key = `Month ${month}`;
+          if (!monthly[key]) monthly[key] = { head: [], speed: [], score: [] };
+          monthly[key].head.push(parseFloat(h.ideal_head_angle_percentage) || 0);
+          monthly[key].speed.push(parseFloat(h.top_speed) || 0);
+          monthly[key].score.push(parseFloat(h.athletic_score) || 0);
         });
-
-        labels = Object.keys(monthlyData);
-        headAngleData = labels.map(key => average(monthlyData[key].head));
-        topSpeedData = labels.map(key => average(monthlyData[key].speed));
-        athleticScoreData = labels.map(key => average(monthlyData[key].score));
+        labels = Object.keys(monthly);
+        head = labels.map(k => average(monthly[k].head));
+        speed = labels.map(k => average(monthly[k].speed));
+        score = labels.map(k => average(monthly[k].score));
       }
 
-      // Update charts
-      const ctx1 = document.getElementById("headAngleChart").getContext("2d");
-      const ctx2 = document.getElementById("topSpeedChart").getContext("2d");
-      const ctx3 = document.getElementById("athleticScoreChart").getContext("2d");
+      chartDataCache.labels = labels;
+      chartDataCache.headAngleData = head;
+      chartDataCache.topSpeedData = speed;
+      chartDataCache.athleticScoreData = score;
 
-      headAngleChart = createOrUpdateChart(headAngleChart, ctx1, labels, headAngleData, "Ideal Head Angle %", "blue");
-      topSpeedChart = createOrUpdateChart(topSpeedChart, ctx2, labels, topSpeedData, "Top Speed (km/h)", "red");
-      athleticScoreChart = createOrUpdateChart(athleticScoreChart, ctx3, labels, athleticScoreData, "Average Athletic Score", "green");
-
-    } catch (error) {
-      console.error("Error loading progress dashboard:", error);
+      renderChart(currentMetricIndex);
+    } catch (err) {
+      console.error("History fetch error:", err);
     }
-  };
-
-  const totaluploads = async () => {
-    try {
-      const userId = localStorage.getItem("user_id");
-      if (!userId) {
-        console.error("User ID not found.");
-        return;
-      }
-
-      const response = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/get-total-uploads?userId=${userId}`);
-      if (!response.ok) throw new Error("Failed to fetch total uploads");
-
-      const data = await response.json();
-      document.getElementById('uploadCounter').textContent = data.total_uploads;
-
-    } catch (error) {
-      console.error("Error fetching total uploads:", error);
-    }
-  };
-
-  // Bind tab click after DOM is ready (because it's dynamically injected)
-  const progressTab = document.querySelector('[data-tab="progress"]');
-  if (progressTab) {
-    progressTab.addEventListener("click", () => {
-      loadProgressDashboard();
-      totaluploads();
-    });
-  } else {
-    console.warn("Progress tab not found");
   }
-})();
+
+  // Run on load
+  fetchUploadCount();
+  fetchHistoryData();
+
+  // Arrows
+  prevBtn.addEventListener("click", () => {
+    currentMetricIndex = (currentMetricIndex - 1 + metricLabels.length) % metricLabels.length;
+    renderChart(currentMetricIndex);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    currentMetricIndex = (currentMetricIndex + 1) % metricLabels.length;
+    renderChart(currentMetricIndex);
+  });
+}
+
+// Required so home.js can access it globally
+window.loadDashboard = loadDashboard;

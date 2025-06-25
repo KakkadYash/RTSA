@@ -1,47 +1,22 @@
-(function () {
-  function sortList() {
-    const list = document.getElementById("id01");
-    let switching = true;
-    while (switching) {
-      switching = false;
-      const items = list.getElementsByTagName("p1");
-      for (let i = 0; i < items.length - 1; i++) {
-        if (items[i].innerHTML.toLowerCase() > items[i + 1].innerHTML.toLowerCase()) {
-          items[i].parentNode.insertBefore(items[i + 1], items[i]);
-          switching = true;
-          break;
-        }
-      }
-    }
-  }
-
-  function myFunction() {
-    document.getElementById("myDropdown").classList.toggle("show");
-  }
-
-  function filterFunction() {
-    const input = document.getElementById("myInput");
-    const filter = input.value.toUpperCase();
-    const div = document.getElementById("myDropdown");
-    const a = div.getElementsByTagName("a");
-    for (let i = 0; i < a.length; i++) {
-      const txtValue = a[i].textContent || a[i].innerText;
-      a[i].style.display = txtValue.toUpperCase().includes(filter) ? "" : "none";
-    }
-  }
-
+function loadHistory() {
   const userId = localStorage.getItem("user_id");
+  if (!userId) return;
 
-  const loadHistory = async () => {
+  const tableBody = document.getElementById("history-table-body");
+  if (!tableBody) {
+    console.warn("History DOM not ready.");
+    return;
+  }
+
+  const fetchHistoryData = async () => {
     try {
       const response = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/history?userId=${userId}`);
       const historyData = await response.json();
 
-      const tableBody = document.getElementById('history-table-body');
       tableBody.innerHTML = '';
 
       if (!Array.isArray(historyData.history)) {
-        console.error("Error: historyData is not an array", historyData);
+        console.error("historyData.history is not an array:", historyData);
         return;
       }
 
@@ -53,7 +28,6 @@
         }
 
         const currentRow = tableBody.lastElementChild;
-
         const drillDiv = document.createElement('div');
         drillDiv.className = 'drill';
         drillDiv.innerHTML = `
@@ -67,19 +41,15 @@
             <span>${item.top_speed || 'N/A'} km/h</span>
           </div>
         `;
-
         currentRow.appendChild(drillDiv);
       });
     } catch (error) {
-      console.error('Error loading history:', error);
+      console.error("Error loading history:", error);
     }
   };
 
-  // Trigger it directly since we no longer use a separate History tab
-  loadHistory();
+  fetchHistoryData();
+}
 
-  // Optional: expose sortList, myFunction, filterFunction if triggered by UI
-  window.sortList = sortList;
-  window.myFunction = myFunction;
-  window.filterFunction = filterFunction;
-})();
+// Make available to home.js loader
+window.loadHistory = loadHistory;
