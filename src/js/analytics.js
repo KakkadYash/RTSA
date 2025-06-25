@@ -459,6 +459,51 @@ function loadAnalytics() {
                 peakDeceleration: appState.peakDeceleration || 0
             };
 
+            // Update Progress bar values and control gradient color
+            function getGradientColor(percent) {
+                // Clamp percent between 0 and 100
+                percent = Math.max(0, Math.min(percent, 100));
+              
+                if (percent <= 50) {
+                  // Red to Yellow
+                  const ratio = percent / 50;
+                  const r = 233; // stays at red
+                  const g = Math.round(57 + (212 - 57) * ratio); // 57 to 212
+                  const b = 44; // stays at 44
+                  return `rgb(${r},${g},${b})`;
+                } else {
+                  // Yellow to Green
+                  const ratio = (percent - 50) / 50;
+                  const r = Math.round(243 - (243 - 122) * ratio); // 243 to 122
+                  const g = Math.round(212 + (222 - 212) * ratio); // 212 to 222
+                  const b = Math.round(85 + (90 - 85) * ratio); // 85 to 90
+                  return `rgb(${r},${g},${b})`;
+                }
+              }
+
+              function updateProgressBar(metricId, value) {
+                const bar = document.getElementById(metricId + 'Bar');
+                const label = document.getElementById(metricId + 'Value');
+                const percent = Math.min(100, value);
+              
+                if (bar && label) {
+                  bar.style.width = percent + '%';
+                  bar.style.background = getGradientColor(percent);
+                  label.textContent = value.toFixed(1);
+                }
+              }
+
+            document.getElementById("averageAthleticScore").innerHTML = appState.averageAthleticScore + "%" || '';
+            document.getElementById("topSpeed").innerHTML = appState.topSpeed + " YD" || '';
+            document.getElementById("averageJumpHeight").innerHTML = appState.topSpeed + " YD" || '';
+            document.getElementById("averageAthleticScore").innerHTML = appState.averageAthleticScore + "%" || '';
+            document.getElementById("averageAthleticScore").innerHTML = appState.averageAthleticScore + "%" || '';
+            updateProgressBar('topSpeed', analyticsData.topSpeed);
+            updateProgressBar('averageJumpHeight', analyticsData.averageJumpHeight);
+            updateProgressBar('averageStrideLength', analyticsData.averageStrideLength);
+            updateProgressBar('peakAcceleration', analyticsData.peakAcceleration);
+            updateProgressBar('peakDeceleration', analyticsData.peakDeceleration);
+
             console.log("Sending analytics data:", analyticsData);
     
             const analyticsResponse = await fetch('https://uploaded-data-443715.uc.r.appspot.com/saveAnalytics', {
@@ -1114,7 +1159,52 @@ function loadAnalytics() {
         };
         console.log("Analysis data and charts reset");
     }
+});
 
+
+const ctx = document.getElementById('myChart').getContext('2d');
+new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    labels: ['IDEAL', 'NOT IDEAL', 'RUNNING', 'STANDING', 'CROUTCHING'],
+    datasets: [
+      {
+        label: 'Outer Ring',
+        data: [0, 0, 70, 20, 10],
+        backgroundColor: ['#93D669', '#EA4940', '#75A6E2', '#5970F7', '#224A62'],
+        borderWidth: 1,
+        radius: '100%',       // Outer ring
+        cutout: '30%',
+      },
+      {
+        label: 'Inner Ring',
+        data: [0, 100],
+        backgroundColor: ['#93D669', '#EA4940'],
+        borderWidth: 1,
+        radius: '100%',        // Inner ring
+        cutout: '30%',
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+      }
+    }
+  }
+});
+
+  function flipAllCards() {
+    // Select all card elements
+    const cards = document.querySelectorAll('.card');
+
+    // Loop through each card and toggle 'is-flipped' class
+    cards.forEach(card => {
+        card.classList.toggle('is-flipped');
+    });
+}
   // Done
   console.log("Analytics module loaded");
 }

@@ -16,12 +16,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // Add more if needed
   };
 
+
   document.querySelectorAll(".nav-link").forEach(link => {
     link.addEventListener("click", async (e) => {
       e.preventDefault();
       const page = link.getAttribute("data-page");
       const cssFile = link.getAttribute("data-css");
       const jsFile = link.getAttribute("data-js");
+
 
       if (!page) return;
 
