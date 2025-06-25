@@ -2,9 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const tabs = document.querySelectorAll(".nav-link");
   const userId = localStorage.getItem("user_id");
 
-  const PAGE_ROOT = "/src/pages/";
-  const CSS_ROOT = "/src/css/";
-  const JS_ROOT = "/src/js/";
+  const PAGE_ROOT = "../../src/pages/";
+  const CSS_ROOT = "../../src/css/";
+  const JS_ROOT = "../../src/js/";
 
   // Optional: dynamic page → function mapping override
   const pageFunctionMap = {
