@@ -10,7 +10,7 @@ body {
     background-color: #383838;
     text-align: center;
     padding-bottom: 50px;
-    background-image: url('../../public/assets/Main-Background.png');
+    /* background-image: url('../../public/assets/Main-Background.png'); */
     background-repeat: no-repeat;
     background-attachment: scroll;  
     background-size: cover;
