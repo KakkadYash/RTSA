@@ -18,6 +18,7 @@ main span {
 .hello{
   display: flex;
   flex-direction: column;
+  padding-left: 20px;
 }
 
 #nameInfo {
@@ -75,6 +76,7 @@ canvas {
   display: flex;
   flex-direction: row;
   gap: 20px;
+  padding-left: 20px;
 }
 
 .chart-container {
@@ -129,4 +131,93 @@ canvas {
   height: 200px;
   gap: 10px;
   border: 1px solid #FFFFFF;
+}
+
+@media (max-width: 768px) {
+  main span,
+  .userData span {
+    font-size: 36px;
+  }
+
+  #nameInfo {
+    font-size: 40px;
+  }
+
+  .small-box {
+    font-size: 30px;
+    width: 90vw;
+    height: auto;
+    padding: 15px;
+    line-height: 40px;
+  }
+
+  .uploads {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .avatar {
+    width: 90vw;
+  }
+
+  #img-preview {
+    width: 100%;
+    height: auto;
+  }
+
+  #bg .line,
+  main .line2 {
+    width: 70vw;
+  }
+
+  .chart-container {
+    width: 90vw;
+    height: 300px;
+    padding: 0;
+  }
+
+  #myChart {
+    width: 100% !important;
+    height: 100% !important;
+    padding-left: 0;
+  }
+
+  .chart-arrows {
+    bottom: -25px;
+  }
+
+  .chart-arrows button {
+    font-size: 18px;
+    transform: scale(0.8);
+  }
+
+  .hello {
+    align-items: center;
+    padding-left: 0;
+    text-align: center;
+  }
+
+  .userData {
+    padding-left: 0;
+    align-items: center;
+  }
+
+  canvas {
+    width: 90vw;
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .small-box {
+    width: 80vw;
+  }
+
+  .avatar {
+    width: 300px;
+  }
+
+  .chart-container {
+    width: 95vw;
+  }
 }

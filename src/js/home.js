@@ -77,5 +77,5 @@ document.addEventListener("DOMContentLoaded", function () {
 // Logout
 function logout() {
 alert("Logging out...");
-window.location.href = "index.html/";
+window.location.href = "../../index.html";
 } 

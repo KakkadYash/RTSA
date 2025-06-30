@@ -141,3 +141,74 @@ video, canvas {
 .dropdown a:hover {background-color: #ddd;}
   
 .show {display: block;}
+
+@media (max-width: 768px) {
+  header .title {
+    font-size: 40px;
+    text-align: center;
+  }
+
+  .search input {
+    width: 80vw;
+    font-size: 18px;
+    padding: 10px;
+  }
+
+  .library {
+    background-size: 80px auto;
+    padding-top: 20px;
+  }
+
+  .description {
+    width: 80vw;
+    font-size: 18px;
+  }
+
+  .drill-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .drill {
+    align-items: center;
+    font-size: 24px;
+    width: 90vw;
+  }
+
+  video,
+  canvas {
+    width: 80vw;
+    height: auto;
+  }
+
+  #history-table-body {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .dropdown,
+  .sort {
+    padding-left: 0;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+  }
+
+  .dropdown-content {
+    width: 80vw;
+    min-width: unset;
+  }
+
+  #sortButton {
+    font-size: 20px;
+    width: 60vw;
+  }
+
+  .dropbtn,
+  #myInput {
+    font-size: 16px;
+    padding: 12px;
+  }
+}
