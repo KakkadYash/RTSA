@@ -1,10 +1,10 @@
 @font-face {
     font-family: FutraLight;
-    src: url(/public/fonts/Futura-Light-font.ttf);
+    src: url(../../public/fonts/Futura-Light-font.ttf);
 }
 
 #bg {
-    background-image: url(/public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(/public/assets/Dashes.png), url(/public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
+    background-image: url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
     background-position: right top, right center, right bottom;
     background-repeat: no-repeat, no-repeat, no-repeat;
     background-attachment: scroll, scroll, scroll;
@@ -22,9 +22,9 @@
 .profileHead {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     padding-top: 10px;
-    gap: 50px;
+    gap: 55px;
 }
 
 .avatar {
@@ -84,7 +84,7 @@ h2 {
     align-items: start;
     justify-content: center;
     padding: 20px;
-    width: 410px;
+    width: 510px;
     height: 200px;
     gap: 10px;
     border: 1px solid #FFFFFF;
@@ -121,7 +121,7 @@ h3 {
     font-size: 50px;
 }
 
-button {
+#saveButton {
     font-family: SCHABO-Condensed;
     background-color: #FFFF;
     color: #000000;
@@ -129,7 +129,7 @@ button {
     border-radius: 6%;
     text-align: center;
     text-decoration: none;
-    /* display: inline-block; */
+    display: inline-block;
     font-size: 40px;
     width: 150px;
     cursor: pointer;
@@ -181,7 +181,14 @@ select {
     display: flex;
     flex-direction: column;
     align-items: start;
+    justify-content: space-between;
     width: auto;
+}
+
+.subscriptionBoxs {
+    display: flex;
+    flex-direction: row;
+    gap: 80px;
 }
 
 .subscription span {
@@ -197,12 +204,6 @@ select {
     width: 220px;
 }
 
-.subscriptionBoxs {
-    display: flex;
-    flex-direction: row;
-    gap: 40px;
-}
-
 .sub-box {
     background-color: #000000;
     color: #FFFFFF;
@@ -211,7 +212,7 @@ select {
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     padding: 10px;
     width: 300px;
     border: 1px solid #FFFFFF;
@@ -219,20 +220,151 @@ select {
 
 h4 {
     color: #FFFFFF; 
-    display: flex;
-    align-items: start;
     font-family: FutraLight;
-    font-size: 30px;
+    font-size: 40px;
 }
 
-.check{
+p {
+    color: #FFFFFF; 
+    font-family: FutraLight;
+    font-size: 40px;
+    line-height: 1;
+}
+
+.check {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: 20px;
 }
 
-.checkBox{
+.checkBox {
     height: auto;
     width: 30px;
 }
+
+#individual, #organization, #school {
+    font-family: SCHABO-Condensed;
+    background-color: #FFFF;
+    color: #000000;
+    border:2px solid #D02720;
+    border-radius: 10%;
+    text-align: center;
+    text-decoration: none;
+    font-size: 40px;
+    width: 150px;
+    cursor: pointer;
+    align-self: center;
+}
+
+@media (max-width: 1200px) {
+    .profileHead {
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+  
+    .avatar img,
+    .img-preview {
+      width: 90vw;
+      max-width: 400px;
+      height: auto;
+    }
+  
+    .user {
+      font-size: 18px;
+    }
+  
+    .small-box {
+      width: 90%;
+      font-size: 40px;
+      height: auto;
+      padding: 15px;
+    }
+  
+    .main-box {
+      width: 90%;
+      font-size: 24px;
+      padding-left: 15px;
+      line-height: 60px;
+    }
+  
+    .subHeader {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 100px;
+    }
+  
+    .form-control,
+    #name, #email, #username, #password, #age, #state, #sports,
+    select {
+      width: 100%;
+      font-size: 24px;
+    }
+  
+    .data, .info {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  
+    #saveButton {
+      font-size: 30px;
+      width: 130px;
+    }
+  
+    .subscriptionBoxs {
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+  
+    .sub-box {
+      width: 90%;
+      font-size: 24px;
+    }
+  
+    h1.title, h2, h3, h4, p {
+      font-size: 5vw;
+      text-align: center;
+    }
+  
+    .checkBox {
+      width: 24px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .avatar img {
+      max-width: 300px;
+    }
+  
+    .main-box,
+    .small-box,
+    .sub-box {
+      font-size: 20px;
+      padding: 10px;
+    }
+  
+    .form-control,
+    select {
+      width: 100%;
+      font-size: 20px;
+    }
+  
+    #saveButton,
+    .button {
+      font-size: 20px;
+      width: 100px;
+    }
+  
+    h1.title, h2, h3, h4, p {
+      font-size: 20px;
+      text-align: center;
+    }
+  
+    .checkBox {
+      width: 20px;
+    }
+  }
+  

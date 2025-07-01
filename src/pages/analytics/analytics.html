@@ -1,149 +1,156 @@
-    <header class="header">
-      <h2 class="title">ANALYTICS</h2>
-    </header>
-    <div id="bg">
-      <!-- Stats -->
-      <div class="stats">
-        <div class="box">
-          <div id="drillTime">DRILL TIME</div>
-          <div id="drillTimeValue">--</div>
-        </div>
-        <div class="box">
-          <div id="distance">DISTANCE</div>
-          <div id="distanceValue">--</div>
-        </div>
-        <div class="box">
-          <div id="steps">STEPS</div>
-          <div id="stepsValue">--</div>
-        </div>
-        <div class="box">
-          <div id="athleticScore">ATHLETIC SCORE</div>
-          <div id="athleticScoreValue">--</div>
-        </div>
+<body>
+  <header class="header">
+    <h1 class="title">ANALYTICS</h1>
+  </header>
+  <div id="bg">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="box">
+        <div id="drillTime">DRILL TIME</div>
+        <div id="drillTimeValue">--</div>
+      </div>
+      <div class="box">
+        <div id="distance">DISTANCE</div>
+        <div id="distanceValue">--</div>
+      </div>
+      <div class="box">
+        <div id="steps">STEPS</div>
+        <div id="stepsValue">--</div>
+      </div>
+      <div class="box">
+        <div id="athleticScore">ATHLETIC SCORE</div>
+        <div id="athleticScoreValue">--</div>
       </div>
     </div>
-      <!-- Loading overlay (hidden initially) -->
-    <div id="loadingOverlayHEML" class="loading-overlay">
-      <div class="loading-spinner"></div>
-    </div>
-    <!-- Video Section -->
-    <div class="video-section">
-      <div class="vid-chart">
-        <!-- Preview video element (visible initially) -->
-        <video id="uploaded-video" controls style="display: block;"></video>
-        <!-- Canvas output for processed video (hidden initially) -->
-        <canvas id="output_canvas" style="display: none;"></canvas>
-        <div class="chart-wrapper">
-          <canvas id="myChart2"></canvas>
-        </div>
-     </div>
-     <form id="videoForm">
-       <label for="uploadButton">
-         <img src="/public/assets/Add.png" alt="add">
-         <input type="file" id="uploadButton" accept="video/*">
-       </label>
-     </form>
-        <!-- <label for="uploadDate">Set Upload Date (optional):</label>
-        <input type="datetime-local" id="uploadDate" name="uploadDate"> -->
-    </div>
-    <!-- Button to start processed playback (revealed after analysis) -->
-    <button id="playProcessedButton" type="button" controls style="display: none;">Play Processed Video</button>
-    <!-- Analyze button -->
-    <div class="btns">
-      <button id="analyzeButton" type="button">ANALYZE VIDEO</button>
-      <button id="showMetrics" type="button" >SHOW ALL METRICS</button>
-    </div>
-    <!-- Analyzing indicator (hidden initially) -->
-    <div id="analyzingIndicator" style="display: none; margin-top: 10px;">
-      <span class="small-spinner"></span> Analyzing...
-    </div>
-    <div id="stats-container">
-      <div class="card-container">
-        <div class="card" onclick="this.classList.toggle('is-flipped')">
-          <div class="card-face card-front">
-            <p>TECHNIQUE</p>
-            <canvas id="myChart"></canvas>
-            <div class="description">
-                <span>Description</span>
-            </div>
-          </div>
-          <div class="card-face card-back">
-            <h1>TECHNIQUE</h1>
-          </div>
-        </div>
-      </div>
-      <div class="card-container">
-        <div class="card" onclick="this.classList.toggle('is-flipped')">
-          <div class="card-face card-front">
-            <p>SPEED & MOVEMENT</p>
-            <div class="sliderHead">
-              <label for="speed">SPEED</label> <div id="speedValue">0</div>
-            </div>
-            <div class="slideContainer"> 
-              <input type="range" class="slider" id="speed" min="0" max="100">
-            </div>
-            <div class="sliderHead">
-              <label for="acceleration">PEAK ACCELERATION</label> <div id="accelerationValue">50</div>
-            </div>
-            <div class="slideContainer"> 
-              <input type="range" class="slider" id="acceleration" min="0" max="100">
-            </div>           
-            <div class="sliderHead">
-              <label for="deceleration">PEAK DECELERATION</label> <div id="decelerationValue">50</div>
-            </div>
-            <div class="slideContainer"> 
-              <input type="range" class="slider" id="deceleration" min="0" max="100">
-            </div>
-            <div class="description">
-              <span>Description</span>
-            </div>
-          </div>
-          <div class="card-face card-back2">
-            <h1>SPEED & MOVEMENT</h1>
-          </div>
-        </div>
-      </div>
-      <div class="card-container">
-        <div class="card" onclick="this.classList.toggle('is-flipped')">
-          <div class="card-face card-front">
-            <p>FOOTWORK</p>
-            <div class="sliderHead">
-              <label for="range">AVG JUMP HEIGHT</label> <div class="value">0</div>
-            </div>
-            <div class="slideContainer"> 
-              <input type="range" class="slider" id="jumpheight" min="0" max="100">
-            </div>
-            <div class="sliderHead">
-              <label for="range">AVG STRIDE LENGTH</label> <div class="value1">50</div>
-            </div>
-            <div class="slideContainer"> 
-              <input type="range" class="slider" id="strideleng" min="0" max="100">
-            </div>
-            <div class="description">
-              <span>Description</span>
-            </div>
-          </div>
-          <div class="card-face card-back3">
-            <h1>FOOTWORK</h1>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-<!-- 
   </div>
-  <script src="d.js"></script>
-  <script>
-    function flipAllCards() {
-    // Select all card elements
-    const cards = document.querySelectorAll('.card');
-
-    // Loop through each card and toggle 'is-flipped' class
-    cards.forEach(card => {
-        card.classList.toggle('is-flipped');
-    });
-}
-  </script>
+    <!-- Loading overlay (hidden initially) -->
+  <div id="loadingOverlayHEML" class="loading-overlay">
+    <div class="loading-spinner"></div>
+  </div>
+  <!-- Video Section -->
+  <div class="video-section">
+    <div class="vid-chart">
+      <!-- Preview video element (visible initially) -->
+      <video id="uploaded-video" controls style="display: block;"></video>
+      <!-- Canvas output for processed video (hidden initially) -->
+      <canvas id="output_canvas" style="display: none;"></canvas>
+      <div class="chart-wrapper">
+        <canvas id="myChart2"></canvas>
+      </div>
+      <form id="videoForm">
+        <label for="uploadButton">
+          <img src="../../public/assets/Add.png" alt="add">
+          <input type="file" id="uploadButton" accept="video/*">
+        </label>
+      </form>
+   </div>
+      <!-- <label for="uploadDate">Set Upload Date (optional):</label>
+      <input type="datetime-local" id="uploadDate" name="uploadDate"> -->
+  </div>
+  <!-- Button to start processed playback (revealed after analysis) -->
+  <button id="playProcessedButton" type="button" controls >Play Processed Video</button>
+  <!-- Analyze button -->
+  <div class="btns">
+    <button id="analyzeButton" type="button">ANALYZE VIDEO</button>
+    <button id="showMetrics" type="button" onclick="flipAllCards()">SHOW ALL METRICS</button>
+  </div>
+  <!-- Analyzing indicator (hidden initially) -->
+  <div id="analyzingIndicator" style="display: none; margin-top: 10px;">
+    <span class="small-spinner"></span> Analyzing...
+  </div>
+  <div id="stats-container">
+    <div class="card-container">
+      <div class="card" onclick="this.classList.toggle('is-flipped')">
+        <div class="card-face card-front">
+          <p>TECHNIQUE</p>
+          <canvas id="myChart"></canvas>
+          <div class="description">
+              <span>Description</span>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <h1>TECHNIQUE</h1>
+        </div>
+      </div>
+    </div>
+    <div class="card-container">
+      <div class="card" onclick="this.classList.toggle('is-flipped')">
+        <div class="card-face card-front">
+          <div class="progressBars">
+            <p>SPEED & MOVEMENT</p>
+            <div class="slideContainer"> 
+              <div class="sliderHead">
+                <label for="speed">SPEED</label>
+                <div id="topSpeed">0</div>
+              </div>
+              <div class="progressWrapper">
+                <div class="progressFill" id="topSpeedBar"></div>
+              </div>
+              <!-- <progress id="speedValue" value="0" max="100"></progress> -->
+            </div>
+            <div class="slideContainer"> 
+              <div class="sliderHead">
+                <label for="acceleration">PEAK ACCEL.</label>
+                <div id="peakAcceleration">0</div>
+              </div>
+              <div class="progressWrapper">
+                <div class="progressFill" id="peakAccelerationBar"></div>
+              </div>
+            </div>
+            <div class="slideContainer"> 
+              <div class="sliderHead">
+                <label for="deceleration">PEAK DECEL.</label>
+                <div id="peakDeceleration">0</div>
+              </div>
+              <div class="progressWrapper">
+                <div class="progressFill" id="peakDecelerationBar"></div>
+              </div>
+            </div>
+          </div>
+          <div class="description">
+            <span>Description</span>
+          </div>
+        </div>
+        <div class="card-face card-back2">
+          <h1>SPEED</h1>
+          <h1>&</h1>
+          <h1>MOVEMENT</h1>
+        </div>
+      </div>
+    </div>
+    <div class="card-container">
+      <div class="card" onclick="this.classList.toggle('is-flipped')">
+        <div class="card-face card-front">
+          <div class="progressBars">
+            <p>FOOTWORK</p>
+            <div class="slideContainer"> 
+              <div class="sliderHead">
+                <label for="jumpHeight">AVG JUMP HEIGHT</label>
+                <div id="averageJumpHeight">0</div>
+              </div>
+              <div class="progressWrapper">
+                <div class="progressFill" id="averageJumpHeightBar"></div>
+              </div>
+            </div>
+            <div class="slideContainer"> 
+              <div class="sliderHead">
+                <label for="strideLength">AVG STRIDE LENGTH</label>
+                <div id="averageStrideLength">0</div>
+              </div>
+              <div class="progressWrapper">
+                <div class="progressFill" id="averageStrideLengthBar"></div>
+              </div>
+            </div>
+          </div>
+          <div class="description">
+            <span>Description</span>
+          </div>
+        </div>
+        <div class="card-face card-back3">
+          <h1>FOOTWORK</h1>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
-</html> -->
+

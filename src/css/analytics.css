@@ -1,6 +1,11 @@
 @font-face {
     font-family: FutraLight;
-    src: url(/public/fonts/Futura-Light-font.ttf);
+    src: url(../../public/fonts/Futura-Light-font.ttf);
+}
+
+@font-face {
+    font-family: SCHABO-Condensed;
+    src: url(../../public/fonts/SCHABO-Condensed.otf);
 }
 
 /* Stats */
@@ -30,6 +35,11 @@
     width: 200px;
 }
 
+.stats #drillTimeValue, #distanceValue, #stepsValue, #athleticScoreValue {
+    margin-left: auto;
+    margin-right: 0;
+}
+
 /* Loading overlay styles */
 .loading-overlay {
     display: none; 
@@ -42,6 +52,16 @@
     z-index: 1000; 
     align-items: center;
     justify-content: center;
+}
+
+/* Loading spinner animation */
+.loading-spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
 }
 
 /* Video Section */
@@ -66,56 +86,59 @@
     width: 500px; 
 }
 
-#myChart {
-    max-width: 400px;
-    max-height: 400px;
+video{
+    width: 35vw; 
+    height: 35vw; 
+    height: auto; 
+    border-radius: 10%;
+    border: 2px solid #000000; 
+}
+
+#output_canvas {
+    width: 35vw; /* Relative width based on the viewport  */
+    height: 35vw; /* Maintain aspect ratio  */
+    height: auto; /* Maintain aspect ratio  */
+    border-radius: 10%;
+    border: 2px solid #000000; /* Red border for emphasis  */
 }
 
 .chart-wrapper {
-  width: 500px;
-  height: 250px;
-  padding: 10px;
-  background-color: transparent;
-  border-radius: 10px;
-  /* border: 1px solid #000000; */
-  border-radius: 20%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    width: 500px;
+    height: 250px;
+    padding: 10px;
+    background-color: transparent;
+    border-radius: 10px;
+    border-radius: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #myChart2 {
     background-color: #A7A7A7;
-    width: 400px;
-    height: 250px;
+    width: 700px;
+    height: auto;
     position: relative;
+    border-radius: 10px;
+    border: 2px solid #000000;
 }
 
 #videoForm {
     position: absolute;
-    top: 250px;
-    left: 55%;
+    top: 15px;
+    left: 470px;
     transform: translateX(-50%);
 }
 
 #uploadButton {
+    opacity: 0;
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0; 
     cursor: pointer;
 }
 
-.btns{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 30px;
-}
-
-button{
+#playProcessedButton {
     font-family: SCHABO-Condensed;
     background-color: #000000;
     border-radius: 25px;
@@ -127,6 +150,31 @@ button{
     font-size: 30px;
     margin: 4px 2px;
     cursor: pointer;
+    border: #FFFFFF solid 0.9px;
+    display: none;
+}
+
+.btns{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 30px;
+    padding-bottom: 20px;
+}
+
+#analyzeButton, #showMetrics{
+    font-family: SCHABO-Condensed;
+    background-color: #000000;
+    border-radius: 25px;
+    color: #FFFFFF;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 30px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border: #FFFFFF solid 0.9px;
 }
 
 #stats-container {
@@ -142,11 +190,6 @@ button{
     margin-top: 100px; 
 }
 
-.stats #totalTime, #totalDistance, #value, #averageAthleticScore {
-    margin-left: auto;
-    margin-right: 0;
-}
-
 .card-container {
     perspective: 1000px;
     width: 350px;
@@ -155,7 +198,7 @@ button{
 
 .card {
     width: 100%;
-    height: 100%;
+    height: 600px;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.6s;
@@ -183,54 +226,26 @@ button{
     transition: transform 0.6s;
 }
 
-.redScuff{
-    height: 300px;
-    width: auto;
-    z-index: -1;
-}
-
 .card-front {
     background-color: #202020;
     transform: rotateY(180deg);
+    justify-content: space-between;
 }
 
 .card-front:hover{
     background-color: #773732;
 }
 
-.card-back {
-    background-color: #202020;
-    background-image: url(/public/assets/redScuff_rotated.png);
-    background-position: -200px -150px;
-    background-repeat: no-repeat;
-    background-attachment:initial;
-    background-size: 600px 500px;
-}
-
-.card-back2 {
-    background-color: #202020;
-}
-
-.card-back3 {
-    background-color: #202020;
-    background-image: url(/public/assets/redScuff.png);
-    background-position: -100px 160px;
-    background-repeat: no-repeat;
-    background-attachment:initial;
-    background-size: 600px 500px;
-}
-
 p {
     text-decoration: underline;
+    align-self: start;
+    font-family: SCHABO-Condensed;
+    padding-left: 10px;
 }
 
-.charts {
-    display: flex;
-    flex-direction: column;
-}
-
-h1 {
-    font-size: 70px;
+#myChart {
+    max-width: 400px;
+    max-height: 400px;
 }
 
 .description {
@@ -247,82 +262,118 @@ h1 {
     width: 200px;
 }
 
-.slider {
-    appearance: none;
-    width: 100%;
-    height: 25px;
-    background: #ebe9e7;
-    outline: none;
-    border-radius: 5px;
+.card-back {
+    background-color: #202020;
+    background-image: url(../../public/assets/redScuff_rotated.png);
+    background-position: -200px -150px;
+    background-repeat: no-repeat;
+    background-attachment:initial;
+    background-size: 600px 500px;
 }
 
-.slideHead {
+h1 {
+    font-size: 70px;
+}
+
+.slideContainer progress {
+    width: 100%;
+    height: 16px;
+    appearance: none;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #FFFFFF;
+}
+
+.sliderHead {
     display: flex;
     flex-direction: row;
+    gap: 200px;
 }
 
-.slider::-webkit-slider-thumb {
-    appearance: none; 
-    width: 0px; 
-    height: 20px; 
-    background: #8758FF;
-    border-radius: 50%;
-    cursor: pointer; 
+.progressWrapper {
+    width: 100%;
+    height: 20px;
+    background-color: #eee;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.slider::-moz-range-thumb {
-    appearance: none; 
-    width: 20px; 
-    height: 20px; 
-    background: #8758FF; 
-    border-radius: 50%;
-    cursor: pointer; 
-} 
-
-/* .main-container{
-    visibility: hidden;
-    height: 1px;
-    width: 1px;
-} */
-
-#video-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-top: 30px;
+.progressFill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A); /* gradient fill */
+    transition: width 0.3s ease;
 }
 
-#videoForm label {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
+progress::-webkit-progress-bar {
+    background-color: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
+}
+  
+progress::-webkit-progress-value {
+    background-color: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
+}
+  
+progress::-moz-progress-bar {
+    background-color: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
 }
 
-#videoForm img {
-    width: 40px;
-    height: 40px;
-} 
-
-/* Video and Canvas Styles */
-video{
-    width: 35vw; 
-    height: 35vw; 
-    height: auto; 
-    border-radius: 10%;
-    border: 2px solid #000000; 
+.card-back2 {
+    background-color: #202020;
 }
 
-canvas {
-    width: 35vw; /* Relative width based on the viewport  */
-    height: 35vw; /* Maintain aspect ratio  */
-    height: auto; /* Maintain aspect ratio  */
-    border-radius: 10%;
-    border: 2px solid #000000; /* Red border for emphasis  */
+.card-back3 {
+    background-color: #202020;
+    background-image: url(../../public/assets/redScuff.png);
+    background-position: -100px 160px;
+    background-repeat: no-repeat;
+    background-attachment:initial;
+    background-size: 600px 500px;
 }
 
+@media (max-width: 768px) {  
+    /* Video and Canvas: stack vertically */
+    .vid-chart {
+        flex-direction: column;
+        align-items: center;
+    } 
+
+    video, canvas {
+        width: 80vw;
+        height: auto;
+    } 
+
+    /* Charts Container: stack vertically */
+    #charts-container {
+        flex-direction: column;
+        align-items: center;
+    } 
+
+    /* Stats: stack vertically */
+    .stats {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .box {
+        width: 80vw;
+    }  
+
+    /* Buttons: stack or shrink gap */
+    .btns {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    } 
+    
+    /* Adjust #videoForm if necessary */
+     #videoForm {
+        position: fixed;
+        margin-top: 20px;
+        right: auto;
+    } 
+ }
 /* Chart Container (aligned side by side and centered) */
- #charts-container {
+ /* #charts-container {
     display: flex;
     justify-content: center; 
     align-items: center;
@@ -342,97 +393,41 @@ canvas {
     width: fit-content; 
     margin-top: 20px; 
     visibility: hidden;
-}
+} */
 
 /* Smaller, fixed-size squares for the charts */
-.chart-square {
+/* .chart-square {
     max-height: 350px;  
     max-width: 350px; 
     border: 2px solid #000000;
     background-color: #FFFFFF;
-}
+} */
 
 /* Hidden class to toggle visibility */
-.hidden {
+/* .hidden {
     display: none;
-}
+} */
 /* Speedometer Chart Customizations */
- #speedometerChart {
+ /* #speedometerChart {
     width: 150px;
     height: 150px;
-}
+} */
 
 /* CSS for the head movement chart */
-#headMovementChart {
+/* #headMovementChart {
     width: 150px;
     height: 150px;
     position: relative;
-}
+} */
 
 /* CSS for the new head angle line chart */
-#headAngleLineChart {
+/* #headAngleLineChart {
     width: 150px;
     height: 150px;
     position: relative;
 } 
-
-/* Loading spinner animation */
-.loading-spinner {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #3498db;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;
-}
-
-
+    
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-@media (max-width: 768px) {
-
-    /* Video and Canvas: stack vertically */
-    .vid-chart {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    /* Video */
-    video, canvas {
-        width: 80vw;
-        height: auto;
-    }
-
-    /* Charts Container: stack vertically */
-    #charts-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    /* Stats: stack vertically */
-    .stats {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .box {
-        width: 80vw;
-    }
-
-    /* Buttons: stack or shrink gap */
-    .btns {
-        flex-direction: column;
-        gap: 15px;
-        align-items: center;
-    }
-
-    /* Adjust #videoForm if necessary */
-    #videoForm {
-        position: static;
-        margin-top: 20px;
-        right: auto;
-    }
-}
+}*/

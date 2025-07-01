@@ -4,7 +4,7 @@
     <div id="bg">
       <div class="hello">
         <span>HEY, <div id=nameInfo></div></span>
-        <img src="/public/assets/white line rt.png" alt="Line" class="line">
+        <img src="../../public/assets/white line rt.png" alt="Line" class="line">
       </div>
       <div class="userData">
         <div class="uploads">
@@ -16,7 +16,7 @@
           </div>
         </div>
         <span>PERFORMANCE METRICS OVER TIME</span>
-        <img src="/public/assets/white line rt.png" alt="Line" class="line2">
+        <img src="../../public/assets/white line rt.png" alt="Line" class="line2">
         <div class="chart-container">
           <canvas id="myChart"></canvas>
           <div class="chart-arrows">
@@ -26,70 +26,3 @@
         </div>
       </div>
     </div>
-   <!-- </main>
-   
-   <script src="dashboard.js"></script>
-   <script src="../Profile/profile.js"></script>
-   <script>
-    const ctx = document.getElementById('myChart').getContext('2d');
-
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['3/15', '3/18', '3/25', '3/28'],
-        datasets: [{
-          label: 'Ideal Head Angle',
-          data: [80, 60, 80, 90],
-          borderColor: '#81DDE3',
-          fill: false,
-          tension: 0.3
-        },
-        {
-          label: 'Top Speed',
-          data: [40, 50, 80, 40],
-          borderColor: '#3932F5',
-          fill: false,
-          tension: 0.3
-        },
-        {
-          label: 'Average Athletic Score',
-          data: [50, 70, 60, 70],
-          borderColor: '#93D669',
-          fill: false,
-          tension: 0.3
-        }],
-        
-      },
-      options: {
-        responsive: false,
-        plugins: {
-          legend: {
-            display: true
-          },
-          title: {
-            display: true,
-            text: 'Progress Overview'
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-  window.addEventListener("DOMContentLoaded", () => {
-  const savedImage = localStorage.getItem("profilePic");
-  const profilePicElement = document.getElementById("img-preview");
-
-  if (savedImage) {
-    profilePicElement.src = savedImage;
-  } else {
-    // Optionally set a fallback image
-    profilePicElement.src = "./assests/profilepic.png";
-  }
-  });
-  </script>
-  <script src="../sp.js"></script>
-</body>
-</html> -->

@@ -1,13 +1,13 @@
 @font-face {
     font-family: FutraLight;
-    src: url(/public/fonts/Futura-Light-font.ttf);
+    src: url(../../public/fonts/Futura-Light-font.ttf);
 }
 
-main {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    /* height: 100vh; */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
 }
 
 .contact {
@@ -18,7 +18,7 @@ main {
     justify-content: center;
     gap: 300px;
     width: 100%;
-    height: 400px;
+    height: 250px;
     position:relative;
     bottom: 0;
 }
@@ -72,7 +72,7 @@ form {
     border-bottom: 2px solid #FFFFFF;
 }
 
-button {
+#submitButton {
     font-family: SCHABO-Condensed;
     background-color: #FFFF;
     color: #000000;
@@ -83,4 +83,4 @@ button {
     font-size: 40px;
     width: 150px;
     cursor: pointer;
-}
+} 
