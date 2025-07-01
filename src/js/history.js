@@ -38,7 +38,7 @@ function loadHistory() {
           <div class="description">
             <span>${item.video_name}</span>
             <span>${new Date(item.upload_date).toLocaleDateString()}</span>
-            <span>${item.top_speed || 'N/A'} km/h</span>
+            <span>${item.top_speed || 'N/A'} yards/sec</span>
           </div>
         `;
         currentRow.appendChild(drillDiv);
