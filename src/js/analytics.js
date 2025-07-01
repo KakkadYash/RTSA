@@ -810,9 +810,9 @@ function loadAnalytics() {
     // 10. UTILITY FUNCTIONS
     // ------------------------
 
-    // function normalize(value, min, max) {
-    //     return (value - min) / (max - min);
-    // }
+    function normalize(value, min, max) {
+        return (value - min) / (max - min);
+    }
 
     function analyzeFootMovements() {
         // Placeholder if you want to implement future stride gait logic
