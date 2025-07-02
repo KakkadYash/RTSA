@@ -539,21 +539,21 @@ function loadAnalytics() {
         const stride = Math.round(calculateAverageStrideLength()) || 0;
 
         // SPEED & MOVEMENT
-        document.getElementById("speedValue").innerText = speed;
-        document.getElementById("speed").value = speed;
+        document.getElementById("topSpeed").innerText = speed;
+        document.getElementById("topSpeedBar").value = speed;
 
-        document.getElementById("accelerationValue").innerText = accel;
-        document.getElementById("acceleration").value = accel;
+        document.getElementById("peakAcceleration").innerText = accel;
+        document.getElementById("peakAccelerationBar").value = accel;
 
-        document.getElementById("decelerationValue").innerText = decel;
-        document.getElementById("deceleration").value = decel;
+        document.getElementById("peakDeceleration").innerText = decel;
+        document.getElementById("peakDecelerationBar").value = decel;
 
         // FOOTWORK
-        document.querySelector(".value").innerText = jump;
-        document.getElementById("jumpheight").value = jump;
+        document.querySelector("averageJumpHeight").innerText = jump;
+        document.getElementById("averageJumpHeightBar").value = jump;
 
-        document.querySelector(".value1").innerText = stride;
-        document.getElementById("strideleng").value = stride;
+        document.querySelector("averageStrideLength").innerText = stride;
+        document.getElementById("averageStrideLengthBar").value = stride;
     }
 
     // ------------------------
