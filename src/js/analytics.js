@@ -549,10 +549,10 @@ function loadAnalytics() {
         document.getElementById("peakDecelerationBar").value = decel;
 
         // FOOTWORK
-        document.querySelector("averageJumpHeight").innerText = jump;
+        document.getElementById("averageJumpHeight").innerText = jump;
         document.getElementById("averageJumpHeightBar").value = jump;
 
-        document.querySelector("averageStrideLength").innerText = stride;
+        document.getElementById("averageStrideLength").innerText = stride;
         document.getElementById("averageStrideLengthBar").value = stride;
     }
 
