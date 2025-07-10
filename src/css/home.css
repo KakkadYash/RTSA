@@ -90,7 +90,7 @@ li {
 
 .logOut {
     color: #000000;
-    font-size: 4em;
+    font-size: 2vw;
     margin: 0rem 0 0rem 1rem;
 }
 
@@ -215,6 +215,7 @@ form {
 
 .logOut span {
     cursor: pointer;
+    text-shadow: 1px 1px 0px #ffffff;
 }
 
 .header input[type=text] {
