@@ -1,370 +1,205 @@
 @font-face {
-    font-family: FutraLight;
-    src: url(../../public/fonts/Futura-Light-font.ttf);
+  font-family: FutraLight;
+  src: url(../../public/fonts/Futura-Light-font.ttf);
 }
 
-#bg {
-    background-image: url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
-    background-position: right top, right center, right bottom;
-    background-repeat: no-repeat, no-repeat, no-repeat;
-    background-attachment: scroll, scroll, scroll;
-    background-size: 300px, auto 600px, 200px auto;
+@font-face {
+  font-family: SCHABO-Condensed;
+  src: url(../../public/fonts/SCHABO-Condensed.otf);
 }
+
 
 /* Avatar */
-.userData{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+.userData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background-image: url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
+  background-position: right top, right center, right bottom;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-attachment: scroll, scroll, scroll;
+  background-size: 300px, auto 600px, 200px auto;
 }
 
 .profileHead {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding-top: 10px;
-    gap: 55px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 1em 0 0 1em;
+  width: 100%;
+  height: 30vh;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+
+}
+
+.avatarclass {
+  display: flex;
+  justify-content: center;
 }
 
 .avatar {
-    background-color: #000000;
-    height: auto; 
-    width: auto; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid #FFFFFF;
+  background-color: #000000;
+  height: 14em;
+  width: 13.5em;
+  margin-right: 36em;
+  display: flex;
+  align-items: center;
+  border: 1px solid #FFFFFF;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-content: center;
+}
+
+img#img-preview {
+  width: 8em;
+  height: 8em;
 }
 
 #file-input {
-    visibility: hidden;
-    opacity: 0;
+  visibility: hidden;
+  opacity: 0;
 }
 
-.img-preview{
-    max-width: 400px;
-    border-radius: 25px;
-    outline: 3px solid var(--prime);
-    cursor: pointer;
-    transition: 200ms ease-in-out;
-    aspect-ratio: 1;
-    object-fit: scale-down;;
+.img-preview {
+  max-width: 400px;
+  border-radius: 25px;
+  outline: 3px solid var(--prime);
+  cursor: pointer;
+  transition: 200ms ease-in-out;
+  aspect-ratio: 1;
+  object-fit: scale-down;
+  ;
 }
 
-label{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 /* Player Info */
 .user {
-    display: flex;
-    flex-direction: column;
-    font-size: 20px;
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+  height: 100%;
+  width: 30vw;
 }
 
 h2 {
-    display: flex;
-    color: #D02720; 
-    font-size: 60px;
-    align-items: start;
+  display: flex;
+  color: #D02720;
+  font-size: 60px;
+  align-items: start;
 }
 
 .small-box {
-    background-color: #000000;
-    color: #FFFFFF;
-    font-size: 60px;
-    line-height: 50px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    justify-content: center;
-    padding: 20px;
-    width: 510px;
-    height: 200px;
-    gap: 10px;
-    border: 1px solid #FFFFFF;
+  background-color: #000000;
+  color: #FFFFFF;
+  font-size: 3.5em;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  padding: 0.5em;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #FFFFFF;
 }
 
 /* Personal Information */
 .main-box {
-    background-color: #000000;
-    color: #797979;
-    font-weight: bold;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    padding-bottom: 20px;
-    padding-left: 20px;
-    line-height: 80px;
-    width: 1100px;
-    border: 1px solid #FFFFFF;
-    font-size: 30px;
+  background-color: #000000;
+  color: #797979;
+  font-weight: bold;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  padding-bottom: 20px;
+  padding-left: 20px;
+  line-height: 80px;
+  width: 1100px;
+  border: 1px solid #FFFFFF;
+  font-size: 30px;
 }
 
 .subHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 600px;
 }
 
 h3 {
-    color: #D02720; 
-    display: flex;
-    justify-content: start;
-    font-size: 50px;
+  color: #D02720;
+  display: flex;
+  justify-content: start;
+  font-size: 50px;
 }
 
 #saveButton {
-    font-family: SCHABO-Condensed;
-    background-color: #FFFF;
-    color: #000000;
-    border:2px solid #D02720;
-    border-radius: 6%;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 40px;
-    width: 150px;
-    cursor: pointer;
+  font-family: SCHABO-Condensed;
+  background-color: #FFFF;
+  color: #000000;
+  border: 2px solid #D02720;
+  border-radius: 6%;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 40px;
+  width: 150px;
+  cursor: pointer;
 }
 
 .save {
-    width: 35px;
-    height: auto;
-    padding-left: 5px;
+  width: 35px;
+  height: auto;
+  padding-left: 5px;
 }
 
 .data {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    font-family: FutraLight;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  font-family: FutraLight;
 }
 
-#name, #email, #username, #password, #age, #state{
-    float: right;
-    opacity: 100%;
-    height: 40px;
-    font-size: 30px;
-    color: #FFFFFF;
-    background-color: #000000;
+#name,
+#email,
+#username,
+#password,
+#age,
+#state {
+  float: right;
+  opacity: 100%;
+  height: 40px;
+  font-size: 30px;
+  color: #FFFFFF;
+  background-color: #000000;
 }
 
-.info{
-    display: flex;
-    flex-direction: row;
+.info {
+  display: flex;
+  flex-direction: row;
 }
 
 #sports {
-    float: right;
-    opacity: 100%;
-    height: 40px;
-    font-size: 30px;
-    color: #787878;
-    background-color: #FFFFFF;
+  float: right;
+  opacity: 100%;
+  height: 40px;
+  font-size: 30px;
+  color: #787878;
+  background-color: #FFFFFF;
 }
 
 select {
-    width: 320px;
+  width: 320px;
 }
-
-/* Subscription */
-.subscription{
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    justify-content: space-between;
-    width: auto;
-}
-
-.subscriptionBoxs {
-    display: flex;
-    flex-direction: row;
-    gap: 80px;
-}
-
-.subscription span {
-    color:#D02720;
-    line-height: 1;
-    font-size: 50px;
-    display: flex;
-    align-items: start;
-}
-
-.subLine{
-    height: auto;
-    width: 220px;
-}
-
-.sub-box {
-    background-color: #000000;
-    color: #FFFFFF;
-    font-size: 30px;
-    line-height: 1px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 10px;
-    width: 300px;
-    border: 1px solid #FFFFFF;
-}
-
-h4 {
-    color: #FFFFFF; 
-    font-family: FutraLight;
-    font-size: 40px;
-}
-
-p {
-    color: #FFFFFF; 
-    font-family: FutraLight;
-    font-size: 40px;
-    line-height: 1;
-}
-
-.check {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.checkBox {
-    height: auto;
-    width: 30px;
-}
-
-#individual, #organization, #school {
-    font-family: SCHABO-Condensed;
-    background-color: #FFFF;
-    color: #000000;
-    border:2px solid #D02720;
-    border-radius: 10%;
-    text-align: center;
-    text-decoration: none;
-    font-size: 40px;
-    width: 150px;
-    cursor: pointer;
-    align-self: center;
-}
-
-@media (max-width: 1200px) {
-    .profileHead {
-      flex-direction: column;
-      align-items: center;
-      gap: 30px;
-    }
-  
-    .avatar img,
-    .img-preview {
-      width: 90vw;
-      max-width: 400px;
-      height: auto;
-    }
-  
-    .user {
-      font-size: 18px;
-    }
-  
-    .small-box {
-      width: 90%;
-      font-size: 40px;
-      height: auto;
-      padding: 15px;
-    }
-  
-    .main-box {
-      width: 90%;
-      font-size: 24px;
-      padding-left: 15px;
-      line-height: 60px;
-    }
-  
-    .subHeader {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 100px;
-    }
-  
-    .form-control,
-    #name, #email, #username, #password, #age, #state, #sports,
-    select {
-      width: 100%;
-      font-size: 24px;
-    }
-  
-    .data, .info {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-    }
-  
-    #saveButton {
-      font-size: 30px;
-      width: 130px;
-    }
-  
-    .subscriptionBoxs {
-      flex-direction: column;
-      align-items: center;
-      gap: 30px;
-    }
-  
-    .sub-box {
-      width: 90%;
-      font-size: 24px;
-    }
-  
-    h1.title, h2, h3, h4, p {
-      font-size: 5vw;
-      text-align: center;
-    }
-  
-    .checkBox {
-      width: 24px;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .avatar img {
-      max-width: 300px;
-    }
-  
-    .main-box,
-    .small-box,
-    .sub-box {
-      font-size: 20px;
-      padding: 10px;
-    }
-  
-    .form-control,
-    select {
-      width: 100%;
-      font-size: 20px;
-    }
-  
-    #saveButton,
-    .button {
-      font-size: 20px;
-      width: 100px;
-    }
-  
-    h1.title, h2, h3, h4, p {
-      font-size: 20px;
-      text-align: center;
-    }
-  
-    .checkBox {
-      width: 20px;
-    }
-  }
-  

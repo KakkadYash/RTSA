@@ -1,94 +1,66 @@
-    <header class="header">
-      <h1 class="title">PROFILE</h1>
-    </header>
-    <div id="bg">
-      <div class="userData">
-        <div class="profileHead">
-          <div class="avatar">
-            <label for="file-input">
-              <input type="file" id="file-input" accept="image/*" />
-              <img src="../../public/assets/profilepic.png" id="img-preview" alt="ProfilePic" width="510px" height="450px" />
-            </label>
-          </div>
-            <div class="user">
-                <h2>PLAYER INFO</h2>
-                <div class="small-box">
-                    <div class="info">NAME: <div id=nameInfo></div> </div>
-                    <div class="info">SPORT: <div id=sportInfo></div></div>
-                </div>
-            </div>
-        </div>
-        <div class="main-box">
-          <div class="subHeader">
-            <h3>PERSONAL INFORMATION</h3> 
-            <button type="submit" id="saveButton" form="userProfileForm">SAVE <img src= "../../public/assets/save.png" alt="save" class="save"></button> 
-          </div>
-            <form id="userProfileForm">
-              <div class="data">
-                <label for="name" class="form-label">FULL NAME</label> <input type="text" id="name" class="form-control" required>
-              </div>
-              <div class="data">
-                <label for="email" class="form-label">EMAIL</label> <input type="text" id="email" class="form-control" required>
-              </div>
-              <div class="data">
-                <label for="username" class="form-label">USERNAME</label> <input type="text" id="username" class="form-control" required>
-              </div>
-              <div class="data">
-                <label for="password" class="form-label">PASSWORD</label> <input type="text" id="password" class="form-control" required>
-              </div>
-              <div class="data">
-                <label for="age" class="form-label">AGE OF ATHELETE</label> <input type="text" id="age" class="form-control" required required autocomplete="age">
-              </div>
-              <div class="data">
-                <label for="state" class="form-label">STATE OF RESIDENCE</label> <input type="text" id="state" class="form-control" required required autocomplete="state">
-              </div>
-              <div class="data">
-                <label for="sports">SPORTS INTREST </label> 
-                <select id="sports" name="sports">
-                  <option value="" disabled selected>Select Sport</option>
-                  <option value="Football">Football</option>
-                  <option value="Baseball">Baseball</option>
-                  <option value="Soccer">Soccer</option>
-                  <option value="Tennis">Tennis</option>
-                  <option value="Swimming">Swimming</option>
-                  <option value="Track and Field">Track and Field</option>
-                  <option value="Hockey">Hockey</option>
-                </select>
-              </div>
-            </form>
-        </div>
-        <div class="subscription">
-          <span>SUBSCRIPTIONS</span>
-          <img src="../../public/assets/white line rt.png" alt="Line" class="subLine"> 
-          <div class="subscriptionBoxs">
-            <div class="sub-box">
-                <p>INDIVIDUAL</p>
-                <div class="check">
-                  <img src="../../public/assets/checkBox.png" alt="check" class="checkBox"> 
-                  <img src="../../public/assets/checkBox.png" alt="check" class="checkBox">
-                  <img src="../../public/assets/checkBox.png" alt="check" class="checkBox">
-                </div>
-                <button id="individual">START NOW</button> 
-            </div>
-            <div class="sub-box">
-                <p>ORGANIZATION</p>
-                <div class="check">
-                  <img src="../../public/assets/checkBox.png" alt="check" class="checkBox"> 
-                  <img src="../../public/assets/checkBox.png" alt="check" class="checkBox">
-                  <img src="../../public/assets/checkBox.png" alt="check" class="checkBox">
-                </div>
-                <button id="organization">START NOW</button>
-            </div>
-            <div class="sub-box">
-                <p>SCHOOL</p>
-                <div class="check">
-                  <img src="../../public/assets/checkBox.png" alt="check" class="checkBox"> 
-                  <img src="../../public/assets/checkBox.png" alt="check" class="checkBox">
-                  <img src="../../public/assets/checkBox.png" alt="check" class="checkBox">
-                </div>
-                <button id="school">START NOW</button>
-            </div>
-        </div> 
-        </div>
+<header class="header">
+  <h1 class="title">PROFILE</h1>
+</header>
+<div class="userData">
+  <div class="profileHead">
+    <label for="file-input"></label>
+    <div class="avatar">
+      <input type="file" id="file-input" accept="image/*" />
+      <img src="../../public/assets/profilepic.png" id="img-preview" alt="ProfilePic" width="510px" height="450px" />
     </div>
+    <div class="user">
+      <h2>PLAYER INFO</h2>
+      <div class="small-box">
+        <div class="info">NAME: <div id=nameInfo></div>
+        </div>
+        <div class="info">SPORT: <div id=sportInfo></div>
+        </div>
+      </div>
     </div>
+  </div>
+  <div class="main-box">
+    <div class="subHeader">
+      <h3>PERSONAL INFORMATION</h3>
+      <button type="submit" id="saveButton" form="userProfileForm">SAVE <img src="../../public/assets/save.png"
+          alt="save" class="save"></button>
+    </div>
+    <form id="userProfileForm">
+      <div class="data">
+        <label for="name" class="form-label">FULL NAME</label> <input type="text" id="name" class="form-control"
+          required>
+      </div>
+      <div class="data">
+        <label for="email" class="form-label">EMAIL</label> <input type="text" id="email" class="form-control" required>
+      </div>
+      <div class="data">
+        <label for="username" class="form-label">USERNAME</label> <input type="text" id="username" class="form-control"
+          required>
+      </div>
+      <div class="data">
+        <label for="password" class="form-label">PASSWORD</label> <input type="text" id="password" class="form-control"
+          required>
+      </div>
+      <div class="data">
+        <label for="age" class="form-label">AGE OF ATHELETE</label> <input type="text" id="age" class="form-control"
+          required required autocomplete="age">
+      </div>
+      <div class="data">
+        <label for="state" class="form-label">STATE OF RESIDENCE</label> <input type="text" id="state"
+          class="form-control" required required autocomplete="state">
+      </div>
+      <div class="data">
+        <label for="sports">SPORTS INTREST </label>
+        <select id="sports" name="sports">
+          <option value="" disabled selected>Select Sport</option>
+          <option value="Football">Football</option>
+          <option value="Baseball">Baseball</option>
+          <option value="Soccer">Soccer</option>
+          <option value="Tennis">Tennis</option>
+          <option value="Swimming">Swimming</option>
+          <option value="Track and Field">Track and Field</option>
+          <option value="Hockey">Hockey</option>
+        </select>
+      </div>
+    </form>
+  </div>
+</div>

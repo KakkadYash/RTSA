@@ -4,6 +4,10 @@
     src: url(../../public/fonts/Futura-Light-font.ttf);
 }
 
+@font-face {
+    font-family: SCHABO-Condensed;
+    src: url(../../public/fonts/SCHABO-Condensed.otf);
+}
 body {
     background-image: url('../../public/assets/login-bkg.png');
     background-repeat: no-repeat;

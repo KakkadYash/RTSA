@@ -8,48 +8,55 @@
     src: url(../../public/fonts/SCHABO-Condensed.otf);
 }
 
+#bg {
+    display: flex;
+    width: 80vw;
+    background-image: url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
+    background-position: right top, right center, right bottom;
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    flex-direction: column;
+}
+
 /* Stats */
 .stats {
-    display: flex; 
+    display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
-    gap: 5px;
     width: 100%;
+    height: 20vh;
     font-size: 30px;
-    margin-top: 10px;
+    padding: 0 2.3em;
     border-radius: 25%;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .box {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
     font-family: Futralight;
     background-color: #202020;
     color: #FFFFFF;
-    border: 1px solid #FFFFFF;
+    border: 0.1rem solid #FFFFFF;
     font-weight: bold;
-    font-size: 30px;
-    padding: 20px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    width: 200px;
-}
-
-.stats #drillTimeValue, #distanceValue, #stepsValue, #athleticScoreValue {
-    margin-left: auto;
-    margin-right: 0;
+    font-size: 3rem;
+    border-radius: 2rem;
+    margin: 0vh 1vw 0vh;
+    padding: 0.8vh 0vw 0.8vh 0vw;
+    width: 12vw;
+    height: 60%;
 }
 
 /* Loading overlay styles */
 .loading-overlay {
-    display: none; 
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); 
-    z-index: 1000; 
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
     align-items: center;
     justify-content: center;
 }
@@ -67,47 +74,46 @@
 /* Video Section */
 .video-section {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    padding-top: 10px;
+    padding: 0em 6em;
+    margin: 0vh 0vw 3vh 0vw;
+    justify-content: space-between;
+    height: 35vh;
 }
 
 .vid-chart {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px;
     position: relative;
-    width: fit-content;
+    margin-right: -4em;
 }
 
 #uploaded-video {
-    display: block;
-    width: 500px; 
+    width: 50em;
+    height: 100%;
 }
 
-video{
-    width: 35vw; 
-    height: 35vw; 
-    height: auto; 
-    border-radius: 10%;
-    border: 2px solid #000000; 
+video {
+    border-radius: 3%;
+    border: 0.1em solid #000000;
 }
 
 #output_canvas {
-    width: 35vw; /* Relative width based on the viewport  */
-    height: 35vw; /* Maintain aspect ratio  */
-    height: auto; /* Maintain aspect ratio  */
+    width: 35em;
+    /* Relative width based on the viewport  */
+    height: 25em;
+    /* Maintain aspect ratio  */
+    height: auto;
+    /* Maintain aspect ratio  */
     border-radius: 10%;
-    border: 2px solid #000000; /* Red border for emphasis  */
+    border: 0.1em solid #000000;
+    /* Red border for emphasis  */
 }
 
 .chart-wrapper {
-    width: 500px;
-    height: 250px;
-    padding: 10px;
     background-color: transparent;
-    border-radius: 10px;
     border-radius: 20%;
     display: flex;
     justify-content: center;
@@ -115,12 +121,10 @@ video{
 }
 
 #myChart2 {
-    background-color: #A7A7A7;
-    width: 700px;
-    height: auto;
-    position: relative;
-    border-radius: 10px;
-    border: 2px solid #000000;
+    background-color: #ffffff;
+    width: 50em;
+    height: 100%;
+    border-radius: 0.6rem;
 }
 
 #videoForm {
@@ -154,46 +158,46 @@ video{
     display: none;
 }
 
-.btns{
+.btns {
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    gap: 30px;
+    justify-content: space-around;
     padding-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    height: 10vh;
 }
 
-#analyzeButton, #showMetrics{
+.button {
     font-family: SCHABO-Condensed;
     background-color: #000000;
     border-radius: 25px;
     color: #FFFFFF;
-    padding: 15px 32px;
+    height: 100%;
+    width: 7em;
+    padding: 1.5rem 2rem;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 30px;
-    margin: 4px 2px;
+    font-size: 3rem;
     cursor: pointer;
-    border: #FFFFFF solid 0.9px;
+    border: #ff4343 solid 0.2rem;
 }
 
 #stats-container {
-    perspective: 1000px;
     width: 300px;
     display: flex;
-    justify-content: center; 
-    align-items: center;
-    gap: 20px; 
-    margin: 0 auto; 
-    width: fit-content; 
-    height: 350px;
-    margin-top: 100px; 
+    justify-content: space-evenly;
+    margin: 0 auto;
+    width: 100%;
+    height: 48vh;
+    margin-top: 3em;
 }
 
 .card-container {
-    perspective: 1000px;
-    width: 350px;
-    height: 550px;
+    width: 27%;
+    height: 100%;
 }
 
 .card {
@@ -232,7 +236,7 @@ video{
     justify-content: space-between;
 }
 
-.card-front:hover{
+.card-front:hover {
     background-color: #773732;
 }
 
@@ -267,12 +271,8 @@ p {
     background-image: url(../../public/assets/redScuff_rotated.png);
     background-position: -200px -150px;
     background-repeat: no-repeat;
-    background-attachment:initial;
+    background-attachment: initial;
     background-size: 600px 500px;
-}
-
-h1 {
-    font-size: 70px;
 }
 
 .slideContainer progress {
@@ -301,18 +301,19 @@ h1 {
 .progressFill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A); /* gradient fill */
+    background: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
+    /* gradient fill */
     transition: width 0.3s ease;
 }
 
 progress::-webkit-progress-bar {
     background-color: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
 }
-  
+
 progress::-webkit-progress-value {
     background-color: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
 }
-  
+
 progress::-moz-progress-bar {
     background-color: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
 }
@@ -326,54 +327,53 @@ progress::-moz-progress-bar {
     background-image: url(../../public/assets/redScuff.png);
     background-position: -100px 160px;
     background-repeat: no-repeat;
-    background-attachment:initial;
+    background-attachment: initial;
     background-size: 600px 500px;
 }
 
-@media (max-width: 768px) {  
+@media (max-width: 768px) {
+
     /* Video and Canvas: stack vertically */
     .vid-chart {
         flex-direction: column;
         align-items: center;
-    } 
+    }
 
-    video, canvas {
+    video,
+    canvas {
         width: 80vw;
         height: auto;
-    } 
+    }
 
     /* Charts Container: stack vertically */
     #charts-container {
         flex-direction: column;
         align-items: center;
-    } 
+    }
 
     /* Stats: stack vertically */
-    .stats {
-        flex-direction: column;
-        align-items: center;
-    }
 
     .box {
         width: 80vw;
-    }  
+    }
 
     /* Buttons: stack or shrink gap */
     .btns {
         flex-direction: column;
         gap: 15px;
         align-items: center;
-    } 
-    
+    }
+
     /* Adjust #videoForm if necessary */
-     #videoForm {
+    #videoForm {
         position: fixed;
         margin-top: 20px;
         right: auto;
-    } 
- }
+    }
+}
+
 /* Chart Container (aligned side by side and centered) */
- /* #charts-container {
+/* #charts-container {
     display: flex;
     justify-content: center; 
     align-items: center;
@@ -408,7 +408,7 @@ progress::-moz-progress-bar {
     display: none;
 } */
 /* Speedometer Chart Customizations */
- /* #speedometerChart {
+/* #speedometerChart {
     width: 150px;
     height: 150px;
 } */
