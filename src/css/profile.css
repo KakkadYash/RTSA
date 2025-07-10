@@ -14,7 +14,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  height: 100vh;
+  gap: 2vh;
   background-image: url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
   background-position: right top, right center, right bottom;
   background-repeat: no-repeat, no-repeat, no-repeat;
@@ -44,7 +45,7 @@
   background-color: #000000;
   height: 14em;
   width: 13.5em;
-  margin-right: 36em;
+  margin-right: 26vw;
   display: flex;
   align-items: center;
   border: 1px solid #FFFFFF;
@@ -101,15 +102,13 @@ h2 {
 .small-box {
   background-color: #000000;
   color: #FFFFFF;
-  font-size: 3.5em;
+  font-size: 2.2vw;
   border-radius: 1rem;
   display: flex;
   flex-direction: column;
   align-items: start;
   justify-content: center;
   padding: 0.5em;
-  width: 100%;
-  height: 100%;
   border: 1px solid #FFFFFF;
 }
 
@@ -122,12 +121,11 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: start;
-  padding-bottom: 20px;
-  padding-left: 20px;
-  line-height: 80px;
-  width: 1100px;
+  padding: 1vh 0vw 0 1vw;
+  line-height: 9vh;
+  width: 76.5vw;
   border: 1px solid #FFFFFF;
-  font-size: 30px;
+  font-size: 2.2vw;
 }
 
 .subHeader {
