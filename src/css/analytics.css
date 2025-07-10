@@ -39,7 +39,7 @@
     color: #FFFFFF;
     border: 0.1rem solid #FFFFFF;
     font-weight: bold;
-    font-size: 3rem;
+    font-size: 2vw;
     border-radius: 2rem;
     margin: 0vh 1vw 0vh;
     padding: 0.8vh 0vw 0.8vh 0vw;
@@ -76,9 +76,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0em 6em;
     margin: 0vh 0vw 3vh 0vw;
-    justify-content: space-between;
+    justify-content: space-around;
     height: 35vh;
 }
 
@@ -91,7 +90,7 @@
 }
 
 #uploaded-video {
-    width: 50em;
+    width: 35vw;
     height: 100%;
 }
 
@@ -101,11 +100,10 @@ video {
 }
 
 #output_canvas {
-    width: 35em;
+    width: 35vw;
     /* Relative width based on the viewport  */
-    height: 25em;
     /* Maintain aspect ratio  */
-    height: auto;
+    height: 100%;
     /* Maintain aspect ratio  */
     border-radius: 10%;
     border: 0.1em solid #000000;
@@ -122,7 +120,7 @@ video {
 
 #myChart2 {
     background-color: #ffffff;
-    width: 50em;
+    width: 35vw;
     height: 100%;
     border-radius: 0.6rem;
 }
@@ -176,7 +174,7 @@ video {
     color: #FFFFFF;
     height: 100%;
     width: 7em;
-    padding: 1.5rem 2rem;
+    padding: 1.5vh 2vh;
     text-align: center;
     text-decoration: none;
     display: inline-block;

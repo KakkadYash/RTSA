@@ -31,7 +31,7 @@ aside {
 nav {
     display: flex;
     flex-direction: column;
-    gap: 8em;
+    gap: 12vh;
 }
 
 aside a {
@@ -57,7 +57,7 @@ aside a:focus-visible {
 
 
 aside a span {
-    font-size: 5.2em;
+    font-size: 3vw;
     text-shadow: 1px 1px 0px #ffffff;
 }
 
@@ -72,12 +72,12 @@ aside a span {
 }
 
 .arrow {
-    width: 4em;
+    width: 20%;
 }
 
 .line {
     height: auto;
-    width: 27em;
+    width: 100%;
 }
 
 li {
@@ -95,8 +95,8 @@ li {
 }
 
 .icons {
-    width: 3em;
-    height: 3em;
+    width: 2vw;
+    height: 4vh;
 }
 
 .socials {
@@ -104,11 +104,6 @@ li {
     justify-content: space-between;
     padding: 0 2rem 0 1rem;
 }
-
-
-
-
-
 
 main {
     flex: 1;
@@ -201,22 +196,18 @@ form {
 
 
 /* copied from index.css */
-
-
 .football {
     height: auto;
     width: 40px;
 }
-
-
 
 .social-box {
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: #FFFFFF;
-    width: 4rem;
-    height: 4rem;
+    width: 3vw;
+    height: 6vh;
     border-radius: 1.5rem;
 }
 
