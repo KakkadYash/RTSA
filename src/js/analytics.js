@@ -167,7 +167,7 @@ function loadAnalytics() {
                 datasets: [{
                     label: "Athletic Scores",
                     data: data,
-                    backgroundColor: "rgba(0, 123, 255, 0.4)",
+                    backgroundColor: "rgba(230, 42, 42, 0.2)",
                     borderColor: "#1a2532ff",
                     borderWidth: 6
                 }]

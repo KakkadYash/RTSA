@@ -14,20 +14,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
-  gap: 2vh;
   background-image: url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
   background-position: right top, right center, right bottom;
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-attachment: scroll, scroll, scroll;
   background-size: 300px, auto 600px, 200px auto;
+  height: 100%;
 }
 
 .profileHead {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  padding: 1em 0 0 1em;
+  padding: 1vw 0 1vw 1.5vw;
   width: 100%;
   height: 30vh;
   flex-wrap: wrap;
@@ -42,10 +41,11 @@
 }
 
 .avatar {
+  border-radius: 1vw;
   background-color: #000000;
-  height: 14em;
-  width: 13.5em;
-  margin-right: 26vw;
+  height: 100%;
+  width: 12vw;
+  margin-right: 3vw;
   display: flex;
   align-items: center;
   border: 1px solid #FFFFFF;
@@ -85,22 +85,27 @@ label {
 
 /* Player Info */
 .user {
+  background-color: black;
   display: flex;
   flex-direction: column;
   font-size: 20px;
   height: 100%;
   width: 30vw;
+  border-radius: 1rem;
+  border: 1px solid #FFFFFF;
+  border-radius: 1rem;
+  padding: 1vw;
 }
 
 h2 {
+  font-weight: normal;
   display: flex;
   color: #D02720;
-  font-size: 60px;
+  font-size: 3.3vw;
   align-items: start;
 }
 
 .small-box {
-  background-color: #000000;
   color: #FFFFFF;
   font-size: 2.2vw;
   border-radius: 1rem;
@@ -108,8 +113,6 @@ h2 {
   flex-direction: column;
   align-items: start;
   justify-content: center;
-  padding: 0.5em;
-  border: 1px solid #FFFFFF;
 }
 
 /* Personal Information */
@@ -126,6 +129,7 @@ h2 {
   width: 76.5vw;
   border: 1px solid #FFFFFF;
   font-size: 2.2vw;
+  margin: 1vw 0vw 1vw 0vw;
 }
 
 .subHeader {
@@ -136,10 +140,11 @@ h2 {
 }
 
 h3 {
+  font-weight: normal;
   color: #D02720;
   display: flex;
   justify-content: start;
-  font-size: 50px;
+  font-size: 3.4vw;
 }
 
 #saveButton {

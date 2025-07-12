@@ -1,28 +1,29 @@
-    <header class="header">
-      <h1 class="title">DASHBOARD</h1>
-    </header>
-    <div id="bg">
-      <div class="hello">
-        <span>HEY, <div id=nameInfo></div></span>
-        <img src="../../public/assets/white line rt.png" alt="Line" class="line">
+<header class="header">
+  <h1 class="title">DASHBOARD</h1>
+</header>
+<div id="bg">
+  <div class="hello">
+    <span>HEY, <div id=nameInfo></div></span>
+    <img src="../../public/assets/white line rt.png" alt="Line" class="line">
+  </div>
+  <div class="userData">
+    <div class="uploads">
+      <div class="avatar">
+        <img id="img-preview" alt="ProfilePic">
       </div>
-      <div class="userData">
-        <div class="uploads">
-          <div class="avatar">
-            <img id="img-preview" alt="ProfilePic">
-          </div>
-          <div class="small-box">
-            <div class="info">TOTAL UPLOADS : <div id=uploadCounter></div></div>
-          </div>
-        </div>
-        <span>PERFORMANCE METRICS OVER TIME</span>
-        <img src="../../public/assets/white line rt.png" alt="Line" class="line2">
-        <div class="chart-container">
-          <canvas id="myChart"></canvas>
-          <div class="chart-arrows">
-            <button id="prevChart">←</button>
-            <button id="nextChart">→</button>
-          </div>
+      <div class="small-box">
+        <div class="info">TOTAL UPLOADS : <div id=uploadCounter></div>
         </div>
       </div>
     </div>
+    <span>PERFORMANCE METRICS OVER TIME</span>
+    <img src="../../public/assets/white line rt.png" alt="Line" class="line2">
+    <div class="chart-container">
+      <canvas id="myChart"></canvas>
+      <div class="chart-arrows">
+        <button id="prevChart"></button>
+        <button id="nextChart"></button>
+      </div>
+    </div>
+  </div>
+</div>

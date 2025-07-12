@@ -1,11 +1,11 @@
 @font-face {
-    font-family: FutraLight;
-    src: url(../../public/fonts/Futura-Light-font.ttf);
+  font-family: FutraLight;
+  src: url(../../public/fonts/Futura-Light-font.ttf);
 }
 
 @font-face {
-    font-family: SCHABO-Condensed;
-    src: url(../../public/fonts/SCHABO-Condensed.otf);
+  font-family: SCHABO-Condensed;
+  src: url(../../public/fonts/SCHABO-Condensed.otf);
 }
 
 #bg {
@@ -14,6 +14,8 @@
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-attachment: scroll, scroll, scroll;
   background-size: 100px, auto 300px, 100px auto;
+  padding: 1vw;
+  height: 60vw;
 }
 
 main span {
@@ -25,7 +27,7 @@ main span {
   color: #fff;
 }
 
-.hello{
+.hello {
   display: flex;
   flex-direction: column;
   padding-left: 20px;
@@ -36,7 +38,7 @@ main span {
   line-height: 1;
   font-size: 65px;
   color: #fff;
-} 
+}
 
 .userData span {
   padding-left: 20px;
@@ -58,7 +60,7 @@ main .line2 {
   width: 510px;
 }
 
-.userData{
+.userData {
   padding-left: 20px;
   display: flex;
   flex-direction: column;
@@ -66,49 +68,72 @@ main .line2 {
 }
 
 canvas {
-  padding-left: 20px;
   border: 2px solid #000000;
   background-color: #A7A7A7;
-  border-radius: 10px;
+  border-radius: 1vw;
 }
 
 .avatar {
-  padding-left: 20px;
+  border-radius: 1vw;
   background-color: #000000;
-  height: auto; 
-  width: 350px; 
+  height: 100%;
+  width: 12vw;
+  margin-right: 3vw;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   border: 1px solid #FFFFFF;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-content: center;
 }
 
 .uploads {
   display: flex;
   flex-direction: row;
-  gap: 20px;
-  padding-left: 20px;
+  justify-content: flex-start;
+  padding: 1vw 0 1vw 1vw;
+  width: 100%;
+  height: 30vh;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  align-content: flex-start;
 }
 
 .chart-container {
   width: 1000px;
-  height: 400px; /* ✅ fixed height */
+  height: 400px;
+  /* ✅ fixed height */
   position: relative;
   padding-left: 20px;
 }
 
-#myChart {
-  padding-left: 20px;
-  width: 100%;
+#prevChart {
+  background-size: contain;
+  width: 2.5vw;
   height: 100%;
+  background-repeat: no-repeat;
+  background-image: url("../../public/assets/arrow white rt.png");
+  transform: scalex(-1);
+}
+
+#nextChart {
+  transform: scale(1);
+  background-size: contain;
+  width: 2.5vw;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-image: url("../../public/assets/arrow white rt.png");
 }
 
 .chart-arrows {
-  position: absolute;
-  bottom: -35px;
+  margin-top: 1vw;
+  height: 2.5vw;
   width: 100%;
   display: flex;
-  justify-content: space-between;
-  padding: 0 10px;
+  justify-content: space-evenly;
 }
 
 .chart-arrows button {
@@ -119,7 +144,7 @@ canvas {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transform: scale(0.6); /* ✅ 50% smaller */
+  transform: scale(0.6);
 }
 
 .chart-arrows button:hover {
@@ -129,21 +154,20 @@ canvas {
 .small-box {
   background-color: #000000;
   color: #FFFFFF;
-  font-size: 60px;
-  line-height: 50px;
-  border-radius: 10px;
+  font-size: 4vw;
+  border-radius: 1vw;
   display: flex;
   flex-direction: column;
   align-items: start;
   justify-content: center;
-  padding: 20px;
-  width: 410px;
-  height: 200px;
-  gap: 10px;
+  padding: 1vw;
+  width: 25vw;
+  height: 100%;
   border: 1px solid #FFFFFF;
 }
 
 @media (max-width: 768px) {
+
   main span,
   .userData span {
     font-size: 36px;
@@ -161,10 +185,6 @@ canvas {
     line-height: 40px;
   }
 
-  .uploads {
-    flex-direction: column;
-    align-items: center;
-  }
 
   .avatar {
     width: 90vw;
@@ -181,15 +201,10 @@ canvas {
   }
 
   .chart-container {
-    width: 90vw;
-    height: 300px;
-    padding: 0;
-  }
-
-  #myChart {
-    width: 100% !important;
-    height: 100% !important;
-    padding-left: 0;
+    width: 65vw;
+    height: 35vw;
+    position: relative;
+    padding: 1vw;
   }
 
   .chart-arrows {
@@ -212,10 +227,6 @@ canvas {
     align-items: center;
   }
 
-  canvas {
-    width: 90vw;
-    padding-left: 0;
-  }
 }
 
 @media (max-width: 1024px) {
