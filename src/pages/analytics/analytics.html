@@ -42,13 +42,21 @@
       <input type="datetime-local" id="uploadDate" name="uploadDate"> -->
     </div>
     <!-- Button to start processed playback (revealed after analysis) -->
-    <button id="playProcessedButton" type="button" controls>Play Processed Video</button>
+    <div class="playprocess">
+      <button id="playProcessedButton" type="button" controls>Play Video</button>
+    </div>
     <!-- Analyze button -->
     <div class="btns">
-      <input type="file" id="videoInput" accept="video/*" hidden="">
-      <label for="videoInput" class="button">UPLOAD VIDEO</label>
-      <button class="button" id="analyzeButton" type="button">ANALYZE VIDEO</button>
-      <button class="button" id="showMetrics" type="button" onclick="flipAllCards()">ALL METRICS</button>
+      <div>
+        <input type="file" id="uploadButton" accept="video/*" hidden="">
+        <label id="uploadvideo" for="uploadButton" class="button">UPLOAD VIDEO</label>
+      </div>
+      <div>
+        <button class="button" id="analyzeButton" type="button">ANALYZE VIDEO</button>
+      </div>
+      <div>
+        <button class="button" id="showMetrics" type="button" onclick="flipAllCards()">ALL METRICS</button>
+      </div>
     </div>
     <!-- Analyzing indicator (hidden initially) -->
     <div id="analyzingIndicator" style="display: none; margin-top: 10px;">
@@ -58,14 +66,20 @@
       <div class="card-container">
         <div class="card" onclick="this.classList.toggle('is-flipped')">
           <div class="card-face card-front">
-            <p>TECHNIQUE</p>
-            <canvas id="myChart"></canvas>
+            <div class="back-card-title">
+              <span>TECHNIQUE</span>
+            </div>
+            <div>
+              <canvas id="myChart"></canvas>
+            </div>
             <div class="description">
-              <span>Description</span>
+              <p>Description</p>
             </div>
           </div>
           <div class="card-face card-back">
-            <h1>TECHNIQUE</h1>
+            <div class="front-card-title">
+              <span>TECHNIQUE</span>
+            </div>
           </div>
         </div>
       </div>
@@ -73,7 +87,9 @@
         <div class="card" onclick="this.classList.toggle('is-flipped')">
           <div class="card-face card-front">
             <div class="progressBars">
-              <p>SPEED & MOVEMENT</p>
+              <div class="back-card-title">
+                <span>SPEED & MOVEMENT</span>
+              </div>
               <div class="slideContainer">
                 <div class="sliderHead">
                   <label for="speed">SPEED</label>
@@ -104,13 +120,13 @@
               </div>
             </div>
             <div class="description">
-              <span>Description</span>
+              <p>Description</p>
             </div>
           </div>
           <div class="card-face card-back2">
-            <h1>SPEED</h1>
-            <h1>&</h1>
-            <h1>MOVEMENT</h1>
+            <div class="front-card-title">
+              <span>SPEED & MOVEMENT</span>
+            </div>
           </div>
         </div>
       </div>
@@ -118,7 +134,9 @@
         <div class="card" onclick="this.classList.toggle('is-flipped')">
           <div class="card-face card-front">
             <div class="progressBars">
-              <p>FOOTWORK</p>
+              <div class="back-card-title">
+                <span>FOOTWORK</span>
+              </div>
               <div class="slideContainer">
                 <div class="sliderHead">
                   <label for="jumpHeight">AVG JUMP HEIGHT</label>
@@ -139,11 +157,13 @@
               </div>
             </div>
             <div class="description">
-              <span>Description</span>
+              <p>Description</p>
             </div>
           </div>
           <div class="card-face card-back3">
-            <h1>FOOTWORK</h1>
+            <div class="front-card-title">
+              <span>FOOTWORK</span>
+            </div>
           </div>
         </div>
       </div>

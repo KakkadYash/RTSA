@@ -167,9 +167,9 @@ function loadAnalytics() {
                 datasets: [{
                     label: "Athletic Scores",
                     data: data,
-                    backgroundColor: "rgba(0, 123, 255, 0.2)",
-                    borderColor: "#007bff",
-                    borderWidth: 2
+                    backgroundColor: "rgba(0, 123, 255, 0.4)",
+                    borderColor: "#1a2532ff",
+                    borderWidth: 6
                 }]
             },
             options: {
@@ -309,8 +309,8 @@ function loadAnalytics() {
         videoElement.currentTime = 0;
         processVideo(videoElement);
 
-        videoElement.removeEventListener('ended', handleVideoEnded); 
-        videoElement.addEventListener('ended', handleVideoEnded);    
+        videoElement.removeEventListener('ended', handleVideoEnded);
+        videoElement.addEventListener('ended', handleVideoEnded);
 
     });
 
@@ -876,15 +876,15 @@ function loadAnalytics() {
         }
         return result;
     }
-    
+
     function calculatePeakAcceleration() {
         return appState.accelerationData.length ? Math.max(...appState.accelerationData) : 0;
     }
-    
+
     function calculatePeakDeceleration() {
         return appState.decelerationData.length ? Math.max(...appState.decelerationData) : 0;
     }
-    
+
     function calculateAverageJumpHeight() {
         if (!appState.jumpHeights.length) return 0;
         const heights = appState.jumpHeights.map(j => j.height || 0);
@@ -966,39 +966,39 @@ function loadAnalytics() {
             const formData = new FormData();
             formData.append('video', appState.videoFile);
             formData.append('userId', localStorage.getItem('user_id'));
-            if (appState.uploadDate){
+            if (appState.uploadDate) {
                 formData.append('uploadDate', appState.uploadDate);
             }
             if (appState.thumbnailFile) {
-                formData.append('thumbnail', appState.thumbnailFile); 
+                formData.append('thumbnail', appState.thumbnailFile);
             }
             const uploadResponse = await fetch('https://uploaded-data-443715.uc.r.appspot.com/upload', {
                 method: 'POST',
                 body: formData,
             });
-    
+
             const uploadResult = await uploadResponse.json();
             console.log('Video uploaded successfully:', uploadResult);
-    
+
             if (!uploadResult.video_id) {
                 console.error('Video upload failed. No video_id received.');
                 return;
             }
-    
+
             appState.videoId = uploadResult.video_id;
-            const idealHeadPercentage = appState.idealHeadAngleFrames 
-            ? Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100) 
-            : 0;
+            const idealHeadPercentage = appState.idealHeadAngleFrames
+                ? Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100)
+                : 0;
             const allscores = appState.score.flat();
             const averageAthleticScore = allscores.length > 0
-            ? allscores.reduce((sum, val) => sum + val, 0) / allscores.length
-            : 0;
+                ? allscores.reduce((sum, val) => sum + val, 0) / allscores.length
+                : 0;
 
             // Update the metric values to be saved
             appState.averageStrideLength = calculateAverageStrideLength();
             appState.peakAcceleration = calculatePeakAcceleration();
             appState.peakDeceleration = calculatePeakDeceleration();
-            appState.averageJumpHeight = calculateAverageJumpHeight(); 
+            appState.averageJumpHeight = calculateAverageJumpHeight();
             const analyticsData = {
                 video_Id: appState.videoId,
                 userId: localStorage.getItem('user_id'),
@@ -1012,17 +1012,17 @@ function loadAnalytics() {
             };
 
             console.log("Sending analytics data:", analyticsData);
-    
+
             const analyticsResponse = await fetch('https://uploaded-data-443715.uc.r.appspot.com/saveAnalytics', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(analyticsData),
             });
-    
+
             const analyticsResult = await analyticsResponse.json();
             console.log('Analytics saved successfully:', analyticsResult);
             alert('Analytics saved successfully!');
-            
+
         } catch (error) {
             console.error('Error in autoSaveAnalytics:', error);
             alert('An error occurred while saving analytics.');
