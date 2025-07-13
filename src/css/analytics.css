@@ -88,11 +88,11 @@
     align-items: center;
     height: 100%;
     position: relative;
-    /* margin-right: -4em; */
+    width: 35vw;
 }
 
 #uploaded-video {
-    width: 35vw;
+    width: 100%;
     height: 100%;
 }
 
@@ -329,7 +329,7 @@ video {
 }
 
 .card-front:hover {
-    background-color: #773732;
+    background-color: #575656;
 }
 
 p {
@@ -342,7 +342,19 @@ p {
     padding-left: 10px;
 }
 
+/* .outerLegend {
+    position: absolute;
+    top: 1vw;
+    right: 1vw;
+    text-align: left;
+}
 
+.innerLegend {
+    position: absolute;
+    bottom: 1vw;
+    right: 1vw;
+    text-align: left;
+} */
 
 #myChart {
     display: block;
@@ -433,4 +445,69 @@ progress::-moz-progress-bar {
     background-repeat: no-repeat;
     background-attachment: initial;
     background-size: 35vw 35vw;
+}
+
+
+
+
+
+
+
+
+
+#outerLegend {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+#outerLegend .legend-color-box {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    margin-right: 6px;
+    border-radius: 2px;
+}
+
+#outerLegend .legend-label-text {
+    font-size: 0.8rem;
+    color: white;
+}
+
+#outerLegend div {
+    display: flex;
+    align-items: center;
+}
+
+
+#innerLegend {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+#innerLegend .legend-color-box {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    margin-right: 6px;
+    border-radius: 2px;
+}
+
+#innerLegend .legend-label-text {
+    font-size: 0.8rem;
+    color: white;
+}
+
+#innerLegend div {
+    display: flex;
+    align-items: center;
 }

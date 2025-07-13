@@ -14,13 +14,17 @@ function loadAnalytics() {
     const RIGHT_HIP_INDEX = 24;
     const RIGHT_ANKLE_INDEX = 28;
     const LEFT_EYE_INDEX = 1;
-    const MAX_SPEED = 5;
+    const MAX_SPEED = 10;
+    const MAX_ACCEL = 10;
+    const MAX_DECEL = 10;
+    const MAX_JUMP = 4;
+    const MAX_STRIDE = 2;
     const ACCELERATION_THRESHOLD = 0.5;
     const DECELERATION_THRESHOLD = 0.5;
     const JUMP_HEIGHT_BASELINE = 0.05;
-
     const uploadButton = document.getElementById('uploadButton');
     const analyzeButton = document.getElementById('analyzeButton');
+    const showMetricsBtn = document.getElementById('showMetrics');
     const videoElement = document.getElementById('uploaded-video');
     const canvasElement = document.getElementById('output_canvas');
     const canvasCtx = canvasElement.getContext('2d');
@@ -106,27 +110,37 @@ function loadAnalytics() {
     Chart.register(centerLabelPlugin);
 
     // Doughnut Chart
-    const doughnutChart = new Chart(document.getElementById('myChart').getContext('2d'), {
+    // <canvas id="myChart"></canvas>
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    const OUTER_LABELS = ['Running', 'Standing', 'Crouching'];
+    const INNER_LABELS = ['Head Up', 'Head Down'];
+
+    const doughnutChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
+            // Keep *one* label list so Chart.js is happy
+            // (it won’t be used for display)
+            labels: [...OUTER_LABELS, ...INNER_LABELS],
+
             datasets: [
-                {
-                    data: [],
-                    backgroundColor: ['#1E90FF', '#FFD700', '#A52A2A'],
+                {   // OUTER ring – 3 slices
+                    data: [0, 0, 0],              // will be filled later
+                    backgroundColor: [
+                        'rgb(255, 255, 0)',         // Running
+                        'rgb(0, 255, 255)',         // Standing
+                        'rgb(255, 0, 0)'            // Crouching
+                    ],
                     borderWidth: 0
                 },
-                {
-                    data: [],
-                    backgroundColor: ['#00ff00', '#FF2429'],
+                {   // INNER ring – 2 slices
+                    data: [0, 0],                 // will be filled later
+                    backgroundColor: [
+                        'rgb(0, 255, 0)',           // Head Up
+                        'rgb(91, 10, 10)'           // Head Down
+                    ],
                     borderWidth: 0
                 }
-            ],
-            labels: [
-                'Running',
-                'Standing',
-                'Crouching',
-                'Ideal Head Angle',
-                'Not Ideal Head Angle'
             ]
         },
         options: {
@@ -134,12 +148,16 @@ function loadAnalytics() {
             maintainAspectRatio: false,
             cutout: '40%',
             plugins: {
+                legend: { display: false },     // we’re building our own
                 tooltip: {
                     callbacks: {
-                        label: function (tooltipItem) {
-                            const label = tooltipItem.label || '';
-                            const value = Math.round(tooltipItem.raw || 0);
-                            return `${label}: ${value}%`;
+                        label(ctx) {
+                            // pick the right label set
+                            const lbl =
+                                ctx.datasetIndex === 0
+                                    ? OUTER_LABELS[ctx.dataIndex]
+                                    : INNER_LABELS[ctx.dataIndex];
+                            return `${lbl}: ${Math.round(ctx.parsed)}%`;
                         }
                     }
                 }
@@ -169,16 +187,46 @@ function loadAnalytics() {
                     data: data,
                     backgroundColor: "rgba(230, 42, 42, 0.2)",
                     borderColor: "#1a2532ff",
-                    borderWidth: 6
+                    borderWidth: 3
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',           // Move legend to top
+                        align: 'end',              // Align it to the right (end of the top line)
+                        labels: {
+                            font: {
+                                size: 22,              // Increase legend font size
+                                weight: 'bold'
+                            },
+                            color: 'rgb(0, 0, 0)'         // Optional: legend text color
+                        }
+                    }
+                },
                 scales: {
                     r: {
                         beginAtZero: true,
-                        max: 100
+                        max: 100,
+                        grid: {
+                            lineWidth: 3, // Increase this value for thicker radar lines
+                            color: 'rgb(82, 80, 80)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 20 // increase this number to enlarge the numeric scale
+                            },
+                            color: 'rgb(82, 80, 80)',         // font color of numbers
+                            stepSize: 10              // optional: controls spacing between ticks
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 22   // Change this to your desired font size
+                            },
+                            color: 'rgb(0, 0, 0)' // Optional: label color
+                        }
                     }
                 }
             }
@@ -186,6 +234,36 @@ function loadAnalytics() {
 
         chartType = "radar";
     }
+
+    function buildLegend(containerId, labels, colors) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = ''; // Clear previous content
+
+        labels.forEach((label, index) => {
+            const legendItem = document.createElement('div');
+
+            const colorBox = document.createElement('span');
+            colorBox.classList.add('legend-color-box');
+            colorBox.style.backgroundColor = colors[index];
+
+            const labelText = document.createElement('span');
+            labelText.classList.add('legend-label-text');
+            labelText.textContent = label;
+
+            legendItem.appendChild(colorBox);
+            legendItem.appendChild(labelText);
+
+            container.appendChild(legendItem);
+        });
+    }
+
+    // Example call for outer and inner doughnut legends:
+    buildLegend('outerLegend', OUTER_LABELS,
+        doughnutChart.data.datasets[0].backgroundColor);
+
+    buildLegend('innerLegend', INNER_LABELS,
+        doughnutChart.data.datasets[1].backgroundColor);
+
 
     // Show unified multi-metric chart (line chart)
     function showUnifiedChart(metricIndices = []) {
@@ -267,7 +345,17 @@ function loadAnalytics() {
     // Upload button: Select and preview the video
     uploadButton.addEventListener('change', (event) => {
         appState.videoFile = event.target.files[0];
+
         if (appState.videoFile) {
+            const maxSizeInBytes = 30 * 1024 * 1024; // 30 MB
+
+            if ((appState.videoFile).size > maxSizeInBytes) {
+                alert("File size exceeds 30MB. Please upload a smaller video.");
+                event.target.value = ""; // Reset the input so they can re-upload
+                return;
+            }
+
+            appState.videoFile = appState.videoFile;
             const videoURL = URL.createObjectURL(appState.videoFile);
             videoElement.src = videoURL;
             videoElement.style.display = 'block';
@@ -286,7 +374,7 @@ function loadAnalytics() {
             alert("Please upload a video file first.");
             return;
         }
-
+        analyzeButton.style.display = 'none';
         loadingOverlay.style.display = 'block';
 
         const estimatedHeight = await estimateHeight(appState.videoFile);
@@ -304,7 +392,8 @@ function loadAnalytics() {
 
         videoElement.style.display = 'none';
         canvasElement.style.display = 'block';
-        playProcessedButton.style.display = 'block';
+
+        playProcessedButton.style.display = 'inline-block';
 
         videoElement.currentTime = 0;
         processVideo(videoElement);
@@ -324,23 +413,48 @@ function loadAnalytics() {
     });
 
     // Card click: Show filtered chart for card
-    document.querySelectorAll('.card').forEach((card, index) => {
+    document.querySelectorAll('.card').forEach((card, index, allCards) => {
         card.addEventListener('click', () => {
             setTimeout(() => {
-                if (card.classList.contains('is-flipped')) {
+                const alreadyFlipped = card.classList.contains('is-flipped');
+
+                // Unflip all cards first
+                allCards.forEach(c => c.classList.remove('is-flipped'));
+
+                // If the clicked card was not flipped, flip it and update chart
+                if (!alreadyFlipped) {
+                    card.classList.add('is-flipped');
+
+                    // Show the filtered chart based on card index
                     if (index === 0) showUnifiedChart([0]);         // Technique
                     if (index === 1) showUnifiedChart([1, 2, 3]);    // Speed & Movement
                     if (index === 2) showUnifiedChart([4, 5]);       // Footwork
+                } else {
+                    // If it was already flipped and now being unflipped, show the pentagon chart again
+                    showPentagonChart();
                 }
             }, 200);
         });
     });
 
     // Show all metrics → Show pentagon chart and flip all cards
-    document.getElementById('showMetrics').addEventListener('click', () => {
-        showPentagonChart();
-        document.querySelectorAll('.card').forEach(card => card.classList.add('is-flipped'));
-    });
+    if (showMetricsBtn) {
+        let metricsVisible = false; // Track state
+        showMetricsBtn.addEventListener('click', () => {
+            metricsVisible = !metricsVisible; // Toggle state
+
+            if (metricsVisible) {
+                showPentagonChart(); // Optional: only if you want to re-show the chart each time
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.add('is-flipped');
+                });
+            } else {
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('is-flipped');
+                });
+            }
+        });
+    }
 
     // ------------------------
     // 5. POSE SETUP
@@ -367,12 +481,47 @@ function loadAnalytics() {
             lastUpdateTime = now;
         }
     }
+    function drawVideoFrameWithAspectRatio() {
+        const canvasWidth = canvasElement.width;
+        const canvasHeight = canvasElement.height;
+        const videoWidth = videoElement.videoWidth;
+        const videoHeight = videoElement.videoHeight;
+        const videoAspectRatio = videoWidth / videoHeight;
+        const canvasAspectRatio = canvasWidth / canvasHeight;
+
+        let drawWidth, drawHeight, offsetX, offsetY;
+        try {
+            if (canvasAspectRatio > videoAspectRatio) {
+                // Canvas is wider than video aspect ratio — fit height
+                drawHeight = canvasHeight;
+                drawWidth = drawHeight * videoAspectRatio;
+                offsetX = (canvasWidth - drawWidth) / 2;
+                offsetY = 0;
+            } else if (canvasAspectRatio < videoAspectRatio) {
+                // Canvas is taller than video aspect ratio — fit width
+                drawWidth = canvasWidth;
+                drawHeight = drawWidth / videoAspectRatio;
+                offsetX = 0;
+                offsetY = (canvasHeight - drawHeight) / 2;
+            } else {
+                // Aspect ratios match exactly — draw full canvas
+                drawWidth = canvasWidth;
+                drawHeight = canvasHeight;
+                offsetX = 0;
+                offsetY = 0;
+            }
+            // Clear the entire canvas
+            canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            // Draw video frame centered with preserved aspect ratio
+            canvasCtx.drawImage(videoElement, offsetX, offsetY, drawWidth, drawHeight);
+        } catch (error) {
+            console.error('Error in drawing with aspect ratio:', error);
+        }
+    }
 
     // Main frame-by-frame pose landmark handler
     function onResults(results) {
-        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-
+        drawVideoFrameWithAspectRatio();
         if (!results.poseLandmarks) {
             console.log("No landmarks detected");
             return;
@@ -519,15 +668,29 @@ function loadAnalytics() {
     function updateDoughnutChart() {
         if (!doughnutChart) return;
 
-        const idealPercentage = Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100);
-        doughnutChart.data.datasets[1].data = [idealPercentage, 100 - idealPercentage];
+        // ---------- INNER ring (head‑angle) ----------
+        const idealPct = Math.round(
+            (appState.idealHeadAngleFrames / appState.totalFrames) * 100
+        );
+        doughnutChart.data.datasets[1].data = [
+            idealPct,
+            100 - idealPct
+        ];
 
-        const totalPosture = Object.values(appState.postureCounts).reduce((a, b) => a + b, 0) || 1;
-        const running = Math.round((appState.postureCounts["Running"] || 0) / totalPosture * 100);
-        const standing = Math.round((appState.postureCounts["Upright Standing"] || 0) / totalPosture * 100);
-        const crouching = Math.round((appState.postureCounts["Crouching"] || 0) / totalPosture * 100);
+        // ---------- OUTER ring (posture counts) ----------
+        const totals = appState.postureCounts;
+        const totalPosture = Object.values(totals).reduce((a, b) => a + b, 0) || 1;
 
-        doughnutChart.data.datasets[0].data = [0, 0, running, standing, crouching];
+        const running = Math.round(((totals['Running'] || 0) / totalPosture) * 100);
+        const standing = Math.round(((totals['Upright Standing'] || 0) / totalPosture) * 100);
+        const crouching = Math.round(((totals['Crouching'] || 0) / totalPosture) * 100);
+
+        doughnutChart.data.datasets[0].data = [
+            running,
+            standing,
+            crouching
+        ];
+
         doughnutChart.update();
     }
 
@@ -535,25 +698,27 @@ function loadAnalytics() {
         const speed = Math.round(appState.smoothedSpeed) || 0;
         const accel = Math.round(calculatePeakAcceleration()) || 0;
         const decel = Math.round(calculatePeakDeceleration()) || 0;
-        const jump = Math.round(calculateAverageJumpHeight()) || 0;
-        const stride = Math.round(calculateAverageStrideLength()) || 0;
-
+        const jump = calculateAverageJumpHeight() || 0;
+        const stride = calculateAverageStrideLength() || 0;
+        console.log(`speed: ${speed}`)
+        console.log(`accel: ${accel}`)
+        console.log(`decel: ${decel}`)
+        console.log(`jump: ${jump}`)
+        console.log(`stride: ${stride}`)
         // SPEED & MOVEMENT
-        document.getElementById("topSpeed").innerText = speed;
-        document.getElementById("topSpeedBar").value = speed;
-
-        document.getElementById("peakAcceleration").innerText = accel;
-        document.getElementById("peakAccelerationBar").value = accel;
-
-        document.getElementById("peakDeceleration").innerText = decel;
-        document.getElementById("peakDecelerationBar").value = decel;
+        updateProgress("topSpeed", "topSpeedBar", speed, MAX_SPEED);
+        updateProgress("peakAcceleration", "peakAccelerationBar", accel, MAX_ACCEL);
+        updateProgress("peakDeceleration", "peakDecelerationBar", decel, MAX_DECEL);
 
         // FOOTWORK
-        document.getElementById("averageJumpHeight").innerText = jump;
-        document.getElementById("averageJumpHeightBar").value = jump;
+        updateProgress("averageJumpHeight", "averageJumpHeightBar", jump, MAX_JUMP);
+        updateProgress("averageStrideLength", "averageStrideLengthBar", stride, MAX_STRIDE);
+    }
 
-        document.getElementById("averageStrideLength").innerText = stride;
-        document.getElementById("averageStrideLengthBar").value = stride;
+    function updateProgress(textId, barId, value, maxValue) {
+        const percentage = Math.min((value / maxValue) * 100, 100); // Cap at 100%
+        document.getElementById(textId).innerText = value;
+        document.getElementById(barId).style.width = `${percentage}%`;
     }
 
     // ------------------------
@@ -887,20 +1052,40 @@ function loadAnalytics() {
 
     function calculateAverageJumpHeight() {
         if (!appState.jumpHeights.length) return 0;
+
         const heights = appState.jumpHeights.map(j => j.height || 0);
         const validHeights = heights.filter(h => h > 0);
         if (!validHeights.length) return 0;
-        return validHeights.reduce((a, b) => a + b, 0) / validHeights.length;
+
+        const sorted = validHeights.slice().sort((a, b) => a - b);
+        const midIndex = Math.floor(sorted.length / 2);
+        const topHalf = sorted.slice(midIndex);
+
+        const average = topHalf.reduce((a, b) => a + b, 0) / topHalf.length;
+        return Math.round(average * 100) / 100; // 2 decimal places
     }
 
     function calculateAverageStrideLength() {
         if (!appState.stridelength.length) return 0;
+
         const lengths = appState.stridelength.map(s => s.length || 0);
         const validLengths = lengths.filter(l => l > 0);
         if (!validLengths.length) return 0;
-        return validLengths.reduce((a, b) => a + b, 0) / validLengths.length;
-    }
 
+        // Step 1: Sort the valid lengths (ascending)
+        const sorted = validLengths.slice().sort((a, b) => a - b);
+
+        // Step 2: Get the index of the median
+        const midIndex = Math.floor(sorted.length / 2);
+
+        // Step 3: Get the top 50% (including median)
+        const topHalf = sorted.slice(midIndex);
+
+        // Step 4: Calculate the average of the top half
+        const average = topHalf.reduce((a, b) => a + b, 0) / topHalf.length;
+
+        return Math.round(average * 100) / 100; // rounded to 2 decimal places
+    }
     // ------------------------
     // 11. RESET & UPLOAD
     // ------------------------
