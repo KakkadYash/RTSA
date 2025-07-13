@@ -344,6 +344,7 @@ function loadAnalytics() {
 
     // Upload button: Select and preview the video
     uploadButton.addEventListener('change', (event) => {
+        analyzeButton.style.display = 'block';
         appState.videoFile = event.target.files[0];
 
         if (appState.videoFile) {
@@ -404,13 +405,16 @@ function loadAnalytics() {
     });
 
     // Play Processed Video button
-    playProcessedButton.addEventListener('click', () => {
-        if (!videoElement.paused) return;
-        showPentagonChart();
-        videoElement.play();
-        playProcessedButton.style.display = 'none';
-        processVideo(videoElement);
-    });
+    playProcessedButton.addEventListener(
+        'click',
+        () => {
+            if (!videoElement.paused) return;
+            showPentagonChart();
+            videoElement.play();
+            processVideo(videoElement);
+        },
+        { once: true }   // listener auto‑removes itself after first call
+    );
 
     // Card click: Show filtered chart for card
     document.querySelectorAll('.card').forEach((card, index, allCards) => {
