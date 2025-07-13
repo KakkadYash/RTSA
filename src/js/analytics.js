@@ -366,12 +366,13 @@ function loadAnalytics() {
                 event.target.value = ""; // Reset the input so they can re-upload
                 return;
             }
-
-            appState.videoFile = appState.videoFile;
             const videoURL = URL.createObjectURL(appState.videoFile);
             videoElement.src = videoURL;
             // Wait for metadata to be loaded
             videoElement.onloadedmetadata = () => {
+                // Video's intrinsic dimensions are now available
+                console.log("Loaded video metadata:", videoElement.videoWidth, videoElement.videoHeight);
+                // Other state resets
                 videoElement.style.display = 'block';
                 resetCharts();
                 resetAnalysisData();
@@ -379,6 +380,7 @@ function loadAnalytics() {
                 playProcessedButton.style.display = 'none';
                 analyzeButton.style.display = 'block';
             };
+
         }
     });
 
@@ -500,6 +502,7 @@ function loadAnalytics() {
             lastUpdateTime = now;
         }
     }
+
     function drawVideoFrameWithAspectRatio() {
         const canvasWidth = canvasElement.width;
         const canvasHeight = canvasElement.height;
@@ -507,48 +510,63 @@ function loadAnalytics() {
         const videoHeight = videoElement.videoHeight;
         const videoAspectRatio = videoWidth / videoHeight;
         const canvasAspectRatio = canvasWidth / canvasHeight;
-        console.log("canvas:", canvasWidth, canvasHeight, "aspect:", canvasAspectRatio);
-        console.log("video:", videoWidth, videoHeight, "aspect:", videoAspectRatio);
+        const zoomLevel = 1.05; // 1.0 = no zoom, 1.05 = 5% zoom
+        const scale = Math.max(canvasWidth / videoWidth, canvasHeight / videoHeight) * zoomLevel;
+
         let drawWidth, drawHeight, offsetX, offsetY;
-        console.log("canvas:", canvasWidth, canvasHeight, "aspect:", canvasAspectRatio);
-        console.log("video:", videoWidth, videoHeight, "aspect:", videoAspectRatio);
         try {
             if (canvasAspectRatio > videoAspectRatio) {
-                // Canvas is wider than video aspect ratio — fit height
                 drawHeight = canvasHeight;
                 drawWidth = drawHeight * videoAspectRatio;
                 offsetX = (canvasWidth - drawWidth) / 2;
                 offsetY = 0;
             } else if (canvasAspectRatio < videoAspectRatio) {
-                // Canvas is taller than video aspect ratio — fit width
                 drawWidth = canvasWidth;
                 drawHeight = drawWidth / videoAspectRatio;
                 offsetX = 0;
                 offsetY = (canvasHeight - drawHeight) / 2;
             } else {
-                // Aspect ratios match exactly — draw full canvas
                 drawWidth = canvasWidth;
                 drawHeight = canvasHeight;
                 offsetX = 0;
                 offsetY = 0;
             }
-            // Clear the entire canvas
+
             canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-            // Draw video frame centered with preserved aspect ratio
             canvasCtx.drawImage(videoElement, offsetX, offsetY, drawWidth, drawHeight);
+
+            return { offsetX, offsetY, drawWidth, drawHeight }; // <- Return these
         } catch (error) {
             console.error('Error in drawing with aspect ratio:', error);
+            return { offsetX: 0, offsetY: 0, drawWidth: canvasWidth, drawHeight: canvasHeight };
         }
     }
 
     // Main frame-by-frame pose landmark handler
     function onResults(results) {
-        drawVideoFrameWithAspectRatio();
+        const { offsetX, offsetY, drawWidth, drawHeight } = drawVideoFrameWithAspectRatio();
+
         if (!results.poseLandmarks) {
             console.log("No landmarks detected");
             return;
         }
+        console.log("Landmark sample:", results.poseLandmarks[0]);
 
+        // Save current canvas state
+        canvasCtx.save();
+
+        // Set up a transform so (0,0) to (1,1) maps to the drawn video area
+        canvasCtx.translate(offsetX, offsetY);
+        canvasCtx.scale(drawWidth, drawHeight);
+
+        // Use smaller line widths because the space is now 0–1
+        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: 'white', lineWidth: 0.02 });
+        drawLandmarks(canvasCtx, results.poseLandmarks, { color: 'red', lineWidth: 0.009 });
+
+        // Restore the transform back
+        canvasCtx.restore();
+
+        // Continue with all metric/posture processing
         appState.landmarkHistory.push([...results.poseLandmarks]);
         if (appState.landmarkHistory.length > 100) {
             appState.landmarkHistory.shift();
@@ -572,11 +590,10 @@ function loadAnalytics() {
         }
 
         const now = performance.now();
-        const timeElapsedSinceLastFrame = appState.previousFrameTime ? (now - appState.previousFrameTime) / 1000 : 0;
+        const timeElapsedSinceLastFrame = appState.previousFrameTime
+            ? (now - appState.previousFrameTime) / 1000
+            : 0;
         appState.previousFrameTime = now;
-
-        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: 'white', lineWidth: 2 });
-        drawLandmarks(canvasCtx, results.poseLandmarks, { color: 'red', lineWidth: 1 });
 
         const headAngle = calculateHeadAngle(results.poseLandmarks);
         if (headAngle >= 5) {
@@ -609,24 +626,25 @@ function loadAnalytics() {
         detectDrillStart(results.poseLandmarks);
         detectDrillEnd();
     }
+
     // ------------------------
     // 6. VIDEO PROCESSING
     // ------------------------
 
-    function processVideo(videoEl) {
+    function processVideo(videoElement) {
         function processFrame() {
-            if (videoEl.paused || videoEl.ended) return;
+            if (videoElement.paused || videoElement.ended) return;
 
-            canvasElement.width = videoEl.videoWidth;
-            canvasElement.height = videoEl.videoHeight;
-            canvasCtx.drawImage(videoEl, 0, 0, canvasElement.width, canvasElement.height);
+            // canvasElement.width = videoElement.videoWidth;
+            // canvasElement.height = videoElement.videoHeight;
+            // canvasCtx.drawImage(videoEl, 0, 0, canvasElement.width, canvasElement.height);
 
-            pose.send({ image: canvasElement }).then(() => {
+            pose.send({ image: videoElement }).then(() => {
                 setTimeout(processFrame, 20);
             }).catch(error => console.error("Error processing frame:", error));
         }
 
-        videoEl.addEventListener('play', processFrame);
+        videoElement.addEventListener('play', processFrame);
     }
 
     function seekToTimestamp(timestamp) {

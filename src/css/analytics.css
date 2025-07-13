@@ -271,7 +271,7 @@ video {
 
 .front-card-title {
     display: flex;
-    background-image: url(/public/assets/images/Red-Streak.png);
+    background-image: url(../../public/assets/images/Red-Streak.png);
     background-attachment: initial;
     background-repeat: no-repeat;
     background-position: 0% 80%;
