@@ -344,7 +344,6 @@ function loadAnalytics() {
 
     // Upload button: Select and preview the video
     uploadButton.addEventListener('change', (event) => {
-        analyzeButton.style.display = 'block';
         appState.videoFile = event.target.files[0];
 
         if (appState.videoFile) {
@@ -364,6 +363,7 @@ function loadAnalytics() {
             resetAnalysisData();
             canvasElement.style.display = 'none';
             playProcessedButton.style.display = 'none';
+            analyzeButton.style.display = 'block';
         }
     });
 
