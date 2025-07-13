@@ -13,16 +13,6 @@ body {
     cursor: pointer;
 }
 
-.splashScreen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;
-    z-index: 0;
-}
-
 .splashLogo {
     position: absolute;
     top: 50%;
@@ -31,4 +21,14 @@ body {
     max-width: 60%;
     height: auto;
     z-index: 1;
+}
+
+.splashScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: 0;
 }
