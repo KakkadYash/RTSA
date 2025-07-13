@@ -370,12 +370,15 @@ function loadAnalytics() {
             appState.videoFile = appState.videoFile;
             const videoURL = URL.createObjectURL(appState.videoFile);
             videoElement.src = videoURL;
-            videoElement.style.display = 'block';
-            resetCharts();
-            resetAnalysisData();
-            canvasElement.style.display = 'none';
-            playProcessedButton.style.display = 'none';
-            analyzeButton.style.display = 'block';
+            // Wait for metadata to be loaded
+            videoElement.onloadedmetadata = () => {
+                videoElement.style.display = 'block';
+                resetCharts();
+                resetAnalysisData();
+                canvasElement.style.display = 'none';
+                playProcessedButton.style.display = 'none';
+                analyzeButton.style.display = 'block';
+            };
         }
     });
 
@@ -504,7 +507,8 @@ function loadAnalytics() {
         const videoHeight = videoElement.videoHeight;
         const videoAspectRatio = videoWidth / videoHeight;
         const canvasAspectRatio = canvasWidth / canvasHeight;
-
+        console.log("canvas:", canvasWidth, canvasHeight, "aspect:", canvasAspectRatio);
+        console.log("video:", videoWidth, videoHeight, "aspect:", videoAspectRatio);
         let drawWidth, drawHeight, offsetX, offsetY;
         console.log("canvas:", canvasWidth, canvasHeight, "aspect:", canvasAspectRatio);
         console.log("video:", videoWidth, videoHeight, "aspect:", videoAspectRatio);
