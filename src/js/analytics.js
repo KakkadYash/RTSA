@@ -29,6 +29,8 @@ function loadAnalytics() {
     const canvasElement = document.getElementById('output_canvas');
     const canvasCtx = canvasElement.getContext('2d');
     const playProcessedButton = document.getElementById('playProcessedButton');
+
+    // Setting Analyzing Indicator Display to None  
     const loadingOverlay = document.getElementById('analyzingIndicator');
 
     let currentChart = null;
@@ -113,8 +115,8 @@ function loadAnalytics() {
     // <canvas id="myChart"></canvas>
     const ctx = document.getElementById('myChart').getContext('2d');
 
-    const OUTER_LABELS = ['Running', 'Standing', 'Crouching'];
-    const INNER_LABELS = ['Head Up', 'Head Down'];
+    const OUTER_LABELS = ['RUNNING', 'STANDING', 'CROUCHING'];
+    const INNER_LABELS = ['HEAD UP', 'HEAD DOWN'];
 
     const doughnutChart = new Chart(ctx, {
         type: 'doughnut',
@@ -131,7 +133,12 @@ function loadAnalytics() {
                         'rgb(0, 255, 255)',         // Standing
                         'rgb(255, 0, 0)'            // Crouching
                     ],
-                    borderWidth: 0
+                    borderColor: [
+                        'rgb(0, 0, 0)',  // white border for slice 1
+                        'rgb(0, 0, 0)',  // white border for slice 2
+                        'rgb(0, 0, 0)'   // white border for slice 3
+                    ],
+                    borderWidth: 2
                 },
                 {   // INNER ring – 2 slices
                     data: [0, 0],                 // will be filled later
@@ -139,7 +146,11 @@ function loadAnalytics() {
                         'rgb(0, 255, 0)',           // Head Up
                         'rgb(91, 10, 10)'           // Head Down
                     ],
-                    borderWidth: 0
+                    borderColor: [
+                        'rgb(0, 0, 0)',       // black border for slice 1
+                        'rgb(0, 0, 0)'        // black border for slice 2
+                    ],
+                    borderWidth: 2
                 }
             ]
         },
@@ -216,10 +227,11 @@ function loadAnalytics() {
                         },
                         ticks: {
                             font: {
-                                size: 20 // increase this number to enlarge the numeric scale
+                                size: 12 // increase this number to enlarge the numeric scale
                             },
                             color: 'rgb(82, 80, 80)',         // font color of numbers
-                            stepSize: 10              // optional: controls spacing between ticks
+                            stepSize: 10,              // optional: controls spacing between ticks
+                            transparency: 0.5
                         },
                         pointLabels: {
                             font: {
@@ -494,6 +506,8 @@ function loadAnalytics() {
         const canvasAspectRatio = canvasWidth / canvasHeight;
 
         let drawWidth, drawHeight, offsetX, offsetY;
+        console.log("canvas:", canvasWidth, canvasHeight, "aspect:", canvasAspectRatio);
+        console.log("video:", videoWidth, videoHeight, "aspect:", videoAspectRatio);
         try {
             if (canvasAspectRatio > videoAspectRatio) {
                 // Canvas is wider than video aspect ratio — fit height

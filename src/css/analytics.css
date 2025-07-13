@@ -48,30 +48,6 @@
     height: 60%;
 }
 
-/* Loading overlay styles */
-.loading-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Loading spinner animation */
-.loading-spinner {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #3498db;
-    border-radius: 50%;
-    width: 3vw;
-    height: 3vw;
-    animation: spin 1s linear infinite;
-}
-
 /* Video Section */
 .video-section {
     display: flex;
@@ -80,6 +56,7 @@
     /* margin: 0vh 0vw 3vw 0vw; */
     justify-content: space-around;
     height: 25vw;
+    margin-bottom: 2vw;
 }
 
 .vid-chart {
@@ -109,16 +86,16 @@ video {
 }
 
 #analyzingIndicator {
-    position: absolute;
-    top: 90%;
-    left: 60%;
-    transform: translate(-50%, -50%);
+    display: none;
     font-size: 2vw;
     color: #FFFFFF;
     background-color: rgba(0, 0, 0, 0.7);
     padding: 1vw;
-    border-radius: 0.2vw;
+    border-radius: 1vw;
 }
+
+
+
 
 .chart-wrapper {
     background-color: transparent;
@@ -143,6 +120,20 @@ video {
     transform: translateX(-50%);
 }
 
+
+
+.replacebtns {
+    display: flex;
+}
+
+
+.playprocess {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 4vw;
+}
+
 .play-process-button {
     /* height: 10vh; */
     display: flex;
@@ -153,34 +144,20 @@ video {
     justify-content: center;
     align-items: center;
     margin: 1vw 0 0 0;
-}
-
-.playprocess {
-    position: absolute;
-    top: 91%;
-    left: 51.8%;
-    display: flex;
-    width: 17vw;
-    height: 1vw;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
-    align-content: center;
-    align-items: center;
+    height: 0vw;
 }
 
 #playProcessedButton {
     font-family: SCHABO-Condensed;
     background-color: #000000;
-    border-radius: 2vw;
+    border-radius: 1.6vw;
     color: #FFFFFF;
-    padding: 1vw 3vw;
-    text-align: center;
-    text-decoration: none;
     display: inline-block;
     font-size: 2vw;
     cursor: pointer;
-    border: #ff4343 solid 0.2vw;
+    border: #ff4343 solid 0.3vw;
     display: none;
+    height: 100%;
 }
 
 .button {
@@ -208,10 +185,11 @@ video {
     flex-direction: row;
     justify-content: space-around;
     flex-wrap: wrap;
-    align-items: center;
     align-content: center;
-    height: 9vh;
-    margin: 1vw 0 2vw 0;
+    width: 100%;
+    margin: 0 0 2vw 0;
+    padding: 0vw 3.5vw;
+    align-items: center;
 }
 
 
@@ -447,22 +425,33 @@ progress::-moz-progress-bar {
     background-size: 35vw 35vw;
 }
 
+.donut-chart-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
-
-
-
-
-
+.inner-legend-wrapper {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    flex-direction: row;
+    align-content: stretch;
+    align-items: baseline;
+}
 
 
 #outerLegend {
+    margin-top: 3.5vw;
     position: absolute;
     top: 10px;
     right: 10px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 6px;
+    /* gap: 6px; */
+    justify-content: space-between;
 }
 
 #outerLegend .legend-color-box {
@@ -473,9 +462,11 @@ progress::-moz-progress-bar {
     border-radius: 2px;
 }
 
-#outerLegend .legend-label-text {
-    font-size: 0.8rem;
+.legend-label-text {
+    font-family: FutraLight;
+    font-size: 1vw;
     color: white;
+    letter-spacing: 0.1vw;
 }
 
 #outerLegend div {
@@ -484,27 +475,12 @@ progress::-moz-progress-bar {
 }
 
 
-#innerLegend {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-}
-
 #innerLegend .legend-color-box {
     width: 12px;
     height: 12px;
     display: inline-block;
     margin-right: 6px;
     border-radius: 2px;
-}
-
-#innerLegend .legend-label-text {
-    font-size: 0.8rem;
-    color: white;
 }
 
 #innerLegend div {

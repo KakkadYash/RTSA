@@ -23,10 +23,6 @@
       </div>
     </div>
 
-    <!-- Loading overlay (hidden initially) -->
-    <div id="loadingOverlayHEML" class="loading-overlay">
-      <div class="loading-spinner"></div>
-    </div>
     <!-- Video Section -->
     <div class="video-section">
       <div class="vid-chart">
@@ -41,38 +37,52 @@
       <!-- <label for="uploadDate">Set Upload Date (optional):</label>
       <input type="datetime-local" id="uploadDate" name="uploadDate"> -->
     </div>
-    <!-- Button to start processed playback (revealed after analysis) -->
-    <div class="playprocess">
-      <button id="playProcessedButton" type="button" controls>Play Video</button>
-    </div>
-    <!-- Analyze button -->
+
     <div class="btns">
       <div>
         <input type="file" id="uploadButton" accept="video/*" hidden="">
         <label id="uploadvideo" for="uploadButton" class="button">UPLOAD VIDEO</label>
       </div>
-      <div>
-        <button class="button" id="analyzeButton" type="button">ANALYZE VIDEO</button>
+
+
+      <!-- Analyze button and replace buttons -->
+      <div class="replacebtns">
+        <div>
+          <button class="button" id="analyzeButton" type="button">ANALYZE VIDEO</button>
+        </div>
+        <!-- Analyzing indicator (hidden initially) -->
+        <div id="analyzingIndicator">
+          <span class="small-spinner"></span> Analyzing...
+        </div>
+        <!-- Button to start processed playback (revealed after analysis) -->
+        <div class="playprocess">
+          <button id="playProcessedButton" class="button" type="button" controls>PLAY VIDEO</button>
+        </div>
       </div>
+
+
       <div>
         <button class="button" id="showMetrics" type="button" onclick="flipAllCards()">ALL METRICS</button>
       </div>
     </div>
-    <!-- Analyzing indicator (hidden initially) -->
-    <div id="analyzingIndicator" style="display: none; margin-top: 10px;">
-      <span class="small-spinner"></span> Analyzing...
-    </div>
+
     <div id="stats-container">
       <div class="card-container">
         <div class="card">
           <div class="card-face card-front">
-            <div class="back-card-title">
-              <span>TECHNIQUE</span>
+            <div class="back-card-title-container">
+              <div class="back-card-title">
+                <span>TECHNIQUE</span>
+              </div>
+              <div class="outerlegendwrapper">
+                <div></div>
+                <div id="outerLegend"></div>
+              </div>
             </div>
-
             <div>
               <canvas id="myChart"></canvas>
-              <div id="outerLegend"></div>
+            </div>
+            <div class="inner-legend-wrapper">
               <div id="innerLegend"></div>
             </div>
             <div class="description">
