@@ -408,10 +408,23 @@ function loadAnalytics() {
         await pose.initialize();
         loadingOverlay.style.display = 'none';
 
+        // Show the play video button
+        playProcessedButton.style.display = 'inline-block';
+
+        // Remove old click listener to avoid duplicates
+        playProcessedButton.removeEventListener('click', handlePlayProcessedClick);
+
+        // Add fresh listener for this session
+        playProcessedButton.addEventListener('click', handlePlayProcessedClick);
+
+
         videoElement.style.display = 'none';
+
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
         canvasElement.style.display = 'block';
 
-        playProcessedButton.style.display = 'inline-block';
+        // playProcessedButton.style.display = 'inline-block';
 
         videoElement.currentTime = 0;
         processVideo(videoElement);
@@ -422,16 +435,16 @@ function loadAnalytics() {
     });
 
     // Play Processed Video button
-    playProcessedButton.addEventListener(
-        'click',
-        () => {
-            if (!videoElement.paused) return;
-            showPentagonChart();
-            videoElement.play();
-            processVideo(videoElement);
-        },
-        { once: true }   // listener auto‑removes itself after first call
-    );
+    function handlePlayProcessedClick() {
+        if (!videoElement.paused) return;
+        showPentagonChart();
+        videoElement.play();
+        processVideo(videoElement);
+
+        // Remove itself after first click
+        playProcessedButton.removeEventListener('click', handlePlayProcessedClick);
+    }
+
 
     // Card click: Show filtered chart for card
     document.querySelectorAll('.card').forEach((card, index, allCards) => {
@@ -544,6 +557,10 @@ function loadAnalytics() {
 
     // Main frame-by-frame pose landmark handler
     function onResults(results) {
+
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
         const { offsetX, offsetY, drawWidth, drawHeight } = drawVideoFrameWithAspectRatio();
 
         if (!results.poseLandmarks) {
@@ -595,6 +612,10 @@ function loadAnalytics() {
             : 0;
         appState.previousFrameTime = now;
 
+
+        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: 'white', lineWidth: 0.8 });
+        drawLandmarks(canvasCtx, results.poseLandmarks, { color: 'red', lineWidth: 0.008 });
+
         const headAngle = calculateHeadAngle(results.poseLandmarks);
         if (headAngle >= 5) {
             appState.totalFrames++;
@@ -633,6 +654,7 @@ function loadAnalytics() {
 
     function processVideo(videoElement) {
         function processFrame() {
+            if (videoElement.paused || videoElement.ended) return;
             if (videoElement.paused || videoElement.ended) return;
 
             // canvasElement.width = videoElement.videoWidth;

@@ -51,6 +51,7 @@ aside ul {
 aside a.active,
 aside a:hover,
 aside a:focus-visible {
+    transform: scale(1.1);
     outline: none;
     color: #FFFFFF;
     text-shadow: 1px 1px 0px #000000;
@@ -86,7 +87,9 @@ li {
 }
 
 .logOut:hover {
+    transform: scale(1.1);
     color: #FFFFFF;
+    padding-left: 1vw;
 }
 
 .logOut {
@@ -202,6 +205,10 @@ form {
     width: 40px;
 }
 
+.social-box:hover {
+    transform: scale(1.1);
+}
+
 .social-box {
     display: flex;
     align-items: center;
@@ -216,7 +223,6 @@ form {
 
 .logOut span {
     cursor: pointer;
-    text-shadow: 1px 1px 0px #ffffff;
 }
 
 .header input[type=text] {

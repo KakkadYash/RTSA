@@ -120,11 +120,11 @@ h2 {
   background-color: #000000;
   color: #797979;
   font-weight: bold;
-  border-radius: 10px;
+  border-radius: 1vw;
   display: flex;
   flex-direction: column;
   align-items: start;
-  padding: 1vh 0vw 0 1vw;
+  padding: 1vw;
   line-height: 9vh;
   width: 76.5vw;
   border: 1px solid #FFFFFF;
@@ -135,8 +135,8 @@ h2 {
 .subHeader {
   display: flex;
   align-items: center;
+  width: 100%;
   justify-content: space-between;
-  gap: 600px;
 }
 
 h3 {
@@ -148,23 +148,26 @@ h3 {
 }
 
 #saveButton {
+  padding: 0.5vw 0.5vw 0vw 0.5vw;
+  display: flex;
   font-family: SCHABO-Condensed;
   background-color: #FFFF;
   color: #000000;
-  border: 2px solid #D02720;
+  border: 0.3vw solid #D02720;
   border-radius: 6%;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
-  font-size: 40px;
-  width: 150px;
+  font-size: 3vw;
+  width: 10vw;
   cursor: pointer;
+  justify-content: space-around;
+  align-content: center;
+  align-items: center;
 }
 
 .save {
-  width: 35px;
-  height: auto;
-  padding-left: 5px;
+  width: 3vw;
+  height: 3vw;
 }
 
 .data {
