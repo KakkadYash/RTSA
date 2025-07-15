@@ -111,22 +111,10 @@ canvas {
 }
 
 #prevChart {
-  background-color: white;
-  background-size: contain;
-  width: 2vw;
-  height: 100%;
-  background-repeat: no-repeat;
-  background-image: url(../../public/assets/images/right.png);
-  transform: scaleX(-1);
+  background-image: url(../../public/assets/images/left-navigation-button.png);
 }
 
 #nextChart {
-  background-color: white;
-  transform: scale(1);
-  background-size: contain;
-  width: 2vw;
-  height: 100%;
-  background-repeat: no-repeat;
   background-image: url(../../public/assets/images/right.png);
 }
 
@@ -135,22 +123,22 @@ canvas {
   height: 2vw;
   width: 100%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  padding: 0vw 0.1vw;
 }
 
 .chart-arrows button {
-  font-size: 24px;
-  padding: 6px 12px;
-  background-color: #333;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  background-repeat: no-repeat;
+  background-color: white;
+  width: 2vw;
+  height: 100%;
+  border-radius: 0.5vw;
   cursor: pointer;
-  transform: scale(0.6);
+  background-size: contain;
 }
 
 .chart-arrows button:hover {
-  background-color: #555;
+  transform: scale(1.1);
 }
 
 .small-box {
