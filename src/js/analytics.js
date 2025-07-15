@@ -372,10 +372,17 @@ function loadAnalytics() {
             videoElement.onloadedmetadata = () => {
                 // Video's intrinsic dimensions are now available
                 console.log("Loaded video metadata:", videoElement.videoWidth, videoElement.videoHeight);
+                canvasElement.width = videoElement.videoWidth;
+                canvasElement.height = videoElement.videoHeight;
+                canvasElement.style.width = videoElement.clientWidth + 'px';
+                canvasElement.style.height = videoElement.clientHeight + 'px';
+
+                console.log("Canvas metadata:", canvasElement.width, canvasElement.height)
                 // Other state resets
                 videoElement.style.display = 'block';
                 resetCharts();
                 resetAnalysisData();
+                resetMetricSlidersUI();
                 canvasElement.style.display = 'none';
                 playProcessedButton.style.display = 'none';
                 analyzeButton.style.display = 'block';
@@ -411,13 +418,8 @@ function loadAnalytics() {
         // Show the play video button
         playProcessedButton.style.display = 'inline-block';
 
-        // Remove old click listener to avoid duplicates
-        playProcessedButton.removeEventListener('click', handlePlayProcessedClick);
-
         // Add fresh listener for this session
         playProcessedButton.addEventListener('click', handlePlayProcessedClick);
-
-
         videoElement.style.display = 'none';
 
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -510,78 +512,23 @@ function loadAnalytics() {
     function throttledUpdates() {
         const now = performance.now();
         if (now - lastUpdateTime > 1000) {
+            updatetopmetricboxes();
             updateDoughnutChart();
             updateMetricSliders();
             lastUpdateTime = now;
         }
     }
 
-    function drawVideoFrameWithAspectRatio() {
-        const canvasWidth = canvasElement.width;
-        const canvasHeight = canvasElement.height;
-        const videoWidth = videoElement.videoWidth;
-        const videoHeight = videoElement.videoHeight;
-        const videoAspectRatio = videoWidth / videoHeight;
-        const canvasAspectRatio = canvasWidth / canvasHeight;
-        const zoomLevel = 1.05; // 1.0 = no zoom, 1.05 = 5% zoom
-        const scale = Math.max(canvasWidth / videoWidth, canvasHeight / videoHeight) * zoomLevel;
-
-        let drawWidth, drawHeight, offsetX, offsetY;
-        try {
-            if (canvasAspectRatio > videoAspectRatio) {
-                drawHeight = canvasHeight;
-                drawWidth = drawHeight * videoAspectRatio;
-                offsetX = (canvasWidth - drawWidth) / 2;
-                offsetY = 0;
-            } else if (canvasAspectRatio < videoAspectRatio) {
-                drawWidth = canvasWidth;
-                drawHeight = drawWidth / videoAspectRatio;
-                offsetX = 0;
-                offsetY = (canvasHeight - drawHeight) / 2;
-            } else {
-                drawWidth = canvasWidth;
-                drawHeight = canvasHeight;
-                offsetX = 0;
-                offsetY = 0;
-            }
-
-            canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-            canvasCtx.drawImage(videoElement, offsetX, offsetY, drawWidth, drawHeight);
-
-            return { offsetX, offsetY, drawWidth, drawHeight }; // <- Return these
-        } catch (error) {
-            console.error('Error in drawing with aspect ratio:', error);
-            return { offsetX: 0, offsetY: 0, drawWidth: canvasWidth, drawHeight: canvasHeight };
-        }
-    }
-
     // Main frame-by-frame pose landmark handler
     function onResults(results) {
-
-        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-
-        const { offsetX, offsetY, drawWidth, drawHeight } = drawVideoFrameWithAspectRatio();
-
         if (!results.poseLandmarks) {
             console.log("No landmarks detected");
             return;
         }
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
         console.log("Landmark sample:", results.poseLandmarks[0]);
 
-        // Save current canvas state
-        canvasCtx.save();
-
-        // Set up a transform so (0,0) to (1,1) maps to the drawn video area
-        canvasCtx.translate(offsetX, offsetY);
-        canvasCtx.scale(drawWidth, drawHeight);
-
-        // Use smaller line widths because the space is now 0–1
-        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: 'white', lineWidth: 0.02 });
-        drawLandmarks(canvasCtx, results.poseLandmarks, { color: 'red', lineWidth: 0.009 });
-
-        // Restore the transform back
-        canvasCtx.restore();
 
         // Continue with all metric/posture processing
         appState.landmarkHistory.push([...results.poseLandmarks]);
@@ -612,9 +559,51 @@ function loadAnalytics() {
             : 0;
         appState.previousFrameTime = now;
 
+        const lHip = results.poseLandmarks[23];
+        const rHip = results.poseLandmarks[24];
+        const lShoulder = results.poseLandmarks[11];
+        const rShoulder = results.poseLandmarks[12];
 
-        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: 'white', lineWidth: 0.8 });
-        drawLandmarks(canvasCtx, results.poseLandmarks, { color: 'red', lineWidth: 0.008 });
+        // Safety check: skip if any are missing
+        if (!lHip || !rHip || !lShoulder || !rShoulder) return;
+        // Get midpoint of shoulders
+        const avgHipX = (lHip.x + rHip.x) / 2;
+        const avgHipY = (lHip.y + rHip.y) / 2;
+        // Get midpoint of shoulders
+        const avgShoulderX = (lShoulder.x + rShoulder.x) / 2;
+        const avgShoulderY = (lShoulder.y + rShoulder.y) / 2;
+
+        // Measure distance between eye and shoulder midpoint
+        const distance = Math.sqrt(
+            Math.pow(avgHipX.x - avgShoulderX, 2) +
+            Math.pow(avgHipY.y - avgShoulderY, 2)
+        );
+
+        // Base (reference) distance when athlete is close to the camera
+        const baseDistance = 2.5;
+
+        // Direct scale: more distance → bigger scale
+        let scalingFactor = distance / baseDistance;
+
+        // Clamp to a reasonable range
+        scalingFactor = Math.min(Math.max(scalingFactor, 0.5), 3);
+
+        // Calculate visual sizes
+        const lineWidth = scalingFactor * 0.5;
+        const landmarkRadius = scalingFactor * 2.5;
+
+        // Draw
+        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
+            color: 'white',
+            lineWidth: lineWidth
+        });
+
+        drawLandmarks(canvasCtx, results.poseLandmarks, {
+            color: 'red',
+            fillColor: 'green',
+            radius: landmarkRadius
+        });
+
 
         const headAngle = calculateHeadAngle(results.poseLandmarks);
         if (headAngle >= 5) {
@@ -657,12 +646,8 @@ function loadAnalytics() {
             if (videoElement.paused || videoElement.ended) return;
             if (videoElement.paused || videoElement.ended) return;
 
-            // canvasElement.width = videoElement.videoWidth;
-            // canvasElement.height = videoElement.videoHeight;
-            // canvasCtx.drawImage(videoEl, 0, 0, canvasElement.width, canvasElement.height);
-
             pose.send({ image: videoElement }).then(() => {
-                setTimeout(processFrame, 20);
+                setTimeout(processFrame, 30);
             }).catch(error => console.error("Error processing frame:", error));
         }
 
@@ -681,7 +666,7 @@ function loadAnalytics() {
     // 7. ANALYTICS CALCULATIONS AND METRICS
     // ------------------------
 
-    function analyzeFrame(landmarks, athleteHeightInMeters, timeElapsedSinceLastFrame, posture, currentVideoTime) {
+    function analyzeFrame(landmarks, athleteHeightInMeters, timeElapsedSinceLastFrame, posture) {
         if (!landmarks || !athleteHeightInMeters) {
             console.warn("Missing landmarks or athlete height");
             return;
@@ -722,7 +707,10 @@ function loadAnalytics() {
             currentChart.data.datasets[0].data = scores;
             currentChart.update();
         }
-        document.getElementById('drillTimeValue').textContent = `${currentVideoTime.toFixed(1)} SECS`;
+    }
+
+    function updatetopmetricboxes() {
+        document.getElementById('drillTimeValue').textContent = `${videoElement.currentTime.toFixed(1)} SECS`;
         document.getElementById('distanceValue').textContent = `${appState.totalDistance.toFixed(1)} YARDS`;
         document.getElementById('stepsValue').textContent = `${appState.stepCount}`;
     }
@@ -1151,6 +1139,17 @@ function loadAnalytics() {
     // ------------------------
     // 11. RESET & UPLOAD
     // ------------------------
+    function resetMetricSlidersUI() {
+        updateProgress("topSpeed", "topSpeedBar", 0, MAX_SPEED);
+        updateProgress("peakAcceleration", "peakAccelerationBar", 0, MAX_ACCEL);
+        updateProgress("peakDeceleration", "peakDecelerationBar", 0, MAX_DECEL);
+        updateProgress("averageJumpHeight", "averageJumpHeightBar", 0, MAX_JUMP);
+        updateProgress("averageStrideLength", "averageStrideLengthBar", 0, MAX_STRIDE);
+        document.getElementById('athleticScoreValue').textContent = `${0}%`
+        document.getElementById('drillTimeValue').textContent = `${0} SECS`;
+        document.getElementById('distanceValue').textContent = `${0} YARDS`;
+        document.getElementById('stepsValue').textContent = `${0}`;
+    }
 
     function resetCharts() {
         doughnutChart.data.datasets[0].data = [0, 0, 0, 0, 0];
@@ -1198,7 +1197,6 @@ function loadAnalytics() {
             topSpeed: 0,
             chartLabels: [],
             headAngleData: [],
-            strideData: [],
             jumpData: [],
             footworkScore: 0,
             speedScore: 0,
