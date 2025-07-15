@@ -67,7 +67,7 @@
 }
 
 #uploaded-video {
-    width: 100%;
+    /* width: 100%; */
     height: 100%;
 }
 
@@ -77,8 +77,8 @@ video {
 }
 
 #output_canvas {
-    width: 100%;
-    height: 100%;
+    /* width: 100%;
+    height: 100%; */
     border-radius: 2%;
     border: 0.1em solid #000000;
 }
