@@ -121,17 +121,15 @@ function loadAnalytics() {
     const doughnutChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            // Keep *one* label list so Chart.js is happy
-            // (it won’t be used for display)
             labels: [...OUTER_LABELS, ...INNER_LABELS],
 
             datasets: [
                 {   // OUTER ring – 3 slices
                     data: [0, 0, 0],              // will be filled later
                     backgroundColor: [
-                        'rgb(255, 255, 0)',         // Running
-                        'rgb(0, 255, 255)',         // Standing
-                        'rgb(255, 0, 0)'            // Crouching
+                        'rgb(243, 212, 85)',         // Running
+                        'rgb(0, 89, 255)',         // Standing
+                        'rgb(255, 123, 0)'            // Crouching
                     ],
                     borderColor: [
                         'rgb(0, 0, 0)',  // white border for slice 1
@@ -143,8 +141,8 @@ function loadAnalytics() {
                 {   // INNER ring – 2 slices
                     data: [0, 0],                 // will be filled later
                     backgroundColor: [
-                        'rgb(0, 255, 0)',           // Head Up
-                        'rgb(91, 10, 10)'           // Head Down
+                        'rgb(122, 222, 90)',           // Head Up
+                        'rgb(233, 57, 44)'           // Head Down
                     ],
                     borderColor: [
                         'rgb(0, 0, 0)',       // black border for slice 1
@@ -416,13 +414,13 @@ function loadAnalytics() {
         loadingOverlay.style.display = 'none';
 
         // Show the play video button
-        playProcessedButton.style.display = 'inline-block';
+        playProcessedButton.style.display = 'block';
 
         // Add fresh listener for this session
         playProcessedButton.addEventListener('click', handlePlayProcessedClick);
         videoElement.style.display = 'none';
 
-        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        // canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
         canvasElement.style.display = 'block';
 
@@ -580,7 +578,7 @@ function loadAnalytics() {
         );
 
         // Base (reference) distance when athlete is close to the camera
-        const baseDistance = 2.5;
+        const baseDistance = 1;
 
         // Direct scale: more distance → bigger scale
         let scalingFactor = distance / baseDistance;
@@ -590,7 +588,7 @@ function loadAnalytics() {
 
         // Calculate visual sizes
         const lineWidth = scalingFactor * 0.5;
-        const landmarkRadius = scalingFactor * 2.5;
+        const landmarkRadius = scalingFactor * 500;
 
         // Draw
         drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
@@ -601,7 +599,7 @@ function loadAnalytics() {
         drawLandmarks(canvasCtx, results.poseLandmarks, {
             color: 'red',
             fillColor: 'green',
-            radius: landmarkRadius
+            radius: 5
         });
 
 
