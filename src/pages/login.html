@@ -20,56 +20,44 @@
 
     <!-- Login Page -->
     <div id="loginPage" class="container vh-100 d-flex justify-content-center align-items-center">
-      <form id="loginForm">
-        <div></div>
-        <div></div>
-        <header>
-          <span class="text-center">LOGIN</span>
-          <img src="../../public/assets/white line rt.png" alt="Line" class="singleLine">
-        </header>
-        <div class="input">
-          <div class="input-fields">
-            <label for="username" class="form-label">USERNAME</label>
-            <input type="text" id="username" required>
-          </div>
-        </div>
-        <div class="input">
-          <div class="input-fields">
-            <label for="password" class="form-label">PASSWORD</label>
-            <input type="password" id="password" required>
-          </div>
-          <div class="pass">
-            <div class="remember">
-              <input type="checkbox" id="remember" name="remember" value="remember"><label id="remember-me-text"
-                for="remember">REMEMBER
-                ME</label>
-            </div>
-            <span class="auth-links" id="forgotPasswordLink">FORGOT YOUR PASSWORD?</span>
-          </div>
-          <div class="buttons">
-            <button id="signInButton" type="submit" class="button">SIGN IN <img
-                src="../../public/assets/arrow black rt.png" alt="arrow" class="arrow"></button>
-            <div class="sign">
-              <span class="auth-links-title">DON'T HAVE AN ACCOUNT?</span>
-              <span class="auth-links">
-                <a href="./signup.html">CREATE ACCOUNT</a>
-              </span>
+      <div id="login-form-wrapper">
+        <form id="loginForm">
+          <header>
+            <span class="text-center">LOGIN</span>
+            <img src="../../public/assets/white line rt.png" alt="Line" class="singleLine">
+          </header>
+          <div class="input">
+            <div class="input-fields">
+              <label for="username" class="form-label">USERNAME</label>
+              <input type="text" id="username" required>
             </div>
           </div>
-        </div>
-        <div></div>
-        <div></div>
-        <div class="buttons">
-          <button id="signInButton" type="submit" class="button">SIGN IN <img
-              src="../../public/assets/arrow black rt.png" alt="arrow" class="arrow"></button>
-          <div class="sign">
-            <span class="auth-links">DON'T HAVE AN ACCOUNT?</span>
-            <span class="auth-links">
-              <a href="./signup.html">CREATE ACCOUNT</a>
-            </span>
+          <div class="input">
+            <div class="input-fields">
+              <label for="password" class="form-label">PASSWORD</label>
+              <input type="password" id="password" required>
+            </div>
+            <div class="pass">
+              <div class="remember">
+                <input type="checkbox" id="remember" name="remember" value="remember"><label id="remember-me-text"
+                  for="remember">REMEMBER
+                  ME</label>
+              </div>
+              <span class="auth-links" id="forgotPasswordLink">FORGOT YOUR PASSWORD?</span>
+            </div>
+            <div class="buttons">
+              <button id="signInButton" type="submit" class="button">SIGN IN <img
+                  src="../../public/assets/arrow black rt.png" alt="arrow" class="arrow"></button>
+              <div class="sign">
+                <span class="auth-links-title">DON'T HAVE AN ACCOUNT?</span>
+                <span class="auth-links">
+                  <a href="./signup.html">CREATE ACCOUNT</a>
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
 
 
