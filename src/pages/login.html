@@ -52,7 +52,7 @@
             <button id="signInButton" type="submit" class="button">SIGN IN <img
                 src="../../public/assets/arrow black rt.png" alt="arrow" class="arrow"></button>
             <div class="sign">
-              <span class="auth-links">DON'T HAVE AN ACCOUNT?</span>
+              <span class="auth-links-title">DON'T HAVE AN ACCOUNT?</span>
               <span class="auth-links">
                 <a href="./signup.html">CREATE ACCOUNT</a>
               </span>
@@ -75,12 +75,13 @@
         <div class="modal-content">
           <form id="forgotPasswordForm">
             <div class="modal-header">
-              <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Password</h5>
+              <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Your Password ?</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+              <label for="forgotEmail" class="form-label">Enter your email address and we will send you instructions
+                to reset your password. </label>
               <div class="mb-3">
-                <label for="forgotEmail" class="form-label">Enter your email address:</label>
                 <input type="email" class="form-control" id="forgotEmail" required>
               </div>
               <div id="forgotPasswordMessage" class="text-success mt-2"></div>
@@ -96,6 +97,8 @@
 
 
   <script>
+
+
     // Open modal on forgot password click
     document.getElementById("forgotPasswordLink").addEventListener("click", function () {
       const modal = new bootstrap.Modal(document.getElementById("forgotPasswordModal"));
@@ -125,6 +128,11 @@
 
         const result = await response.json();
         console.log("Forgot Password Response:", result);
+
+        document.getElementById("forgotEmail").style.display = "none";
+        document.getElementById("forgotPasswordModal").style.display = "flex";
+        document.getElementById("forgotPasswordMessage").style.display = "flex";
+
 
         document.getElementById("forgotPasswordMessage").innerText =
           "If this email exists, a reset link will be sent.";
