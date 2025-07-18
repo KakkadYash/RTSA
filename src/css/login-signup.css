@@ -80,6 +80,9 @@ header {
 
 #signUpForm label {
     margin: 0;
+    font-family: FutraLight;
+    color: #fff;
+    font-size: 2vw;
 }
 
 .line {
@@ -99,14 +102,23 @@ p#header-p {
     font-weight: normal;
 }
 
+span.text-center {
+    color: #D02720;
+    line-height: 3vw;
+    font-size: 5vw;
+}
+
 #loginForm {
+    padding: 5vw 0 10vw 0;
     font-family: SCHABO-Condensed;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
 }
+
+
 
 .auth-links {
     cursor: pointer;
@@ -183,7 +195,7 @@ div#signUpPage {
 label {
     font-family: FutraLight;
     color: #fff;
-    font-size: 2vw;
+    font-size: 3vw;
 }
 
 .pass {
@@ -201,6 +213,7 @@ label {
 
 .input input {
     width: 100%;
+    height: 3vw;
 }
 
 .input-fields:hover {
@@ -262,6 +275,7 @@ input#remember {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    margin: 1vw 0;
 }
 
 .auth-links-title {
@@ -274,6 +288,10 @@ input#remember {
 
 .sign a {
     color: #fff;
+}
+
+a#login-button:hover {
+    color: green;
 }
 
 .sign a:hover {
@@ -433,6 +451,7 @@ div#forgotPasswordModal {
     flex-direction: column;
     align-items: end;
     justify-content: space-around;
+    margin: 1vw 0;
 }
 
 footer {
