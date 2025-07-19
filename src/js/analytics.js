@@ -372,8 +372,8 @@ function loadAnalytics() {
                 console.log("Loaded video metadata:", videoElement.videoWidth, videoElement.videoHeight);
                 canvasElement.width = videoElement.videoWidth;
                 canvasElement.height = videoElement.videoHeight;
-                canvasElement.style.width = videoElement.videoHeight + 'px';
-                canvasElement.style.height = videoElement.videoWidth + 'px';
+                canvasElement.style.width = videoElement.clientHeight + 'px';
+                canvasElement.style.height = videoElement.clientWidth + 'px';
 
                 console.log("Canvas metadata:", canvasElement.width, canvasElement.height)
                 // Other state resets
