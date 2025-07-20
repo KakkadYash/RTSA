@@ -42,6 +42,8 @@ function loadAnalytics() {
     // ------------------------
     const appState = {
         postureCounts: { Running: 0, 'Upright Standing': 0, Crouching: 0 },
+        lastLeftAnkleY: null,
+        lastRightAnkleY: null,
         lastFootY: 0,
         stepCount: 0,
         videoFile: null,
@@ -822,15 +824,33 @@ function loadAnalytics() {
     }
 
     function calculateSteps(landmarks) {
-        const leftFootY = landmarks[LEFT_ANKLE_INDEX].y;
-        const rightFootY = landmarks[RIGHT_ANKLE_INDEX].y;
-        const footDistance = Math.abs(leftFootY - rightFootY);
+        const leftAnkleY = landmarks[LEFT_ANKLE_INDEX].y;
+        const rightAnkleY = landmarks[RIGHT_ANKLE_INDEX].y;
 
-        if (footDistance > 0.05 && Math.abs(footDistance - appState.lastFootY) > 0.02) {
+        const leftDisplacement = Math.abs(leftAnkleY - appState.lastLeftAnkleY || 0);
+        const rightDisplacement = Math.abs(rightAnkleY - appState.lastRightAnkleY || 0);
+
+        const stepThreshold = 0.02; // Customize based on your video scale and pose precision
+
+        if (
+            leftDisplacement > stepThreshold &&
+            appState.lastStepFoot !== 'left'
+        ) {
             appState.stepCount++;
-            appState.lastFootY = footDistance;
+            appState.lastStepFoot = 'left';
+        } else if (
+            rightDisplacement > stepThreshold &&
+            appState.lastStepFoot !== 'right'
+        ) {
+            appState.stepCount++;
+            appState.lastStepFoot = 'right';
         }
+
+        // Update last known Y positions
+        appState.lastLeftAnkleY = leftAnkleY;
+        appState.lastRightAnkleY = rightAnkleY;
     }
+
 
     function calculatestride(landmarks) {
         const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
@@ -959,7 +979,7 @@ function loadAnalytics() {
     function calculateAthleticScores(posture) {
         const strideScore = Math.min(100, (calculateAverageStrideLength() / 0.04) * 100);
         const jumpScore = Math.min(100, (calculateAverageJumpHeight() / 0.03) * 100);
-        const speedScore = Math.min(100, (appState.topSpeed / 8.0467) * 100); // converting 8.0467 yards/sec (30 km/h)
+        const speedScore = Math.min(100, (appState.topSpeed / 10) * 100); // converting 8.0467 yards/sec (30 km/h)
         const accelerationScore = Math.min(100, (calculatePeakAcceleration() / 1.5) * 100);
         const headAngleScore = Math.min(100, (appState.idealHeadAngleFrames / appState.totalFrames) * 100);
 
