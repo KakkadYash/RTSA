@@ -440,7 +440,7 @@ function loadAnalytics() {
     function handlePlayProcessedClick() {
         if (!videoElement.paused) return;
         showPentagonChart();
-        videoElement.play();
+        // videoElement.play();
         processVideo(videoElement);
 
         // Remove itself after first click
@@ -781,14 +781,15 @@ function loadAnalytics() {
             return;
         }
 
-        const rightHip = landmarks[RIGHT_HIP_INDEX];
-        const leftHip = landmarks[LEFT_HIP_INDEX];
+        const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
+        const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
         const currentPosition = {
-            x: (rightHip.x + leftHip.x) / 2,
-            y: (rightHip.y + leftHip.y) / 2,
+            x: (rightAnkle.x + leftAnkle.x) / 2,
+            y: (rightAnkle.y + leftAnkle.y) / 2,
         };
 
-        if (!appState.startTime) {
+        if (!appState.previousLegPosition) {
+            appState.previousLegPosition = currentPosition;
             appState.startTime = performance.now();
             appState.previousFrameTime = appState.startTime;
             appState.topSpeed = 0;
@@ -800,13 +801,14 @@ function loadAnalytics() {
         const timeElapsedSinceLastFrame = (currentTime - appState.previousFrameTime) / 1000;
         if (timeElapsedSinceLastFrame <= 0 || timeElapsedSinceLastFrame > 1) return;
 
-        const scaleFactor = calculateScaleFactor(landmarks, athleteHeightInMeters);
-        const distanceCovered = Math.sqrt(
+        const distanceNormalized = Math.sqrt(
             Math.pow(currentPosition.x - appState.previousLegPosition.x, 2) +
             Math.pow(currentPosition.y - appState.previousLegPosition.y, 2)
         );
-        if (distanceCovered < 0.1) return;
 
+        if (distanceNormalized < 0.001) return; // ignore very tiny movements
+
+        const distanceCovered = (distanceNormalized * athleteHeightInMeters) * 1.09361;
         appState.totalDistance += distanceCovered;
         appState.previousLegPosition = currentPosition;
         appState.previousFrameTime = currentTime;
@@ -818,7 +820,6 @@ function loadAnalytics() {
         appState.speedData.push(speed);
         const smoothingFactor = 0.5;
         appState.smoothedSpeed = smoothingFactor * speed + (1 - smoothingFactor) * appState.smoothedSpeed;
-
         appState.topSpeed = Math.max(appState.topSpeed || 0, speed);
         appState.totalTime = (currentTime - appState.startTime) / 1000;
     }
@@ -1235,7 +1236,7 @@ function loadAnalytics() {
             if (appState.thumbnailFile) {
                 formData.append('thumbnail', appState.thumbnailFile);
             }
-            const uploadResponse = await fetch('https://uploaded-data-443715.uc.r.appspot.com/upload', {
+            const uploadResponse = await fetch('https://fastapi-app-843332298202.us-central1.run.app/upload', {
                 method: 'POST',
                 body: formData,
             });
@@ -1276,7 +1277,7 @@ function loadAnalytics() {
 
             console.log("Sending analytics data:", analyticsData);
 
-            const analyticsResponse = await fetch('https://uploaded-data-443715.uc.r.appspot.com/saveAnalytics', {
+            const analyticsResponse = await fetch('https://fastapi-app-843332298202.us-central1.run.app/saveAnalytics', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(analyticsData),
@@ -1297,7 +1298,7 @@ function loadAnalytics() {
         formData.append('video', videoFile);
 
         try {
-            const response = await fetch('https://uploaded-data-443715.uc.r.appspot.com/estimate_height', {
+            const response = await fetch('https://fastapi-app-843332298202.us-central1.run.app/estimate_height', {
                 method: 'POST',
                 body: formData
             });

@@ -10,7 +10,7 @@ function loadHistory() {
 
   const fetchHistoryData = async () => {
     try {
-      const response = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/history?userId=${userId}`);
+      const response = await fetch(`https://fastapi-app-843332298202.us-central1.run.app/history?userId=${userId}`);
       const historyData = await response.json();
 
       tableBody.innerHTML = '';
