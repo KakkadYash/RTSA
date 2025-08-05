@@ -53,7 +53,7 @@
             <option value="sport8">Hockey</option>
           </select>
           <footer>
-            <div class="log">
+            <div class="log" id="target">
               <span>ALREADY HAVE AN ACCOUNT?</span>
               <a id="login-button" href="./login.html">LOG IN</a>
             </div>
@@ -99,6 +99,17 @@
           console.error('Error:', error);
           alert('An error occurred. Please try again.');
         });
+    });
+  </script>
+
+
+  <script>
+    // Below script is for automatic scroll down on clicking arrows
+    document.getElementById('sport').addEventListener('click', function () {
+      document.getElementById('target').scrollIntoView({
+        behavior: 'smooth',   // smooth scrolling animation
+        block: 'start'
+      });
     });
   </script>
 </body>

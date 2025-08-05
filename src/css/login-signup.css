@@ -69,7 +69,7 @@ header {
     text-align: left !important;
     font-family: SCHABO-Condensed;
     color: #D02720;
-    font-size: 4vw;
+    font-size: 3vw;
     line-height: 0.6;
 }
 
@@ -77,6 +77,7 @@ header {
     height: auto;
     width: 8.5vw;
 }
+
 
 #signUpForm label {
     margin: 0;
@@ -87,7 +88,7 @@ header {
 
 .line {
     height: auto;
-    width: 15vw;
+    width: 11vw;
 }
 
 p {
@@ -144,15 +145,15 @@ div#signUpPage {
 }
 
 #signUpForm .form-control {
-
     display: block;
     width: 100%;
-    padding: 0 .75rem;
-    font-size: 1rem;
+    padding: 0.25vw .75vw;
+    font-size: 2vw;
     border: 0.1vw solid #ced4da;
-    height: 2.5rem;
-    border-radius: .25rem;
-
+    height: 2vw;
+    border-radius: .25vw;
+    font-weight: normal;
+    font-family: 'FutraLight';
 }
 
 .rt {
@@ -174,16 +175,17 @@ div#signUpPage {
 }
 
 .signUp-box {
-    height: 100%;
+    height: 80%;
     display: flex;
     padding: 1vw 0 0.5vw 0;
     width: 70%;
     align-items: flex-start;
     flex-direction: column;
+    justify-content: space-evenly;
 }
 
 #signUpForm {
-    height: 100%;
+    overflow: auto;
     font-family: SCHABO-Condensed;
     width: 100%;
     display: flex;
@@ -248,6 +250,11 @@ input#remember {
     height: 100%;
 }
 
+option {
+    font-family: 'FutraLight';
+    font-weight: normal;
+}
+
 #signUpButton,
 #signInButton {
     display: flex;
@@ -263,7 +270,7 @@ input#remember {
     font-family: SCHABO-Condensed;
     justify-content: space-evenly;
     align-content: space-around;
-    align-items: stretch;
+    align-items: center;
     flex-wrap: wrap;
 }
 
@@ -437,6 +444,10 @@ div#forgotPasswordModal {
     flex-wrap: wrap;
 }
 
+form#signUpForm::-webkit-scrollbar {
+    display: none;
+}
+
 #forgotPasswordMessage {
     text-align: center;
     display: none;
@@ -455,6 +466,7 @@ div#forgotPasswordModal {
 }
 
 footer {
+    margin: 1vw 0 0 0;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -463,19 +475,19 @@ footer {
 }
 
 footer span {
-    font-size: 1.5vw;
+    font-size: 2vw;
     font-family: 'FutraLight';
 }
 
 .log a {
     font-family: 'FutraLight';
     color: #fff;
-    font-size: 1.5vw;
+    font-size: 2vw;
 }
 
 #sport {
-    height: 2.5vw;
+    height: 2vw;
     width: 100%;
-    font-size: 2.5vw;
+    font-size: 2vw;
     color: #000000;
 }
