@@ -25,7 +25,7 @@ function loadProfile() {
   // Fetch and populate profile data
   async function fetchProfileData() {
     try {
-      const response = await fetch(`https://uploaded-data-443715.uc.r.appspot.com/profile?userId=${userId}`);
+      const response = await fetch(`https://fastapi-app-843332298202.us-central1.run.app/profile?userId=${userId}`);
       const data = await response.json();
 
       if (data.error) {
@@ -64,7 +64,7 @@ function loadProfile() {
     };
 
     try {
-      const response = await fetch("https://uploaded-data-443715.uc.r.appspot.com/updateProfile", {
+      const response = await fetch("https://fastapi-app-843332298202.us-central1.run.app/updateProfile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profileData),
