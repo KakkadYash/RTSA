@@ -1,6 +1,8 @@
 function loadDashboard() {
-  const userId = localStorage.getItem("user_id");
-  if (!userId) return;
+  console.log('dashboard.js loaded');
+  
+  // const userId = localStorage.getItem("user_id");
+  // if (!userId) return;
 
   const chartCanvas = document.getElementById("myChart");
   const uploadCounter = document.getElementById("uploadCounter");
@@ -143,6 +145,8 @@ function loadDashboard() {
     currentMetricIndex = (currentMetricIndex + 1) % metricLabels.length;
     renderChart(currentMetricIndex);
   });
+  
+
 }
 
 // Required so home.js can access it globally

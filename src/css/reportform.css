@@ -1,0 +1,298 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.form-container {
+  max-width: 500px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input, textarea {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  height: 90%;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#reportFrame {
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.close-button {
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #333;
+  z-index: 1000;
+}
+
+.preview-btn {
+  margin: 20px;
+  padding: 10px 20px;
+  background-color: #000000;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.preview-btn:hover {
+  background-color: #141414;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: flex-end; /* aligns buttons to the right */
+  align-items: center;
+  gap: 10px; /* spacing between buttons */
+  padding: 10px 12px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+
+.modal-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.close-button {
+  background-color: #ccc;
+  color: #000;
+}
+
+.close-button:hover {
+  background-color: #999;
+}
+
+.export-pdf-button {
+  background-color: #0066cc;
+  color: white;
+}
+
+.export-pdf-button:hover {
+  background-color: #004a99;
+}
+
+/* Share Modal Styles */
+.share-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.share-modal.hidden {
+  display: none;
+}
+
+.share-modal-content {
+  background: white;
+  width: 400px;
+  padding: 20px;
+  border-radius: 12px; /* more rounded corners */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
+
+.share-modal-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-align: left; /* top-left aligned */
+}
+
+.share-modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.share-modal-buttons button {
+  padding: 10px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px; /* increased corner radius */
+  cursor: pointer;
+}
+
+.generate-link-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.generate-link-button:hover {
+  background-color: #218838;
+}
+
+.export-pdf-button {
+  background-color: #0066cc;
+  color: white;
+}
+
+.export-pdf-button:hover {
+  background-color: #004a99;
+}
+
+.close-share-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Achievement Modal Custom Styles */
+.achievement-modal-content {
+  max-width: 500px;
+  width: 100%;
+  padding: 20px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+/* New modal header */
+.achievement-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Title on top-left */
+.achievement-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+}
+
+/* Close button on top-right */
+#closeAchievementModal {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.25s ease;
+  padding: 4px;
+  line-height: 1;
+}
+
+#closeAchievementModal:hover {
+  color: #000;
+}
+
+.modal-body input,
+.modal-body select,
+.modal-body textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1.5px solid #ccc;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  font-family: inherit;
+}
+
+.modal-body input:focus,
+.modal-body select:focus,
+.modal-body textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px #007bffaa;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.save-ach-btn {
+  padding: 10px 18px;
+  background-color: #28a745;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgb(40 167 69 / 0.5);
+  transition: background-color 0.3s ease;
+}
+
+.save-ach-btn:hover {
+  background-color: #218838;
+}
