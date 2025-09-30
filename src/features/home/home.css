@@ -1,11 +1,11 @@
 @font-face {
     font-family: FutraLight;
-    src: url(/public/fonts/Futura-Light-font.ttf);
+    src: url(../../public/fonts/Futura-Light-font.ttf);
 }
 
 @font-face {
     font-family: SCHABO-Condensed;
-    src: url(/public/fonts/SCHABO-Condensed.otf);
+    src: url(../../public/fonts/SCHABO-Condensed.otf);
 }
 
 * {
