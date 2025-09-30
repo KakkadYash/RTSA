@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Athlete Performance Report</title>
+  <link rel="stylesheet" href="../../css/report.css" />
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Athlete profile section -->
+    <header class="header">
+      <div class="profile">
+        <img src="avatar.png" alt="Athlete Avatar" class="avatar" />
+        <div>
+          <h1>Marcus Johnson</h1>
+          <p>Football • Quarterback • Lincoln High School • Class of 2025</p>
+          <div class="contact-grid full-width">
+            <p></p>
+            <p></p>
+            <p></p>
+            <!-- HUDL profile icon -->
+            <p>
+              <img src="../../../public/assets/hudl-icon.png" alt="HUDL Icon" class="hudl-icon" />
+            </p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Key performance metrics -->
+    <section class="metrics metric-row">
+      <div class="metric-card"><strong>Height & Weight</strong><p></p></div>
+      <div class="metric-card"><strong>Average Speed</strong><p></p></div>
+      <div class="metric-card"><strong>Jump</strong><p></p></div>
+      <div class="metric-card"><strong>Athletic Score</strong><p></p></div>
+    </section>
+
+    <!-- AI-generated performance analysis -->
+    <section class="ai-section">
+      <div class="ai-analysis">
+        <strong>AI Analysis</strong>
+        <p></p>
+      </div>
+    </section>
+
+    <!-- Charts and technical analysis -->
+    <section class="analysis">
+      <div class="analysis-box square equal-height">
+        <h2>Athletic Score Chart</h2>
+        <div class="placeholder">Athletic Score Visualization</div>
+      </div>
+      <div class="analysis-box equal-height">
+        <h2>Technique Analysis</h2>
+        <div class="placeholder">Head Angle Tracking Data</div>
+      </div>
+    </section>
+
+    <!-- Drills on left, bio/feedback/achievements on right -->
+    <div class="drills-bio-section">
+      
+      <!-- Left: Top drills thumbnails -->
+      <div class="top-drills">
+        <h3>Top Drills</h3>
+        <div class="drill-thumbnails">
+          <div class="drill-thumb">Drill 1</div>
+          <div class="drill-thumb">Drill 2</div>
+          <div class="drill-thumb">Drill 3</div>
+        </div>
+      </div>
+
+      <!-- Right: Bio, feedback, achievements -->
+      <div class="right-column">
+        <div class="bio">
+          <h3>Personal Bio</h3>
+          <p></p>
+        </div>
+        <div class="feedback">
+          <h3>Coach Feedback</h3>
+          <p></p>
+        </div>
+        <div class="achievements">
+          <h3>Past Achievements</h3>
+          <ul id="achievementsList"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer with report date and branding -->
+    <footer class="footer">
+      <p>Report generated on </p>
+      <p>Powered by Reaction Technologies.</p>
+    </footer>
+
+  </div>
+</body>
+</html>
