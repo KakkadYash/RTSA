@@ -1,11 +1,11 @@
 @font-face {
     font-family: FutraLight;
-    src: url(../../public/fonts/Futura-Light-font.ttf);
+    src: url(../../../public/fonts/Futura-Light-font.ttf);
 }
 
 @font-face {
     font-family: SCHABO-Condensed;
-    src: url(../../public/fonts/SCHABO-Condensed.otf);
+    src: url(../../../public/fonts/SCHABO-Condensed.otf);
 }
 
 * {
@@ -51,12 +51,12 @@ aside ul {
 aside a.active,
 aside a:hover,
 aside a:focus-visible {
-    transform: scale(1.1);
-    outline: none;
     color: #FFFFFF;
-    text-shadow: 1px 1px 0px #000000;
 }
 
+aside a:hover span{
+    text-shadow: 0.1em 0.1em 0.1em black;
+}
 
 aside a span {
     font-size: 3vw;
@@ -86,15 +86,15 @@ li {
     margin: 0.5vh 0vw 0.5vh 0vw;
 }
 
-.logOut:hover {
+.logOut:hover span {
     transform: scale(1.1);
     color: #FFFFFF;
-    padding-left: 1vw;
+    text-shadow: 0.1em 0.1em  0.1em black;
 }
 
 .logOut {
     color: #000000;
-    font-size: 2vw;
+    font-size: 2.5vw;
     margin: 0rem 0 0rem 1rem;
 }
 

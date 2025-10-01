@@ -1,15 +1,15 @@
 @font-face {
   font-family: FutraLight;
-  src: url(../../public/fonts/Futura-Light-font.ttf);
+  src: url(../../../public/fonts/Futura-Light-font.ttf);
 }
 
 @font-face {
   font-family: SCHABO-Condensed;
-  src: url(../../public/fonts/SCHABO-Condensed.otf);
+  src: url(../../../public/fonts/SCHABO-Condensed.otf);
 }
 
 #bg {
-  background-image: url(../../public/assets/route.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png);
+  background-image: url(../../../public/assets/route.png), url(../../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png);
   background-position: right top, right center, right bottom;
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-attachment: scroll, scroll, scroll;
@@ -111,11 +111,11 @@ canvas {
 }
 
 #prevChart {
-  background-image: url(../../public/assets/images/left-navigation-button.png);
+  background-image: url(../../../public/assets/images/left-navigation-button.png);
 }
 
 #nextChart {
-  background-image: url(../../public/assets/images/right.png);
+  background-image: url(../../../public/assets/images/right.png);
 }
 
 .chart-arrows {

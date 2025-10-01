@@ -1,0 +1,17 @@
+#signInButton:hover,
+aside a:hover span,
+.logOut:hover,
+#saveButton:hover {
+    transition: transform 0.4s ease-in-out,
+    boxshadow 0.4s ease-in-out;
+    box-shadow: 0.2em;
+    cursor: pointer;
+    transform: translateY(-1vh);
+}
+
+#signInButton:active,
+aside a.active {
+    transition: transform 0.4s ease;
+    transform: scale(0.92);
+}
+
