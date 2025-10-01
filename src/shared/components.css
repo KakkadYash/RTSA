@@ -1,17 +1,32 @@
 #signInButton:hover,
 aside a:hover span,
 .logOut:hover,
-#saveButton:hover {
+#saveButton:hover,
+#uploadvideo:hover,
+#analyzeButton:hover,
+#showMetrics:hover,
+.playprocess:hover {
     transition: transform 0.4s ease-in-out,
-    boxshadow 0.4s ease-in-out;
-    box-shadow: 0.2em;
+        boxshadow 0.4s ease-in-out;
     cursor: pointer;
     transform: translateY(-1vh);
 }
 
+#uploadvideo:hover,
+#analyzeButton:hover,
+#showMetrics:hover,
+.playprocess:hover,
+#signInButton:hover {
+
+    box-shadow: 0.1em 0.1em 0.1em 0.1em black;
+}
+
 #signInButton:active,
-aside a.active {
+aside a.active,
+#uploadvideo:active,
+#analyzeButton:active,
+#showMetrics:active,
+.playprocess:active {
     transition: transform 0.4s ease;
     transform: scale(0.92);
 }
-

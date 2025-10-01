@@ -216,6 +216,7 @@ label {
 .input input {
     width: 100%;
     height: 3vw;
+    border-radius: 0.5em;
 }
 
 .input-fields:hover {

@@ -37,8 +37,6 @@ function loadProfile() {
       document.getElementById("sportInfo").innerHTML = data.sports || '';
       document.getElementById("name").value = data.name || '';
       document.getElementById("email").value = data.email || '';
-      document.getElementById("username").value = data.username || '';
-      document.getElementById("password").value = '********';
       document.getElementById("age").value = data.age || '';
       document.getElementById("state").value = data.state || '';
 
