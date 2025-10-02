@@ -175,10 +175,6 @@ h3 {
   align-items: center;
 }
 
-#saveButton:hover {
-  transform: scale(1.1) translate(-1vw, 0vw);
-}
-
 .save {
   width: 3vw;
   height: 3vw;

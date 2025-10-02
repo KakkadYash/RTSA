@@ -129,9 +129,9 @@ function loadAnalytics() {
                 {   // OUTER ring – 3 slices
                     data: [0, 0, 0],              // will be filled later
                     backgroundColor: [
-                        'rgb(243, 212, 85)',         // Running
-                        'rgb(0, 89, 255)',         // Standing
-                        'rgb(255, 123, 0)'            // Crouching
+                        'rgb(102, 169, 232)',         // Running
+                        'rgb(82, 113, 255)',         // Standing
+                        'rgb(0, 74, 100)'            // Crouching
                     ],
                     borderColor: [
                         'rgb(0, 0, 0)',  // white border for slice 1

@@ -67,7 +67,7 @@
 }
 
 #uploaded-video {
-    /* width: 100%; */
+    width: 100%;
     height: 100%;
 }
 
@@ -189,15 +189,6 @@ video {
     align-items: center;
     justify-content: space-around;
     align-content: space-around;
-}
-
-#uploadvideo:hover,
-#analyzeButton:hover,
-#showMetrics:hover,
-.playprocess:hover {
-
-    transform: scale(1.1);
-
 }
 
 #stats-container {
@@ -461,6 +452,51 @@ progress::-moz-progress-bar {
     color: white;
     letter-spacing: 0.1vw;
 }
+
+.tooltip-label {
+  position: relative;
+  cursor: help;
+  font-weight: bold;
+}
+
+/* Tooltip box */
+.tooltip-label .tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    width: 15em;
+    background: #fff;
+    color: #222;
+    text-align: left;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    font-size: 0.6em;
+    line-height: 1.5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    position: absolute;
+    bottom: 130%;
+    left: 0%;
+    /* transform: translateX(-50%); */
+    z-index: 10;
+    transition: opacity 0.3s ease;
+}
+
+/* Speech bubble arrow - bottom left */
+.tooltip-label .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%; /* Places arrow below tooltip */
+  left: 20px; /* Adjust this to move arrow horizontally */
+  border-width: 10px;
+  border-style: solid;
+  border-color: #fff transparent transparent transparent;
+}
+
+/* Show tooltip on hover */
+.tooltip-label:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
 
 #outerLegend div {
     display: flex;
