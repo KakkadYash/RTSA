@@ -115,5 +115,5 @@ document.addEventListener("DOMContentLoaded", () => {
  */
 function logout() {
   alert("Logging out...");
-  window.location.href = "../../index.html";
+  window.location.href = "../index.html";
 }
