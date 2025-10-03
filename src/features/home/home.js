@@ -4,7 +4,7 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  const PAGE_ROOT = "/src/features/";
+  const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
   const tabs = document.querySelectorAll(".nav-link");
 
