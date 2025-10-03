@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
   const tabs = document.querySelectorAll(".nav-link");
+  console.log(`Heres the button you clicked ${PAGE_ROOT}`)
 
   const pageFunctionMap = {
     dashboard: "loadDashboard",
@@ -114,5 +115,5 @@ document.addEventListener("DOMContentLoaded", () => {
  */
 function logout() {
   alert("Logging out...");
-  window.location.href = "../../../index.html";
+  window.location.href = "../../index.html";
 }
