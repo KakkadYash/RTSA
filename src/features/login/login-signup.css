@@ -1,13 +1,5 @@
 /* Login  */
-@font-face {
-    font-family: FutraLight;
-    src: url(../../../public/fonts/Futura-Light-font.ttf)
-}
-
-@font-face {
-    font-family: SCHABO-Condensed;
-    src: url(../../../public/fonts/SCHABO-Condensed.otf)
-}
+@import url(/src/shared/stylesheet.css);
 
 /* 1. Reset / Normalize */
 * {
@@ -67,7 +59,7 @@ header {
 
 #header {
     text-align: left !important;
-    font-family: SCHABO-Condensed;
+    font-family: SCHABO Condensed;
     color: #D02720;
     font-size: 3vw;
     line-height: 0.6;
@@ -81,7 +73,7 @@ header {
 
 #signUpForm label {
     margin: 0;
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     color: #fff;
     font-size: 2vw;
 }
@@ -92,13 +84,13 @@ header {
 }
 
 p {
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     color: #fff;
     font-size: 2.5vw;
 }
 
 p#header-p {
-    font-family: 'SCHABO-Condensed';
+    font-family: SCHABO Condensed;
     margin: 0;
     font-weight: normal;
 }
@@ -111,7 +103,7 @@ span.text-center {
 
 #loginForm {
     padding: 5vw 0 10vw 0;
-    font-family: SCHABO-Condensed;
+    font-family: SCHABO Condensed;
     width: 100%;
     height: 100vh;
     display: flex;
@@ -124,7 +116,7 @@ span.text-center {
 .auth-links {
     cursor: pointer;
     font-size: 1.5vw;
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     text-decoration: underline;
     color: #fff;
 }
@@ -153,7 +145,7 @@ div#signUpPage {
     height: 2vw;
     border-radius: .25vw;
     font-weight: normal;
-    font-family: 'FutraLight';
+    font-family: Futura LtCn BT;
 }
 
 .rt {
@@ -186,7 +178,7 @@ div#signUpPage {
 
 #signUpForm {
     overflow: auto;
-    font-family: SCHABO-Condensed;
+    font-family: SCHABO Condensed;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -195,7 +187,7 @@ div#signUpPage {
 }
 
 label {
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     color: #fff;
     font-size: 3vw;
 }
@@ -247,7 +239,7 @@ input#remember {
 }
 
 option {
-    font-family: 'FutraLight';
+    font-family: Futura LtCn BT;
     font-weight: normal;
 }
 
@@ -263,7 +255,7 @@ option {
     font-size: 2vw;
     cursor: pointer;
     flex-direction: row;
-    font-family: SCHABO-Condensed;
+    font-family: SCHABO Condensed;
     justify-content: space-evenly;
     align-content: space-around;
     align-items: center;
@@ -283,7 +275,7 @@ option {
 
 .auth-links-title {
     font-size: 1.5vw;
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     color: #fff;
     text-decoration: none;
 }
@@ -303,7 +295,7 @@ a#login-button:hover {
 
 .log {
     font-size: 1.5vw;
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     display: flex;
     flex-direction: column;
     color: #fff;
@@ -332,7 +324,7 @@ a#login-button:hover {
     color: #dddddd;
     border: 0.2vw solid #000000;
     border-radius: 1.2vw;
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     background-color: rgba(0, 0, 0, 0.5);
     ;
     flex-direction: column;
@@ -371,7 +363,7 @@ form#forgotPasswordForm {
 
 .modal-title {
     font-weight: normal;
-    font-family: SCHABO-Condensed;
+    font-family: SCHABO Condensed;
     color: #fffcfc;
     font-size: 2vw;
     display: flex;
@@ -384,7 +376,7 @@ form#forgotPasswordForm {
     font-weight: normal;
     color: #ffffff;
     font-size: 1.5vw;
-    font-family: 'FutraLight';
+    font-family: Futura LtCn BT;
 }
 
 .modal-header {
@@ -413,7 +405,7 @@ form#forgotPasswordForm {
     width: 10vw;
     height: 3vw;
     background-color: #fbfbfb;
-    font-family: SCHABO-Condensed;
+    font-family: SCHABO Condensed;
     font-size: 1.5vw;
 }
 
@@ -449,7 +441,7 @@ form#signUpForm::-webkit-scrollbar {
     display: none;
     font-size: 2vw;
     color: #ffffff;
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
 }
 
 .buttons {
@@ -472,11 +464,11 @@ footer {
 
 footer span {
     font-size: 2vw;
-    font-family: 'FutraLight';
+    font-family: Futura LtCn BT;
 }
 
 .log a {
-    font-family: 'FutraLight';
+    font-family: Futura LtCn BT;
     color: #fff;
     font-size: 2vw;
 }

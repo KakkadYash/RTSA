@@ -1,18 +1,10 @@
-@font-face {
-    font-family: FutraLight;
-    src: url(../../public/fonts/Futura-Light-font.ttf);
-}
-
-@font-face {
-    font-family: SCHABO-Condensed;
-    src: url(../../public/fonts/SCHABO-Condensed.otf);
-}
+@import url(/src/shared/stylesheet.css);
 
 #bg {
     display: flex;
     padding: 0 0 4vh 0;
     width: 79vw;
-    background-image: url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
+    background-image: url(../../../public/assets/images/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../../public/assets/images/Dashes.png), url(../../../public/assets/images/Logo-para-marca-personal-en-negro-y-rosa-15.png);
     background-position: right top, right center, right bottom;
     background-repeat: no-repeat, no-repeat, no-repeat;
     flex-direction: column;
@@ -35,7 +27,7 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    font-family: Futralight;
+    font-family: Futura LtCn BT;
     background-color: #202020;
     color: #FFFFFF;
     border: 0.1rem solid #FFFFFF;
@@ -144,7 +136,7 @@ video {
 }
 
 #playProcessedButton {
-    font-family: SCHABO-Condensed;
+    font-family: SCHABO Condensed;
     background-color: #000000;
     border-radius: 1.6vw;
     color: #FFFFFF;
@@ -157,7 +149,7 @@ video {
 }
 
 .button {
-    font-family: SCHABO-Condensed;
+    font-family: SCHABO Condensed;
     background-color: #000000;
     border-radius: 1.5vw;
     color: #FFFFFF;
@@ -270,7 +262,7 @@ video {
 
 .front-card-title {
     display: flex;
-    background-image: url(../../public/assets/images/Red-Streak.png);
+    background-image: url(../../../public/assets/images/Red-Streak.png);
     background-attachment: initial;
     background-repeat: no-repeat;
     background-position: 0% 80%;
@@ -311,7 +303,7 @@ video {
 
 p {
     letter-spacing: 0.1vw;
-    font-family: 'FutraLight';
+    font-family: Futura LtCn BT;
     text-decoration: underline;
     align-self: start;
     font-size: 2vw;
@@ -326,7 +318,7 @@ p {
 }
 
 .description {
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     width: 100%;
     height: 30%;
     background-color: #202020;
@@ -342,7 +334,7 @@ p {
 
 .card-back {
     background-color: #202020;
-    background-image: url(../../public/assets/redScuff_rotated.png);
+    background-image: url(../../../public/assets/images/redScuff_rotated.png);
     background-position: -13vw -10vw;
     background-repeat: no-repeat;
     background-attachment: initial;
@@ -360,7 +352,7 @@ p {
 
 .sliderHead {
     font-size: 2vw;
-    font-family: 'FutraLight';
+    font-family: Futura LtCn BT;
 
     display: flex;
     flex-direction: row;
@@ -402,7 +394,7 @@ progress::-moz-progress-bar {
 
 .card-back3 {
     background-color: #202020;
-    background-image: url(../../public/assets/redScuff.png);
+    background-image: url(../../../public/assets/images/redScuff.png);
     background-position: 0vw 11vw;
     background-repeat: no-repeat;
     background-attachment: initial;
@@ -447,7 +439,7 @@ progress::-moz-progress-bar {
 }
 
 .legend-label-text {
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     font-size: 1vw;
     color: white;
     letter-spacing: 0.1vw;

@@ -1,26 +1,17 @@
-@font-face {
-  font-family: FutraLight;
-  src: url(../../public/fonts/Futura-Light-font.ttf);
-}
-
-@font-face {
-  font-family: SCHABO-Condensed;
-  src: url(../../public/fonts/SCHABO-Condensed.otf);
-}
-
+@import url(../../../src/shared/stylesheet.css);
 
 /* Avatar */
-.userData {
+/* .userData {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-image: url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../public/assets/Dashes.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
+  background-image: url(../../../public\assets\images\Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../../public/assets/images/Dashes.png), url(../../public/assets/Logo-para-marca-personal-en-negro-y-rosa-15.png);
   background-position: right top, right center, right bottom;
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-attachment: scroll, scroll, scroll;
   background-size: 300px, auto 600px, 200px auto;
   height: 100%;
-}
+} */
 
 .profileHead {
   display: flex;
@@ -133,7 +124,7 @@ h2 {
   width: 76.5vw;
   border: 1px solid #FFFFFF;
   font-size: 2.2vw;
-  margin: 1vw 0vw 1vw 0vw;
+  margin: 1vw 0vw 1vw 1.5vw;
 }
 
 #userProfileForm {
@@ -160,7 +151,7 @@ h3 {
 #saveButton {
   padding: 0.5vw 0.5vw 0vw 0.5vw;
   display: flex;
-  font-family: SCHABO-Condensed;
+  font-family: SCHABO Condensed;
   background-color: #FFFF;
   color: #000000;
   border: 0.3vw solid #D02720;
@@ -185,7 +176,7 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: FutraLight;
+  font-family: Futura LtCn BT;
 }
 
 #name,
