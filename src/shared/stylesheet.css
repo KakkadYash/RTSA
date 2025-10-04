@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'Futura LtCn BT';
+    src: url('../../public/fonts/FuturaBT-LightCondensed.woff') format('woff2'),
+        url('../../public/fonts/FuturaBT-LightCondensed.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'SCHABO Condensed';
+    src: url('../../public/fonts/SCHABO-Condensed.woff2') format('woff2'),
+        url('../../public/fonts/SCHABO-Condensed.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

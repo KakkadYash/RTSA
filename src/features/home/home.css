@@ -1,21 +1,14 @@
 @import url(../../../src/shared/components.css);
 
-@font-face {
-    font-family: FutraLight;
-    src: url(../../../public/fonts/Futura-Light-font.ttf);
-}
+@import url(../../../src/shared/stylesheet.css);
 
-@font-face {
-    font-family: SCHABO-Condensed;
-    src: url(../../../public/fonts/SCHABO-Condensed.otf);
-}
 * {
     box-sizing: border-box;
     margin: 0;
 }
 
 body {
-    font-family: SCHABO-Condensed;
+    font-family: SCHABO Condensed;
     background-color: #383838;
     display: flex;
 }
@@ -154,13 +147,13 @@ h1 {
 }
 
 p {
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     font-size: 30px;
     text-align: left;
 }
 
 input::placeholder {
-    font-family: FutraLight;
+    font-family: Futura LtCn BT;
     color: #FFFFFF;
     font-size: 30px;
 }
@@ -190,7 +183,7 @@ form {
 }
 
 #submitButton {
-    font-family: SCHABO-Condensed;
+    font-family: SCHABO Condensed;
     background-color: #FFFF;
     color: #000000;
     border: 2px solid #D02720;

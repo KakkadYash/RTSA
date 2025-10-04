@@ -1,12 +1,4 @@
-@font-face {
-    font-family: FutraLight;
-    src: url(../../public/fonts/Futura-Light-font.ttf);
-}
-
-@font-face {
-    font-family: SCHABO-Condensed;
-    src: url(../../public/fonts/SCHABO-Condensed.otf);
-}
+@import url(/src/shared/stylesheet.css);
 
 .library {
   display: flex;
@@ -31,7 +23,7 @@ div.library a {
 }
 
 .description {
-  font-family: FutraLight;
+  font-family: Futura LtCn BT;
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -39,7 +31,7 @@ div.library a {
 }
 
 .sort{
-  font-family: FutraLight;
+  font-family: Futura LtCn BT;
   display: flex;
   align-items: end;
   padding-left: 900px;
@@ -81,7 +73,7 @@ video, canvas {
 }
 
 #sortButton {
-  font-family: FutraLight;
+  font-family: Futura LtCn BT;
   background-color: #FFFF;
   color: #787878;
   padding: 15px 32px;
@@ -119,7 +111,7 @@ video, canvas {
 #myInput:focus {outline: 3px solid #ddd;}
   
 .dropdown {
-  font-family: FutraLight;
+  font-family: Futura LtCn BT;
   display: flex;
   flex-direction: column;
   align-items: end;

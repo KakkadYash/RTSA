@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
   const tabs = document.querySelectorAll(".nav-link");
-  console.log(`Heres the button you clicked ${PAGE_ROOT}`)
 
   const pageFunctionMap = {
     dashboard: "loadDashboard",
@@ -40,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cssEl.id = "dynamic-page-style";
     cssEl.rel = "stylesheet";
     cssEl.href = `${PAGE_ROOT}${page}/${cssFile}`;
-    console.log(`${PAGE_ROOT}${page}/${cssFile}`)
     document.head.appendChild(cssEl);
   }
 
