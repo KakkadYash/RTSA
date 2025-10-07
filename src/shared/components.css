@@ -1,32 +1,33 @@
-#signInButton:hover,
-aside a:hover span,
-.logOut:hover,
-#saveButton:hover,
-#uploadvideo:hover,
-#analyzeButton:hover,
-#showMetrics:hover,
-.playprocess:hover {
+.hover-animation:hover {
     transition: transform 0.4s ease-in-out,
         boxshadow 0.4s ease-in-out;
     cursor: pointer;
     transform: translateY(-1vh);
 }
 
-#uploadvideo:hover,
-#analyzeButton:hover,
-#showMetrics:hover,
-.playprocess:hover,
-#signInButton:hover {
+.click-animation:active {
+    transition: transform 0.4s ease;
+    transform: scale(0.92);
+}
 
+.hover-box-shadow:hover {
     box-shadow: 0.1em 0.1em 0.1em 0.1em black;
 }
 
-#signInButton:active,
-aside a.active,
-#uploadvideo:active,
-#analyzeButton:active,
-#showMetrics:active,
-.playprocess:active {
-    transition: transform 0.4s ease;
-    transform: scale(0.92);
+.button {
+    padding: 0.5vw 0.5vw 0vw 0.5vw;
+    display: flex;
+    font-family: SCHABO Condensed;
+    background-color: #FFFF;
+    color: #000000;
+    border: 0.3vw solid #D02720;
+    border-radius: 0.5vw;
+    text-align: center;
+    text-decoration: none;
+    font-size: 2.2vw;
+    width: 10vw;
+    cursor: pointer;
+    justify-content: space-around;
+    align-content: center;
+    align-items: center;
 }
