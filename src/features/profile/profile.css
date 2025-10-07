@@ -1,5 +1,5 @@
 @import url(../../../src/shared/stylesheet.css);
-
+@import url(../../../src/shared/components.css);
 /* Avatar */
 /* .userData {
   display: flex;
@@ -148,7 +148,7 @@ h3 {
   font-size: 3.4vw;
 }
 
-#saveButton {
+/* #saveButton {
   padding: 0.5vw 0.5vw 0vw 0.5vw;
   display: flex;
   font-family: SCHABO Condensed;
@@ -164,7 +164,7 @@ h3 {
   justify-content: space-around;
   align-content: center;
   align-items: center;
-}
+} */
 
 .save {
   width: 3vw;
@@ -209,4 +209,10 @@ h3 {
 
 select {
   width: 320px;
+}
+
+.button-wrapper {
+  display: flex;
+  width: 25vw;
+  justify-content: space-around;
 }
