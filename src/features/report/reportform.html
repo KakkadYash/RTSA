@@ -5,31 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Report Form</title>
   <link rel="stylesheet" href="reportform.css" />
-  <script src="../../src/js/reportform.js" defer></script>
 </head>
 <body>
   <!-- Main heading for the report form page -->
   <h1>Report Information</h1>
-
+  
   <!-- Container for all form inputs -->
   <div class="form-container">
-
+    
     <!-- Email input field -->
     <label>Email:</label>
     <input type="email" id="email" placeholder="e.g. johndoe@email.com">
-
+    
     <!-- Phone number input field -->
     <label>Phone Number:</label>
     <input type="tel" id="phone" placeholder="e.g. (123)-456-7890">
-
+    
     <!-- Social media handle input field -->
     <label>Social Media Handle:</label>
     <input type="text" id="handle" placeholder="e.g. @john_doe">
-
+    
     <!-- HUDL link input field -->
     <label>HUDL Link:</label>
     <input type="url" id="hudl">
-
+    
     <!-- Position input field -->
     <label>Position:</label>
     <input type="text" id="position" placeholder="e.g. Quarterback">
@@ -37,7 +36,7 @@
     <!-- School input field -->
     <label>School:</label>
     <input type="text" id="school" placeholder="e.g. Lincoln High School">
-
+    
     <!-- Class input field -->
     <label>Class:</label>
     <input type="text" id="class" placeholder="e.g. Class of 2025">
@@ -45,7 +44,7 @@
     <!-- Personal biography text area -->
     <label>Personal Bio:</label>
     <textarea id="bio"></textarea>
-
+    
     <!-- Past achievements section -->
     <label>Past Achievements:</label>
     <div id="achievement-section">
@@ -54,7 +53,7 @@
       <!-- List of added achievements -->
       <ul id="achievementList"></ul>
     </div>
-
+    
     <!-- Modal for adding a new achievement -->
     <div id="achievementModal" class="modal hidden">
       <div class="modal-content achievement-modal-content">
@@ -65,7 +64,7 @@
         <div class="modal-body">
           <!-- Event name -->
           <input type="text" id="achEvent" placeholder="Event Name" />
-
+          
           <!-- Month selector -->
           <select id="achMonth">
             <option value="">Month</option>
@@ -82,7 +81,7 @@
             <option>November</option>
             <option>December</option>
           </select>
-
+          
           <!-- Year input -->
           <input type="number" id="achYear" placeholder="Year" min="1900" max="2100" />
 
@@ -99,7 +98,7 @@
     <!-- Button to open preview modal -->
     <button id="openPreviewButton" class="preview-btn click-animation">Preview Reaction Report</button>
   </div>
-
+  
   <!-- Modal for previewing the full report -->
   <div id="reportModal" class="modal hidden">
     <div class="modal-content">
@@ -129,5 +128,6 @@
     </div>
   </div>
 
+  <script src="../../../src/features/report/reportform.js" defer></script>
 </body>
 </html>
