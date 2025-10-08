@@ -102,9 +102,47 @@ function loadProfile() {
 // Make available globally so `home.js` can call it
 window.loadProfile = loadProfile;
 
+
+//modal button 
+const openModalBtn = document.getElementById('openModalBtn');
+const modal = document.getElementById("popupModal");
+
+openModalBtn.addEventListener('click',()=>{
+  openModal();
+})
+
+  function openModal() {
+    console.log("openModal button clicked");
+
+    // Sync modal inputs with existing profile data before showing
+    const fullName = document.getElementById('name').value || '';
+    const nameParts = fullName.split(' ');
+    document.getElementById('firstName').value = nameParts[0] || '';
+    document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
+
+    document.getElementById('popupAge').value = document.getElementById('age').value || '';
+
+    const sportsSelect = document.getElementById('sports');
+    if (sportsSelect.multiple) {
+      const selectedSports = Array.from(sportsSelect.selectedOptions).map(opt => opt.value);
+      document.getElementById('popupSports').value = selectedSports.join(', ');
+    } else {
+      document.getElementById('popupSports').value = sportsSelect.value || '';
+    }
+
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+
+    trapFocus(modalContent);
+
+    modalContent.focus();
+
+    document.body.style.overflow = 'hidden';
+  }
+
+
 function initModal() {
   // Modal elements
-  const modal = document.getElementById("popupModal");
   const openModalBtn = document.getElementById('openModalBtn'); // button that opens modal
   const closeModalBtn = modal.querySelector(".close-btn");
   const modalContent = modal.querySelector(".modal-content");
@@ -146,35 +184,6 @@ function initModal() {
     if (e.key === 'Escape') {
       closeModal();
     }
-  }
-
-  function openModal() {
-    console.log("openModal button clicked");
-
-    // Sync modal inputs with existing profile data before showing
-    const fullName = document.getElementById('name').value || '';
-    const nameParts = fullName.split(' ');
-    document.getElementById('firstName').value = nameParts[0] || '';
-    document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
-
-    document.getElementById('popupAge').value = document.getElementById('age').value || '';
-
-    const sportsSelect = document.getElementById('sports');
-    if (sportsSelect.multiple) {
-      const selectedSports = Array.from(sportsSelect.selectedOptions).map(opt => opt.value);
-      document.getElementById('popupSports').value = selectedSports.join(', ');
-    } else {
-      document.getElementById('popupSports').value = sportsSelect.value || '';
-    }
-
-    modal.classList.remove('hidden');
-    modal.setAttribute('aria-hidden', 'false');
-
-    trapFocus(modalContent);
-
-    modalContent.focus();
-
-    document.body.style.overflow = 'hidden';
   }
 
   function closeModal() {

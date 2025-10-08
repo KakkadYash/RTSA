@@ -223,7 +223,7 @@ select {
   z-index: 1000; /* high to overlay */
   left: 0; top: 0;
   width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.5); /* dim background */
+  background-color: rgba(0,0,0,0.8); /* dim background */
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,29 +1,53 @@
+@import url('../../../src/shared/stylesheet.css');
+@import url('../../../src/shared/components.css');
+
 body {
   font-family: Arial, sans-serif;
-  background: #f8f9fa;
+  background: #383838;
+  background-image: url(../../../public/assets/images/route.png), url(../../../public/assets/images/Dashes.png);
+  background-position: right top, right bottom;
+  background-repeat: no-repeat, no-repeat, no-repeat;
   padding: 20px;
 }
 
 h1 {
+  color: white;
   text-align: center;
+  font-family: SCHABO Condensed;
+  font-weight: normal;
+  font-size: 3em;
+  /* text-transform: uppercase; */
+  letter-spacing: 0.04em;
 }
 
 .form-container {
   max-width: 500px;
   margin: auto;
   display: flex;
+  background-size: 20%;
   flex-direction: column;
   gap: 12px;
-  background: white;
+  background: #202020;
   padding: 20px;
   border-radius: 8px;
+  background-image: url(../../../public/assets/images/redScuff.png);
+  background-position: 0vw 13vw;
+  background-repeat: no-repeat;
+  background-attachment: initial;
 }
 
 label {
   font-weight: bold;
+  color: white;
 }
 
-input, textarea {
+#openAchievementModal {
+    width: 7em;
+    font-size: 1.2em;
+}
+
+input,
+textarea {
   padding: 8px;
   font-size: 14px;
   border-radius: 4px;
@@ -87,6 +111,7 @@ input, textarea {
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  font-size: 1.2em;
 }
 
 .preview-btn:hover {
@@ -95,9 +120,11 @@ input, textarea {
 
 .modal-header {
   display: flex;
-  justify-content: flex-end; /* aligns buttons to the right */
+  justify-content: flex-end;
+  /* aligns buttons to the right */
   align-items: center;
-  gap: 10px; /* spacing between buttons */
+  gap: 10px;
+  /* spacing between buttons */
   padding: 10px 12px;
   background: #f5f5f5;
   border-bottom: 1px solid #ddd;
@@ -154,7 +181,8 @@ input, textarea {
   background: white;
   width: 400px;
   padding: 20px;
-  border-radius: 12px; /* more rounded corners */
+  border-radius: 12px;
+  /* more rounded corners */
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
@@ -166,7 +194,8 @@ input, textarea {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 8px;
-  text-align: left; /* top-left aligned */
+  text-align: left;
+  /* top-left aligned */
 }
 
 .share-modal-buttons {
@@ -179,7 +208,8 @@ input, textarea {
   padding: 10px;
   font-size: 15px;
   border: none;
-  border-radius: 8px; /* increased corner radius */
+  border-radius: 8px;
+  /* increased corner radius */
   cursor: pointer;
 }
 
