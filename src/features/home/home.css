@@ -80,14 +80,16 @@ li {
     margin: 0.5vh 0vw 0.5vh 0vw;
 }
 
+#logoutButton{
+    display: inline-block;
+}
+
 .logOut:hover span {
-    transform: scale(1.1);
     color: #FFFFFF;
     text-shadow: 0.1em 0.1em  0.1em black;
 }
 
 .logOut {
-    color: #000000;
     font-size: 2.5vw;
     margin: 0rem 0 0rem 1rem;
 }
