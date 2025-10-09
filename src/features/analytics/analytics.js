@@ -775,282 +775,29 @@ function loadAnalytics() {
     // 8. FRAME-BASED METRIC CALCULATIONS
     // ------------------------
 
-    function calculateDistance(landmarks, athleteHeightInMeters) {
-        if (!landmarks || !landmarks[RIGHT_HIP_INDEX] || !landmarks[LEFT_HIP_INDEX]) {
-            console.warn("Required landmarks not found for distance calculation");
-            return;
-        }
+    // function detectDrillStart(landmarks) {
+    //     if (!appState.isDrillActive) {
+    //         const feetY = landmarks[LEFT_ANKLE_INDEX].y + landmarks[RIGHT_ANKLE_INDEX].y;
+    //         const hipsY = landmarks[LEFT_HIP_INDEX].y + landmarks[RIGHT_HIP_INDEX].y;
+    //         if (hipsY - feetY > 0.2) {
+    //             appState.isDrillActive = true;
+    //             appState.startTime = performance.now();
+    //             console.log("Drill started");
+    //         }
+    //     }
+    // }
 
-        const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
-        const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
-        const currentPosition = {
-            x: (rightAnkle.x + leftAnkle.x) / 2,
-            y: (rightAnkle.y + leftAnkle.y) / 2,
-        };
-
-        if (!appState.previousLegPosition) {
-            appState.previousLegPosition = currentPosition;
-            appState.startTime = performance.now();
-            appState.previousFrameTime = appState.startTime;
-            appState.topSpeed = 0;
-            appState.smoothedSpeed = 0;
-            return;
-        }
-
-        const currentTime = performance.now();
-        const timeElapsedSinceLastFrame = (currentTime - appState.previousFrameTime) / 1000;
-        if (timeElapsedSinceLastFrame <= 0 || timeElapsedSinceLastFrame > 1) return;
-
-        const distanceNormalized = Math.sqrt(
-            Math.pow(currentPosition.x - appState.previousLegPosition.x, 2) +
-            Math.pow(currentPosition.y - appState.previousLegPosition.y, 2)
-        );
-
-        if (distanceNormalized < 0.001) return; // ignore very tiny movements
-
-        const distanceCovered = (distanceNormalized * athleteHeightInMeters) * 1.09361;
-        appState.totalDistance += distanceCovered;
-        appState.previousLegPosition = currentPosition;
-        appState.previousFrameTime = currentTime;
-
-        const SAFE_TIME_THRESHOLD = 0.05;
-        const timeStep = Math.max(timeElapsedSinceLastFrame, SAFE_TIME_THRESHOLD);
-        const speed = distanceCovered / timeStep;
-
-        appState.speedData.push(speed);
-        const smoothingFactor = 0.5;
-        appState.smoothedSpeed = smoothingFactor * speed + (1 - smoothingFactor) * appState.smoothedSpeed;
-        appState.topSpeed = Math.max(appState.topSpeed || 0, speed);
-        appState.totalTime = (currentTime - appState.startTime) / 1000;
-    }
-
-    function calculateSteps(landmarks) {
-        const leftAnkleY = landmarks[LEFT_ANKLE_INDEX].y;
-        const rightAnkleY = landmarks[RIGHT_ANKLE_INDEX].y;
-
-        const leftDisplacement = Math.abs(leftAnkleY - appState.lastLeftAnkleY || 0);
-        const rightDisplacement = Math.abs(rightAnkleY - appState.lastRightAnkleY || 0);
-
-        const stepThreshold = 0.02; // Customize based on your video scale and pose precision
-
-        if (
-            leftDisplacement > stepThreshold &&
-            appState.lastStepFoot !== 'left'
-        ) {
-            appState.stepCount++;
-            appState.lastStepFoot = 'left';
-        } else if (
-            rightDisplacement > stepThreshold &&
-            appState.lastStepFoot !== 'right'
-        ) {
-            appState.stepCount++;
-            appState.lastStepFoot = 'right';
-        }
-
-        // Update last known Y positions
-        appState.lastLeftAnkleY = leftAnkleY;
-        appState.lastRightAnkleY = rightAnkleY;
-    }
-
-
-    function calculatestride(landmarks) {
-        const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
-        const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
-        const avgAnkleX = (leftAnkle.x + rightAnkle.x) / 2;
-        const avgAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
-
-        const stridedistance = Math.sqrt(
-            Math.pow(avgAnkleX - appState.previousLegPosition.x, 2) +
-            Math.pow(avgAnkleY - appState.previousLegPosition.y, 2)
-        );
-
-        let strideValue = 0;
-        if (stridedistance > 0.01) {
-            strideValue = stridedistance;
-        }
-
-        appState.stridelength.push({
-            time: appState.currentSecond,
-            length: strideValue
-        });
-
-        appState.previousLegPosition = { x: avgAnkleX, y: avgAnkleY };
-    }
-
-    function detectJumps(landmarks) {
-        const leftAnkle = landmarks[LEFT_ANKLE_INDEX];
-        const rightAnkle = landmarks[RIGHT_ANKLE_INDEX];
-        const averageAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
-
-        if (typeof appState.previousAnkleY !== "number") {
-            appState.previousAnkleY = averageAnkleY;
-            return;
-        }
-
-        const jumpHeight = appState.previousAnkleY - averageAnkleY;
-        let jumpValue = 0;
-        if (jumpHeight > JUMP_HEIGHT_BASELINE) {
-            jumpValue = jumpHeight;
-        }
-
-        appState.jumpHeights.push({
-            time: appState.currentSecond,
-            height: jumpValue
-        });
-
-        appState.previousAnkleY = averageAnkleY;
-    }
-
-    function detectPosture(landmarks) {
-        if (!landmarks) return "Unknown";
-
-        const avgAngle = (a, b) => (a + b) / 2;
-
-        const leftKnee = calculateAngle(landmarks[LEFT_HIP_INDEX], landmarks[LEFT_KNEE_INDEX], landmarks[LEFT_ANKLE_INDEX]);
-        const rightKnee = calculateAngle(landmarks[RIGHT_HIP_INDEX], landmarks[RIGHT_KNEE_INDEX], landmarks[RIGHT_ANKLE_INDEX]);
-        const kneeAngle = avgAngle(leftKnee, rightKnee);
-
-        const leftHip = calculateAngle(landmarks[LEFT_SHOULDER_INDEX], landmarks[LEFT_HIP_INDEX], landmarks[LEFT_KNEE_INDEX]);
-        const rightHip = calculateAngle(landmarks[RIGHT_SHOULDER_INDEX], landmarks[RIGHT_HIP_INDEX], landmarks[RIGHT_KNEE_INDEX]);
-        const hipAngle = avgAngle(leftHip, rightHip);
-
-        const leftTorso = calculateAngle(
-            landmarks[LEFT_HIP_INDEX],
-            landmarks[LEFT_SHOULDER_INDEX],
-            { x: landmarks[LEFT_SHOULDER_INDEX].x, y: landmarks[LEFT_SHOULDER_INDEX].y - 1 }
-        );
-        const rightTorso = calculateAngle(
-            landmarks[RIGHT_HIP_INDEX],
-            landmarks[RIGHT_SHOULDER_INDEX],
-            { x: landmarks[RIGHT_SHOULDER_INDEX].x, y: landmarks[RIGHT_SHOULDER_INDEX].y - 1 }
-        );
-        const torsoAngle = avgAngle(leftTorso, rightTorso);
-
-        if (
-            kneeAngle >= 30 && kneeAngle <= 45 &&
-            hipAngle >= 20 && hipAngle <= 30 &&
-            torsoAngle >= 10 && torsoAngle <= 20
-        ) return "Crouching";
-
-        if (
-            kneeAngle >= 20 && kneeAngle <= 30 &&
-            hipAngle >= 15 && hipAngle <= 25 &&
-            torsoAngle >= 5 && torsoAngle <= 15
-        ) return "Running";
-
-        if (
-            kneeAngle >= 10 && kneeAngle <= 25 &&
-            torsoAngle >= 75 && torsoAngle <= 90
-        ) return "Standing";
-
-        return "Running"; // fallback
-    }
-
-    function calculateHeadAngle(landmarks) {
-        const leftEye = landmarks[3];
-        const rightEye = landmarks[6];
-        const leftShoulder = landmarks[12];
-        const rightShoulder = landmarks[13];
-
-        const headPositionX = (leftEye.x + rightEye.x) / 2;
-        const headPositionY = (leftEye.y + rightEye.y) / 2;
-        const shoulderPositionX = (leftShoulder.x + rightShoulder.x) / 2;
-        const shoulderPositionY = (leftShoulder.y + rightShoulder.y) / 2;
-
-        const deltaX = shoulderPositionX - headPositionX;
-        const deltaY = shoulderPositionY - headPositionY;
-        const headAngle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-
-        return headAngle;
-    }
-
-    function calculateAngle(pointA, pointB, pointC) {
-        const vectorAB = { x: pointB.x - pointA.x, y: pointB.y - pointA.y };
-        const vectorBC = { x: pointC.x - pointB.x, y: pointC.y - pointB.y };
-        const dotProduct = (vectorAB.x * vectorBC.x) + (vectorAB.y * vectorBC.y);
-        const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
-        const magnitudeBC = Math.sqrt(vectorBC.x ** 2 + vectorBC.y ** 2);
-        const cosineAngle = dotProduct / (magnitudeAB * magnitudeBC);
-        return Math.acos(cosineAngle) * (180 / Math.PI);
-    }
-
-    // ------------------------
-    // 9. ACCELERATION, REACTION, DRILL DETECTION
-    // ------------------------
-    function calculateAthleticScores(posture) {
-        const strideScore = Math.min(100, (calculateAverageStrideLength() / 0.04) * 100);
-        const jumpScore = Math.min(100, (calculateAverageJumpHeight() / 0.03) * 100);
-        const speedScore = Math.min(100, (appState.topSpeed / 10) * 100); // converting 8.0467 yards/sec (30 km/h)
-        const accelerationScore = Math.min(100, (calculatePeakAcceleration() / 1.5) * 100);
-        const headAngleScore = Math.min(100, (appState.idealHeadAngleFrames / appState.totalFrames) * 100);
-
-        let postureScore = 0;
-        const totalPostures = Object.values(appState.postureCounts).reduce((a, b) => a + b, 0) || 1;
-        if (posture === 'Running') {
-            postureScore = Math.min(100, (appState.postureCounts['Running'] / totalPostures) * 100);
-        } else if (posture === 'Crouching') {
-            postureScore = Math.min(100, (appState.postureCounts['Crouching'] / totalPostures) * 100);
-        } else {
-            postureScore = Math.min(100, (appState.postureCounts['Upright Standing'] / totalPostures) * 100);
-        }
-
-        return [strideScore, speedScore, accelerationScore, headAngleScore, postureScore];
-    }
-
-    function calculateAcceleration(speedData, timeStep) {
-        if (speedData.length < 2 || timeStep === 0) return 0;
-        const lastSpeed = speedData[speedData.length - 1];
-        const prevSpeed = speedData[speedData.length - 2];
-        return (lastSpeed - prevSpeed) / timeStep;
-    }
-
-    function calculateDeceleration(speedData, timeStep) {
-        return calculateAcceleration(speedData, timeStep); // same logic reused
-    }
-
-    function calculatePeakAcceleration() {
-        return appState.accelerationDataRaw.length > 0
-            ? Math.max(...appState.accelerationDataRaw)
-            : 0;
-    }
-
-    function calculatePeakDeceleration() {
-        return appState.decelerationDataRaw.length > 0
-            ? Math.min(...appState.decelerationDataRaw)
-            : 0;
-    }
-
-    function detectDrillStart(landmarks) {
-        if (!appState.isDrillActive) {
-            const feetY = landmarks[LEFT_ANKLE_INDEX].y + landmarks[RIGHT_ANKLE_INDEX].y;
-            const hipsY = landmarks[LEFT_HIP_INDEX].y + landmarks[RIGHT_HIP_INDEX].y;
-            if (hipsY - feetY > 0.2) {
-                appState.isDrillActive = true;
-                appState.startTime = performance.now();
-                console.log("Drill started");
-            }
-        }
-    }
-
-    function detectDrillEnd() {
-        if (appState.isDrillActive && appState.totalTime > 8) {
-            appState.endTime = performance.now();
-            appState.isDrillActive = false;
-            console.log("Drill ended");
-        }
-    }
+    // function detectDrillEnd() {
+    //     if (appState.isDrillActive && appState.totalTime > 8) {
+    //         appState.endTime = performance.now();
+    //         appState.isDrillActive = false;
+    //         console.log("Drill ended");
+    //     }
+    // }
 
     // ------------------------
     // 10. UTILITY FUNCTIONS
     // ------------------------
-
-    function normalize(value, min, max) {
-        return (value - min) / (max - min);
-    }
-
-    function analyzeFootMovements() {
-        // Placeholder if you want to implement future stride gait logic
-    }
 
     function isAthleteInFrame(currentLandmarks) {
         const currentBox = calculateBoundingBox(currentLandmarks);
@@ -1093,67 +840,6 @@ function loadAnalytics() {
     function lockOnAthlete(landmarks) {
         appState.athleteBoundingBox = calculateBoundingBox(landmarks);
         appState.athleteLocked = true;
-    }
-
-    function calculateScaleFactor(landmarks, athleteHeightInMeters) {
-        const pixelHeight = Math.abs(landmarks[LEFT_ANKLE_INDEX].y - landmarks[LEFT_EYE_INDEX].y);
-        return athleteHeightInMeters / pixelHeight;
-    }
-
-    function movingAverage(data, windowSize) {
-        const result = [];
-        for (let i = 0; i < data.length; i++) {
-            const windowStart = Math.max(0, i - windowSize + 1);
-            const window = data.slice(windowStart, i + 1);
-            const avg = window.reduce((a, b) => a + b, 0) / window.length;
-            result.push(avg);
-        }
-        return result;
-    }
-
-    function calculatePeakAcceleration() {
-        return appState.accelerationData.length ? Math.max(...appState.accelerationData) : 0;
-    }
-
-    function calculatePeakDeceleration() {
-        return appState.decelerationData.length ? Math.max(...appState.decelerationData) : 0;
-    }
-
-    function calculateAverageJumpHeight() {
-        if (!appState.jumpHeights.length) return 0;
-
-        const heights = appState.jumpHeights.map(j => j.height || 0);
-        const validHeights = heights.filter(h => h > 0);
-        if (!validHeights.length) return 0;
-
-        const sorted = validHeights.slice().sort((a, b) => a - b);
-        const midIndex = Math.floor(sorted.length / 2);
-        const topHalf = sorted.slice(midIndex);
-
-        const average = topHalf.reduce((a, b) => a + b, 0) / topHalf.length;
-        return Math.round(average * 100) / 100; // 2 decimal places
-    }
-
-    function calculateAverageStrideLength() {
-        if (!appState.stridelength.length) return 0;
-
-        const lengths = appState.stridelength.map(s => s.length || 0);
-        const validLengths = lengths.filter(l => l > 0);
-        if (!validLengths.length) return 0;
-
-        // Step 1: Sort the valid lengths (ascending)
-        const sorted = validLengths.slice().sort((a, b) => a - b);
-
-        // Step 2: Get the index of the median
-        const midIndex = Math.floor(sorted.length / 2);
-
-        // Step 3: Get the top 50% (including median)
-        const topHalf = sorted.slice(midIndex);
-
-        // Step 4: Calculate the average of the top half
-        const average = topHalf.reduce((a, b) => a + b, 0) / topHalf.length;
-
-        return Math.round(average * 100) / 100; // rounded to 2 decimal places
     }
     // ------------------------
     // 11. RESET & UPLOAD
