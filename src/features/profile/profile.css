@@ -242,7 +242,7 @@ select {
 .modal-content {
   background-color: #222;
   color: white;
-  padding: 20px;
+  padding: 0em 1em 1em;
   border-radius: 8px;
   width: 320px;
   max-width: 90vw;
@@ -259,12 +259,15 @@ select {
 .close-btn {
   background: transparent;
   border: none;
-  font-size: 2rem;
+  font-size: 4rem;
   color: white;
-  position: absolute;
-  right: 15px;
-  top: 10px;
   cursor: pointer;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .modal form label {

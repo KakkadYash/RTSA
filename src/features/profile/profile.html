@@ -65,8 +65,10 @@
   <div id="popupModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"
     aria-hidden="true">
     <div class="modal-content" tabindex="-1">
-      <button class="close-btn" aria-label="Close modal">&times;</button>
-      <h2 id="modalTitle">Update Profile</h2>
+      <div class="heading">
+        <h2 id="modalTitle">Update Profile</h2>
+        <button id="closeBtn" class="close-btn" aria-label="Close modal">&times;</button>
+      </div>
       <form id="popupProfileForm">
         <div>
           <label for="firstName">First Name:</label>
@@ -92,7 +94,7 @@
           <label for="fullBodyPic">Full Body Picture:</label>
           <input type="file" id="fullBodyPic" name="fullBodyPic" accept="image/*">
         </div>
-        <button type="submit">Submit</button>
+        <button id="calibration" type="submit">Submit</button>
       </form>
     </div>
   </div>

@@ -103,97 +103,84 @@ function loadProfile() {
 window.loadProfile = loadProfile;
 
 
-//modal button 
+//Upload Photo Button: Height Calibration popup-modal  
+
 const openModalBtn = document.getElementById('openModalBtn');
 const modal = document.getElementById("popupModal");
 
-openModalBtn.addEventListener('click',()=>{
+openModalBtn.addEventListener('click', () => {
   openModal();
 })
 
-  function openModal() {
-    console.log("openModal button clicked");
+let focusableElements, firstFocusableElement, lastFocusableElement;
 
-    // Sync modal inputs with existing profile data before showing
-    const fullName = document.getElementById('name').value || '';
-    const nameParts = fullName.split(' ');
-    document.getElementById('firstName').value = nameParts[0] || '';
-    document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
+function trapFocus(element) {
+  focusableElements = element.querySelectorAll(focusableSelectors);
+  if (focusableElements.length === 0) return;
 
-    document.getElementById('popupAge').value = document.getElementById('age').value || '';
+  firstFocusableElement = focusableElements[0];
+  lastFocusableElement = focusableElements[focusableElements.length - 1];
+}
 
-    const sportsSelect = document.getElementById('sports');
-    if (sportsSelect.multiple) {
-      const selectedSports = Array.from(sportsSelect.selectedOptions).map(opt => opt.value);
-      document.getElementById('popupSports').value = selectedSports.join(', ');
-    } else {
-      document.getElementById('popupSports').value = sportsSelect.value || '';
-    }
+const modalContent = modal.querySelector('.modal-content');
 
-    modal.classList.remove('hidden');
-    modal.setAttribute('aria-hidden', 'false');
+function openModal() {
+  console.log("openModal button clicked");
 
-    trapFocus(modalContent);
+  // Sync modal inputs with existing profile data before showing
+  const fullName = document.getElementById('name').value || '';
+  const nameParts = fullName.split(' ');
+  document.getElementById('firstName').value = nameParts[0] || '';
+  document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
 
-    modalContent.focus();
+  document.getElementById('popupAge').value = document.getElementById('age').value || '';
 
-    document.body.style.overflow = 'hidden';
+  const sportsSelect = document.getElementById('sports');
+  if (sportsSelect.multiple) {
+    const selectedSports = Array.from(sportsSelect.selectedOptions).map(opt => opt.value);
+    document.getElementById('popupSports').value = selectedSports.join(', ');
+  } else {
+    document.getElementById('popupSports').value = sportsSelect.value || '';
   }
 
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+
+  trapFocus(modalContent);
+
+  modalContent.focus();
+
+  document.body.style.overflow = 'hidden';
+}
+
+
+// Focus trap setup
+const focusableSelectors = [
+  'a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])',
+  'textarea:not([disabled])', 'button:not([disabled])', '[tabindex]:not([tabindex="-1"])'
+].join(',');
+
+
+function closeModal() {
+  modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden', 'true');
+  openModalBtn.focus();
+  document.body.style.overflow = '';
+}
+
+//Problem lies below
+/**
+ * to remove the modal press escp key
+ * press tab for focus on first element
+ * Solution: add event listerner to cross
+ */
+
+//Problem ends here
 
 function initModal() {
   // Modal elements
   const openModalBtn = document.getElementById('openModalBtn'); // button that opens modal
   const closeModalBtn = modal.querySelector(".close-btn");
-  const modalContent = modal.querySelector(".modal-content");
-
-  // Focus trap setup
-  const focusableSelectors = [
-    'a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])',
-    'textarea:not([disabled])', 'button:not([disabled])', '[tabindex]:not([tabindex="-1"])'
-  ].join(',');
-
-  let focusableElements, firstFocusableElement, lastFocusableElement;
-
-  function trapFocus(element) {
-    focusableElements = element.querySelectorAll(focusableSelectors);
-    if (focusableElements.length === 0) return;
-
-    firstFocusableElement = focusableElements[0];
-    lastFocusableElement = focusableElements[focusableElements.length - 1];
-
-    // Add keydown event listener inside trapFocus
-    element.addEventListener('keydown', handleKeyDown);
-  }
-
-  // Handle tab and escape keys inside modal
-  function handleKeyDown(e) {
-    if (e.key === 'Tab') {
-      if (e.shiftKey) {
-        if (document.activeElement === firstFocusableElement) {
-          e.preventDefault();
-          lastFocusableElement.focus();
-        }
-      } else {
-        if (document.activeElement === lastFocusableElement) {
-          e.preventDefault();
-          firstFocusableElement.focus();
-        }
-      }
-    }
-    if (e.key === 'Escape') {
-      closeModal();
-    }
-  }
-
-  function closeModal() {
-    modal.classList.add('hidden');
-    modal.setAttribute('aria-hidden', 'true');
-
-    openModalBtn.focus();
-
-    document.body.style.overflow = '';
-  }
 
   // Remove any old event listeners before adding new ones (optional but safer)
   openModalBtn.replaceWith(openModalBtn.cloneNode(true));
@@ -217,3 +204,36 @@ function initModal() {
     closeModal();
   });
 }
+
+
+
+
+
+//Update Photo Btn Event: Height Calibration using photo 
+async function calibration() {
+  const req = await fetch('https://fastapi-app-843332298202.us-central1.run.app/calibration')
+  try {
+    if (req.status === 200) {
+      const data = await response.json();
+      console.log('Calibration data:', data);
+      return data;
+    } else {
+      console.error('Calibration failed with status:', response.status);
+    }
+  } catch (error) {
+    console.error('Error during calibration:', error);
+  }
+}
+
+const calibrationBtn = document.getElementById('calibration')
+
+calibrationBtn.addEventListener('click', () => {
+  calibration();
+  console.log()
+})
+
+const closeBtn=document.getElementById('closeBtn')
+
+closeBtn.addEventListener('click',()=>{
+  closeModal()
+})
