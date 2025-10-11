@@ -11,7 +11,7 @@ body {
 }
 
 h1 {
-  color: white;
+  color: black;
   text-align: center;
   font-family: SCHABO Condensed;
   font-weight: normal;
@@ -79,9 +79,9 @@ textarea {
 }
 
 .modal-content {
-  background: white;
-  width: 90%;
-  height: 90%;
+  /* background: white; */
+  width: 100%;
+  height: 100%;
   border-radius: 8px;
   position: relative;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
@@ -123,28 +123,21 @@ textarea {
 }
 
 .modal-header {
+  width: 15em;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-around;
   align-items: center;
 }
 
-.modal-button {
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
+#shareButton {
+  width: 5em;
+  font-size: 1.5em;
 }
 
 .close-button {
-  background-color: #ccc;
+  border: none;
+  background-color: inherit;
   color: #000;
-}
-
-.close-button:hover {
-  background-color: #999;
 }
 
 .export-pdf-button {
@@ -260,6 +253,7 @@ textarea {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  width: 100%;
 }
 
 /* Title on top-left */
@@ -282,8 +276,8 @@ textarea {
 }
 
 #closeAchievementModal:hover {
-    color: #ff0101;
-    text-shadow: 1px 5px 0px black;
+  color: #ff0101;
+  text-shadow: 1px 5px 0px black;
 }
 
 .modal-body {
