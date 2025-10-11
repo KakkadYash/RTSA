@@ -35,7 +35,7 @@ function loadProfile() {
         return;
       }
 
-      document.getElementById("nameInfo").innerHTML = data.name || '';
+      document.getElementById("name").innerHTML = data.name || '';
       document.getElementById("sportInfo").innerHTML = data.sports || '';
       document.getElementById("name").value = data.name || '';
       document.getElementById("email").value = data.email || '';
@@ -99,9 +99,6 @@ function loadProfile() {
 
   // Initial fetch
   fetchProfileData();
-
-
-  // --- Handle Calibration (Update Profile Popup) ---
   // --- Handle Calibration (Update Profile Popup) ---
   const popupForm = document.getElementById("popupProfileForm");
 
