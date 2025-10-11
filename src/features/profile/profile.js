@@ -254,7 +254,14 @@ function loadProfile() {
     openModalBtn.focus();
     document.body.style.overflow = '';
   }
+  const closeBtn = document.getElementById('closeBtn');
 
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      // Call your closeModal function
+      closeModal();
+    });
+  }
 }
 
 // Make available globally so `home.js` can call it

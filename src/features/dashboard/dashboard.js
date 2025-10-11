@@ -143,13 +143,12 @@ function loadDashboard() {
     currentMetricIndex = (currentMetricIndex + 1) % metricLabels.length;
     renderChart(currentMetricIndex);
   });
+  const one_page_report=document.getElementById('one-page-report');
+  
+  one_page_report.addEventListener('click',()=>{
+    window.open('../../../src/features/report/reportform.html', '_blank');
+  })
 }
 
 // Required so home.js can access it globally
 window.loadDashboard = loadDashboard;
-
-const one_page_report=document.getElementById('one-page-report');
-
-one_page_report.addEventListener('click',()=>{
-  window.open('../../../src/features/report/reportform.html', '_blank');
-})
