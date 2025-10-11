@@ -282,7 +282,8 @@ textarea {
 }
 
 #closeAchievementModal:hover {
-  color: #000;
+    color: #ff0101;
+    text-shadow: 1px 5px 0px black;
 }
 
 .modal-body {
