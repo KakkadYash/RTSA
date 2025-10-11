@@ -130,7 +130,7 @@ body {
 
 #closePreview:active,
 #closePreview:hover{
-  color: red;
+  color: #e62a2a;
   font-size: 2em;
 }
 
