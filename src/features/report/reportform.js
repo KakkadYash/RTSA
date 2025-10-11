@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   openPreviewBtn.addEventListener("click", () => {
     modal.classList.remove("hidden");
-    reportFrame.src = "/src/features/report/report.html";
+    reportFrame.src = "../../../src/features/report/report.html";
 
     reportFrame.onload = () => {
       reportDoc = reportFrame.contentDocument || reportFrame.contentWindow.document;
