@@ -241,6 +241,9 @@ textarea {
 
 /* Achievement Modal Custom Styles */
 .achievement-modal-content {
+  background-image: url(../../../public/assets/images/route.png), url(../../../public/assets/images/redScuff.png);
+  background-position: left bottom;
+  background-repeat: no-repeat, no-repeat, no-repeat;
   background-color: #383838;
   max-width: 500px;
   width: 100%;
