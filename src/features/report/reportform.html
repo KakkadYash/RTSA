@@ -1,34 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Report Form</title>
   <link rel="stylesheet" href="reportform.css" />
 </head>
+
 <body>
   <!-- Main heading for the report form page -->
   <h1>Report Information</h1>
-  
+
   <!-- Container for all form inputs -->
   <div class="form-container">
-    
+
     <!-- Email input field -->
     <label>Email:</label>
     <input type="email" id="email" placeholder="e.g. johndoe@email.com">
-    
+
     <!-- Phone number input field -->
     <label>Phone Number:</label>
     <input type="tel" id="phone" placeholder="e.g. (123)-456-7890">
-    
+
     <!-- Social media handle input field -->
     <label>Social Media Handle:</label>
     <input type="text" id="handle" placeholder="e.g. @john_doe">
-    
+
     <!-- HUDL link input field -->
     <label>HUDL Link:</label>
     <input type="url" id="hudl">
-    
+
     <!-- Position input field -->
     <label>Position:</label>
     <input type="text" id="position" placeholder="e.g. Quarterback">
@@ -36,7 +38,7 @@
     <!-- School input field -->
     <label>School:</label>
     <input type="text" id="school" placeholder="e.g. Lincoln High School">
-    
+
     <!-- Class input field -->
     <label>Class:</label>
     <input type="text" id="class" placeholder="e.g. Class of 2025">
@@ -44,16 +46,17 @@
     <!-- Personal biography text area -->
     <label>Personal Bio:</label>
     <textarea id="bio"></textarea>
-    
+
     <!-- Past achievements section -->
     <label>Past Achievements:</label>
     <div id="achievement-section">
       <!-- Button to open the "Add Achievement" modal -->
-      <button class="button hover-box-shadow click-animation hover-animation" type="button" id="openAchievementModal">Add Achievement</button>
+      <button class="button hover-box-shadow click-animation hover-animation" type="button"
+        id="openAchievementModal">Add Achievement</button>
       <!-- List of added achievements -->
       <ul id="achievementList"></ul>
     </div>
-    
+
     <!-- Modal for adding a new achievement -->
     <div id="achievementModal" class="modal hidden">
       <div class="modal-content achievement-modal-content">
@@ -64,7 +67,7 @@
         <div class="modal-body">
           <!-- Event name -->
           <input type="text" id="achEvent" placeholder="Event Name" />
-          
+
           <!-- Month selector -->
           <select id="achMonth">
             <option value="">Month</option>
@@ -81,7 +84,7 @@
             <option>November</option>
             <option>December</option>
           </select>
-          
+
           <!-- Year input -->
           <input type="number" id="achYear" placeholder="Year" min="1900" max="2100" />
 
@@ -90,7 +93,8 @@
         </div>
         <div class="modal-footer">
           <!-- Save achievement button -->
-          <button id="saveAchievement" class="button hover-animation click-animation hover-box-shadow">Save Achievement</button>
+          <button id="saveAchievement" class="button hover-animation click-animation hover-box-shadow">Save
+            Achievement</button>
         </div>
       </div>
     </div>
@@ -98,15 +102,11 @@
     <!-- Button to open preview modal -->
     <button id="openPreviewButton" class="preview-btn click-animation">Preview Reaction Report</button>
   </div>
-  
+
   <!-- Modal for previewing the full report -->
   <div id="reportModal" class="modal hidden">
     <div class="modal-content">
       <div class="modal-header">
-        <!-- Share button inside preview modal -->
-        <button id="shareButton" class="modal-button share-button">Share Report</button>
-        <!-- Close preview modal button -->
-        <button id="closePreview" class="modal-button close-button">✖</button>
       </div>
       <!-- Iframe to display the live report -->
       <iframe id="reportFrame" src="" frameborder="0"></iframe>
@@ -116,18 +116,22 @@
   <!-- Modal for sharing the report -->
   <div id="shareModal" class="share-modal hidden">
     <div class="share-modal-content">
-      <!-- Close share modal button -->
-      <button class="close-share-modal" id="closeShareModal">✖</button>
       <!-- Share modal title -->
-      <div class="share-modal-title">Share Report</div>
-      <!-- Buttons for generating a share link and exporting as PDF -->
+      <div class="share-modal-header">
+        <div class="share-modal-title">Share Report</div>
+        <!-- Close share modal button -->
+        <button class="close-share-modal click-animation hover-animation" id="closeShareModal">✖</button>
+        <!-- Buttons for generating a share link and exporting as PDF -->
+      </div>
       <div class="share-modal-buttons">
-        <button class="generate-link-button" id="generateLink">Generate Link & Copy</button>
-        <button class="export-pdf-button" id="exportPDF">Export as PDF</button>
+        <button class="generate-link-button click-animation hover-animation" id="generateLink">Generate Link &
+          Copy</button>
+        <button class="export-pdf-button click-animation hover-animation" id="exportPDF">Export as PDF</button>
       </div>
     </div>
   </div>
 
   <script src="../../../src/features/report/reportform.js" defer></script>
 </body>
+
 </html>

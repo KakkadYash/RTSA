@@ -29,5 +29,6 @@
     cursor: pointer;
     justify-content: space-around;
     align-content: center;
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
     align-items: center;
 }

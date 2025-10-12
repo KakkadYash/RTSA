@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Athlete Performance Report</title>
   <link rel="stylesheet" href="report.css" />
 </head>
+
 <body>
   <div class="container">
-    
+
     <!-- Athlete profile section -->
     <header class="header">
       <div class="profile">
-        <img src="../../public/assets/images/profilepic.png" alt="Athlete Avatar" class="avatar" />
+        <img src="../../../public/assets/images/profilepic.png" alt="Athlete Avatar" class="avatar" />
         <div>
           <h1>Marcus Johnson</h1>
           <p>Football • Quarterback • Lincoln High School • Class of 2025</p>
@@ -22,54 +24,44 @@
             <p></p>
             <!-- HUDL profile icon -->
             <p>
-              <img src="../../public/assets/images/Hudle.png" alt="HUDL Icon" class="hudl-icon" />
+              <img src="../../../public/assets/images/Hudle.png" alt="HUDL Icon" class="hudl-icon" />
             </p>
           </div>
         </div>
+      </div>
+      <div class="modal-header">
+        <!-- Share button inside preview modal -->
+        <button id="shareButton" class="modal-button share-button click-animation hover-animation button">Share
+          Report</button>
+        <!-- Close preview modal button -->
+        <button id="closePreview" class="modal-button close-button click-animation hover-animation">✖</button>
       </div>
     </header>
 
     <!-- Key performance metrics -->
     <section class="metrics metric-row">
-      <div class="metric-card"><strong>Height & Weight</strong><p></p></div>
-      <div class="metric-card"><strong>Average Speed</strong><p></p></div>
-      <div class="metric-card"><strong>Jump</strong><p></p></div>
-      <div class="metric-card"><strong>Athletic Score</strong><p></p></div>
-    </section>
-
-    <!-- AI-generated performance analysis -->
-    <section class="ai-section">
-      <div class="ai-analysis">
-        <strong>AI Analysis</strong>
+      <div class="metric-card"><strong>Height & Weight</strong>
+        <p></p>
+      </div>
+      <div class="metric-card"><strong>Average Speed</strong>
+        <p></p>
+      </div>
+      <div class="metric-card"><strong>Jump</strong>
+        <p></p>
+      </div>
+      <div class="metric-card"><strong>Athletic Score</strong>
         <p></p>
       </div>
     </section>
 
-    <!-- Charts and technical analysis -->
-    <section class="analysis">
-      <div class="analysis-box square equal-height">
-        <h2>Athletic Score Chart</h2>
-        <div class="placeholder">Athletic Score Visualization</div>
-      </div>
-      <div class="analysis-box equal-height">
-        <h2>Technique Analysis</h2>
-        <div class="placeholder">Head Angle Tracking Data</div>
-      </div>
-    </section>
-
-    <!-- Drills on left, bio/feedback/achievements on right -->
-    <div class="drills-bio-section">
-      
-      <!-- Left: Top drills thumbnails -->
-      <div class="top-drills">
-        <h3>Top Drills</h3>
-        <div class="drill-thumbnails">
-          <div class="drill-thumb">Drill 1</div>
-          <div class="drill-thumb">Drill 2</div>
-          <div class="drill-thumb">Drill 3</div>
+    <!-- AI-generated performance analysis -->
+    <div class="ai-section-wrapper">
+      <section class="ai-section">
+        <div class="ai-analysis">
+          <strong>AI Analysis</strong>
+          <p></p>
         </div>
-      </div>
-
+      </section>
       <!-- Right: Bio, feedback, achievements -->
       <div class="right-column">
         <div class="bio">
@@ -87,6 +79,32 @@
       </div>
     </div>
 
+    <!-- Charts and technical analysis -->
+    <section class="analysis">
+      <div class="analysis-box square equal-height">
+        <h2>Athletic Score Chart</h2>
+        <div class="placeholder">Athletic Score Visualization</div>
+      </div>
+      <div class="analysis-box equal-height">
+        <h2>Technique Analysis</h2>
+        <div class="placeholder">Head Angle Tracking Data</div>
+      </div>
+    </section>
+
+    <!-- Drills on left, bio/feedback/achievements on right -->
+    <div class="drills-bio-section">
+
+      <!-- Left: Top drills thumbnails -->
+      <div class="top-drills">
+        <h3>Top Drills</h3>
+        <div class="drill-thumbnails">
+          <div class="drill-thumb">Drill 1</div>
+          <div class="drill-thumb">Drill 2</div>
+          <div class="drill-thumb">Drill 3</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Footer with report date and branding -->
     <footer class="footer">
       <p>Report generated on </p>
@@ -96,4 +114,5 @@
   </div>
   <script src="../../../src/features/report/reportform.js"></script>
 </body>
+
 </html>
