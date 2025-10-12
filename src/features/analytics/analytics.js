@@ -267,6 +267,9 @@ import {
         return resp.json();
     }
 
-    // expose (optional)
-    window.__analyticsState = state;
-})();
+// ------------------------
+// 12. MODULE EXPORT
+// ------------------------
+window.loadAnalytics = loadAnalytics;
+
+

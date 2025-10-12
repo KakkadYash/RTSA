@@ -11,7 +11,7 @@ body {
 }
 
 h1 {
-  color: white;
+  color: black;
   text-align: center;
   font-family: SCHABO Condensed;
   font-weight: normal;
@@ -79,9 +79,9 @@ textarea {
 }
 
 .modal-content {
-  background: white;
-  width: 90%;
-  height: 90%;
+  /* background: white; */
+  width: 100%;
+  height: 100%;
   border-radius: 8px;
   position: relative;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
@@ -107,6 +107,14 @@ textarea {
   z-index: 1000;
 }
 
+#closePreview:active {
+  color: red;
+}
+
+#closePreview:hover {
+  color: red;
+}
+
 .preview-btn {
   margin: 20px;
   padding: 10px 20px;
@@ -123,124 +131,169 @@ textarea {
 }
 
 .modal-header {
+  width: 15em;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-around;
   align-items: center;
 }
 
-.modal-button {
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
+#shareButton {
+  width: 5em;
+  font-size: 1.5em;
 }
 
 .close-button {
-  background-color: #ccc;
-  color: #000;
-}
-
-.close-button:hover {
-  background-color: #999;
-}
-
-.export-pdf-button {
-  background-color: #0066cc;
+  border: none;
+  background-color: inherit;
   color: white;
-}
-
-.export-pdf-button:hover {
-  background-color: #004a99;
+  font-size: 2em;
 }
 
 /* Share Modal Styles */
+/* =========================================================
+   Reaction Technologies - Share Modal (Pro Dark UI)
+   ========================================================= */
+
 .share-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(5px);
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1001;
+  transition: opacity 0.3s ease;
 }
 
 .share-modal.hidden {
   display: none;
+  opacity: 0;
 }
 
+/* Modal Content Box */
 .share-modal-content {
-  background: white;
-  width: 400px;
-  padding: 20px;
-  border-radius: 12px;
-  /* more rounded corners */
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  background: rgba(25, 25, 25, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 3px solid var(--rt-red);
+  border-radius: 16px;
+  width: 380px;
+  padding: 24px 28px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: stretch;
+  gap: 1em;
   position: relative;
+  animation: fadeInScale 0.25s ease;
+  color: var(--rt-text-primary);
+  height: 11em;
 }
 
+/* Subtle Pop-in Animation */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+.share-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+/* Modal Title */
 .share-modal-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 8px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+  letter-spacing: 0.6px;
   text-align: left;
-  /* top-left aligned */
 }
 
+/* Buttons Layout */
 .share-modal-buttons {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 1.5em;
+  margin-top: 6px;
 }
 
+/* Unified Button Style */
 .share-modal-buttons button {
-  padding: 10px;
+  background-color: #E50914;
+  padding: 12px;
   font-size: 15px;
   border: none;
-  border-radius: 8px;
-  /* increased corner radius */
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: none;
   cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
 }
 
+/* RT Button Colors */
 .generate-link-button {
-  background-color: #28a745;
-  color: white;
+  background: var(--rt-green);
+  color: #fff;
 }
 
 .generate-link-button:hover {
-  background-color: #218838;
+  background: #FF3131;
+  box-shadow: 0 0 15px #ff0000;
 }
 
 .export-pdf-button {
-  background-color: #0066cc;
-  color: white;
+  background: var(--rt-red);
+  color: #fff;
 }
 
 .export-pdf-button:hover {
-  background-color: #004a99;
+  background: #FF3131;
+  box-shadow: 0 0 15px #ff0000;
 }
 
+/* Close (X) Button */
 .close-share-modal {
-  position: absolute;
-  top: 10px;
-  right: 15px;
   background: transparent;
   border: none;
-  font-size: 20px;
+  font-size: 1.5em;
+  color: white;
   cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.close-share-modal:hover {
+  color: red;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .share-modal-content {
+    width: 90%;
+    padding: 20px;
+  }
 }
 
 /* Achievement Modal Custom Styles */
 .achievement-modal-content {
+  background-image: url(../../../public/assets/images/route.png), url(../../../public/assets/images/redScuff.png);
+  background-position: left bottom;
+  background-repeat: no-repeat, no-repeat, no-repeat;
   background-color: #383838;
   max-width: 500px;
   width: 100%;
@@ -257,6 +310,7 @@ textarea {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  width: 100%;
 }
 
 /* Title on top-left */
@@ -279,7 +333,8 @@ textarea {
 }
 
 #closeAchievementModal:hover {
-  color: #000;
+  color: #ff0101;
+  text-shadow: 1px 5px 0px black;
 }
 
 .modal-body {

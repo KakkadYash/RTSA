@@ -1,5 +1,7 @@
 function loadProfile() {
+  const calibrationBtn = document.getElementById('calibration')
   const userId = localStorage.getItem("user_id");
+
   if (!userId) {
     alert("User ID not found. Redirecting to login.");
     window.location.href = "lo.html";
@@ -33,7 +35,7 @@ function loadProfile() {
         return;
       }
 
-      document.getElementById("nameInfo").innerHTML = data.name || '';
+      document.getElementById("name").innerHTML = data.name || '';
       document.getElementById("sportInfo").innerHTML = data.sports || '';
       document.getElementById("name").value = data.name || '';
       document.getElementById("email").value = data.email || '';
@@ -97,143 +99,173 @@ function loadProfile() {
 
   // Initial fetch
   fetchProfileData();
+  // --- Handle Calibration (Update Profile Popup) ---
+  const popupForm = document.getElementById("popupProfileForm");
+
+  if (popupForm && calibrationBtn) {
+    popupForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const userId = localStorage.getItem("user_id");
+      if (!userId) {
+        alert("User not found. Please log in again.");
+        return;
+      }
+
+      // ✅ Read input values *now*, not at page load
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const age = document.getElementById("popupAge").value.trim();
+      const height = document.getElementById("height").value.trim();
+      const sports = document.getElementById("popupSports").value.trim();
+      const fullBodyPic = document.getElementById("fullBodyPic").files[0];
+
+      console.log("firstName", firstName);
+      console.log("lastName", lastName);
+      console.log("age", age);
+      console.log("height", height);
+      console.log("sports", sports);
+      console.log("fullBodyPic", fullBodyPic);
+
+      if (!firstName || !lastName || !age || !height || !sports) {
+        alert("Please fill out all required fields.");
+        return;
+      }
+
+      // ✅ Build FormData dynamically
+      const update_data = new FormData();
+      update_data.append("userId", userId);
+      update_data.append("first_name", firstName);
+      update_data.append("last_name", lastName);
+      update_data.append("age", age);
+      update_data.append("height_cm", height);
+      update_data.append("sport", sports);
+      if (fullBodyPic) update_data.append("fullBodyPic", fullBodyPic);
+
+      try {
+        calibrationBtn.disabled = true;
+        calibrationBtn.textContent = "Submitting...";
+
+        const response = await fetch(
+          "https://fastapi-app-843332298202.us-central1.run.app/calibration",
+          {
+            method: "POST",
+            body: update_data,
+          }
+        );
+
+        const result = await response.json();
+
+        if (response.ok) {
+          console.log("Calibration response:", result);
+          alert("Profile updated successfully!");
+
+          if (result.calibrated_height_m) {
+            console.log(
+              "Calibrated Height (m):",
+              result.calibrated_height_m.toFixed(3)
+            );
+          }
+
+          // ✅ Close the modal on success
+          const modal = document.getElementById("popupModal");
+          modal.classList.add("hidden");
+          document.body.style.overflow = "";
+        } else {
+          console.error("Error response:", result);
+          alert(result.detail || "Error during calibration.");
+        }
+      } catch (err) {
+        console.error("Calibration error:", err);
+        alert("An unexpected error occurred during calibration.");
+      } finally {
+        calibrationBtn.disabled = false;
+        calibrationBtn.textContent = "Submit";
+      }
+    });
+  }
+
+
+
+  //Upload Photo Button: Height Calibration popup-modal  
+
+  const openModalBtn = document.getElementById('openModalBtn');
+  const modal = document.getElementById("popupModal");
+
+  openModalBtn.addEventListener('click', () => {
+    openModal();
+  })
+
+  let focusableElements, firstFocusableElement, lastFocusableElement;
+
+  function trapFocus(element) {
+    focusableElements = element.querySelectorAll(focusableSelectors);
+    if (focusableElements.length === 0) return;
+
+    firstFocusableElement = focusableElements[0];
+    lastFocusableElement = focusableElements[focusableElements.length - 1];
+  }
+
+  const modalContent = modal.querySelector('.modal-content');
+
+  function openModal() {
+    console.log("openModal button clicked");
+
+    // Sync modal inputs with existing profile data before showing
+    const fullName = document.getElementById('name').value || '';
+    const nameParts = fullName.split(' ');
+    document.getElementById('firstName').value = nameParts[0] || '';
+    document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
+
+    document.getElementById('popupAge').value = document.getElementById('age').value || '';
+
+    const sportsSelect = document.getElementById('sports');
+    if (sportsSelect.multiple) {
+      const selectedSports = Array.from(sportsSelect.selectedOptions).map(opt => opt.value);
+      document.getElementById('popupSports').value = selectedSports.join(', ');
+    } else {
+      document.getElementById('popupSports').value = sportsSelect.value || '';
+    }
+
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+
+    trapFocus(modalContent);
+
+    modalContent.focus();
+
+    document.body.style.overflow = 'hidden';
+  }
+
+
+  // Focus trap setup
+  const focusableSelectors = [
+    'a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])',
+    'textarea:not([disabled])', 'button:not([disabled])', '[tabindex]:not([tabindex="-1"])'
+  ].join(',');
+
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    openModalBtn.focus();
+    document.body.style.overflow = '';
+  }
+  const closeBtn = document.getElementById('closeBtn');
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      // Call your closeModal function
+      closeModal();
+    });
+  }
 }
 
 // Make available globally so `home.js` can call it
 window.loadProfile = loadProfile;
 
 
-//Upload Photo Button: Height Calibration popup-modal  
-
-const openModalBtn = document.getElementById('openModalBtn');
-const modal = document.getElementById("popupModal");
-
-openModalBtn.addEventListener('click', () => {
-  openModal();
-})
-
-let focusableElements, firstFocusableElement, lastFocusableElement;
-
-function trapFocus(element) {
-  focusableElements = element.querySelectorAll(focusableSelectors);
-  if (focusableElements.length === 0) return;
-
-  firstFocusableElement = focusableElements[0];
-  lastFocusableElement = focusableElements[focusableElements.length - 1];
-}
-
-const modalContent = modal.querySelector('.modal-content');
-
-function openModal() {
-  console.log("openModal button clicked");
-
-  // Sync modal inputs with existing profile data before showing
-  const fullName = document.getElementById('name').value || '';
-  const nameParts = fullName.split(' ');
-  document.getElementById('firstName').value = nameParts[0] || '';
-  document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
-
-  document.getElementById('popupAge').value = document.getElementById('age').value || '';
-
-  const sportsSelect = document.getElementById('sports');
-  if (sportsSelect.multiple) {
-    const selectedSports = Array.from(sportsSelect.selectedOptions).map(opt => opt.value);
-    document.getElementById('popupSports').value = selectedSports.join(', ');
-  } else {
-    document.getElementById('popupSports').value = sportsSelect.value || '';
-  }
-
-  modal.classList.remove('hidden');
-  modal.setAttribute('aria-hidden', 'false');
-
-  trapFocus(modalContent);
-
-  modalContent.focus();
-
-  document.body.style.overflow = 'hidden';
-}
-
-
-// Focus trap setup
-const focusableSelectors = [
-  'a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])',
-  'textarea:not([disabled])', 'button:not([disabled])', '[tabindex]:not([tabindex="-1"])'
-].join(',');
-
-
-function closeModal() {
-  modal.classList.add('hidden');
-  modal.setAttribute('aria-hidden', 'true');
-  openModalBtn.focus();
-  document.body.style.overflow = '';
-}
-
-//Problem lies below
-/**
- * to remove the modal press escp key
- * press tab for focus on first element
- * Solution: add event listerner to cross
- */
-
-//Problem ends here
-
-function initModal() {
-  // Modal elements
-  const openModalBtn = document.getElementById('openModalBtn'); // button that opens modal
-  const closeModalBtn = modal.querySelector(".close-btn");
-
-  // Remove any old event listeners before adding new ones (optional but safer)
-  openModalBtn.replaceWith(openModalBtn.cloneNode(true));
-  const newOpenModalBtn = document.getElementById('openModalBtn');
-  newOpenModalBtn.addEventListener('click', openModal);
-
-  closeModalBtn.replaceWith(closeModalBtn.cloneNode(true));
-  const newCloseModalBtn = modal.querySelector(".close-btn");
-  newCloseModalBtn.addEventListener('click', closeModal);
-
-  window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeModal();
-    }
-  });
-
-  const popupForm = document.getElementById('popupProfileForm');
-  popupForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    alert('Popup form submitted!');
-    closeModal();
-  });
-}
 
 
 
 
-
-//Update Photo Btn Event: Height Calibration using photo 
-async function calibration() {
-  const req = await fetch('https://fastapi-app-843332298202.us-central1.run.app/calibration')
-  try {
-    if (req.status === 200) {
-      const data = await response.json();
-      console.log('Calibration data:', data);
-      return data;
-    } else {
-      console.error('Calibration failed with status:', response.status);
-    }
-  } catch (error) {
-    console.error('Error during calibration:', error);
-  }
-}
-
-const calibrationBtn = document.getElementById('calibration')
-
-calibrationBtn.addEventListener('click', () => {
-  calibration();
-  console.log()
-})
-
-const closeBtn=document.getElementById('closeBtn')
-
-closeBtn.addEventListener('click',()=>{
-  closeModal()
-})
