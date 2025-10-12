@@ -264,6 +264,10 @@ select {
   cursor: pointer;
 }
 
+button#closeBtn:hover {
+  color: red;
+}
+
 .heading {
   display: flex;
   align-items: center;
