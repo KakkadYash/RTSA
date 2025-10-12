@@ -1,14 +1,13 @@
 document.getElementById("signUpForm").addEventListener("submit", function (event) {
       event.preventDefault();
 
-      const name = document.getElementById('name').value.trim();
-      const username = document.getElementById('username').value.trim();
+      const first_name = document.getElementById('first_name').value.trim();
+      const last_name = document.getElementById('last_name').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
-      const code = document.getElementById('code').value.trim();
       const sport = document.getElementById('sport').value.trim();
 
-      if (!name || !username || !email || !password || !code || !sport) {
+      if (!first_name || !last_name || !email || !password || !sport) {
         alert('Please fill out all fields.');
         return;
       }
@@ -16,7 +15,7 @@ document.getElementById("signUpForm").addEventListener("submit", function (event
       fetch('https://fastapi-app-843332298202.us-central1.run.app/signup', {
         method: 'POST',  // ✅ Change this from 'OPTIONS' to 'POST'
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, username, email, password }),
+        body: JSON.stringify({ first_name, last_name, email, password }),
       })
         .then(response => response.json())  // Handle response correctly
         .then(data => {
