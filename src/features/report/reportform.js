@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     openPreviewBtn.addEventListener("click", () => {
       modal.classList.remove("hidden");
       reportLoaded = false;
-      reportFrame.src = "/src/features/report/report.html";
+      reportFrame.src = "../../../src/features/report/report.html";
     });
 
     reportFrame.addEventListener("load", () => {
