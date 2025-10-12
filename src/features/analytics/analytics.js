@@ -1,1001 +1,271 @@
-function loadAnalytics() {
-    // ------------------------
-    // 1. CONSTANTS & DOM REFERENCES
-    // ------------------------
-    const OVERLAP_THRESHOLD = 0.5;
-    const HEAD_ANGLE_MIN = 40;
-    const HEAD_ANGLE_MAX = 120;
-    const LEFT_SHOULDER_INDEX = 11;
-    const LEFT_KNEE_INDEX = 25;
-    const LEFT_HIP_INDEX = 23;
-    const LEFT_ANKLE_INDEX = 27;
-    const RIGHT_SHOULDER_INDEX = 12;
-    const RIGHT_KNEE_INDEX = 26;
-    const RIGHT_HIP_INDEX = 24;
-    const RIGHT_ANKLE_INDEX = 28;
-    const LEFT_EYE_INDEX = 1;
-    const MAX_SPEED = 10;
-    const MAX_ACCEL = 10;
-    const MAX_DECEL = 10;
-    const MAX_JUMP = 4;
-    const MAX_STRIDE = 2;
-    const ACCELERATION_THRESHOLD = 0.5;
-    const DECELERATION_THRESHOLD = 0.5;
-    const JUMP_HEIGHT_BASELINE = 0.05;
-    const uploadButton = document.getElementById('uploadButton');
-    const analyzeButton = document.getElementById('analyzeButton');
-    const showMetricsBtn = document.getElementById('showMetrics');
-    const videoElement = document.getElementById('uploaded-video');
-    const canvasElement = document.getElementById('output_canvas');
-    const canvasCtx = canvasElement.getContext('2d');
-    const playProcessedButton = document.getElementById('playProcessedButton');
+// analytics.js
+// Orchestrates UI, backend calls, charts, and the Mediapipe overlay.
 
-    // Setting Analyzing Indicator Display to None  
-    const loadingOverlay = document.getElementById('analyzingIndicator');
+import {
+    initDoughnutChart,
+    initPentagonChart,
+    showPentagonChart,
+    showUnifiedChart,
+    buildLegend,
+    updateDoughnutChartFromData,
+    updateSlidersFromData,
+    resetCharts,
+    resetMetricSlidersUI,
+    updateTopMetricBoxes
+} from "./modules/metricsVisualization.js";
 
-    let currentChart = null;
-    let chartType = "radar";
-    let lastUpdateTime = 0;
+import {
+    initPoseOverlay,
+    startOverlayLoop,
+    stopOverlayLoop,
+    drawOneFrameIfPaused
+} from "./modules/analyticsCore.js";
 
+import {
+    wireUploadButton,
+    wireCardsAndShowAll,
+    setAnalyzeHandler,
+    setPlayProcessedHandler
+} from "./modules/uiHandlers.js";
+
+(function loadAnalytics() {
     // ------------------------
-    // 2. APP STATE
+    // 1) CONSTANTS & DOM references
     // ------------------------
-    const appState = {
-        postureCounts: { Running: 0, 'Upright Standing': 0, Crouching: 0 },
-        lastLeftAnkleY: null,
-        lastRightAnkleY: null,
-        lastFootY: 0,
-        stepCount: 0,
-        videoFile: null,
-        uploadDate: '',
-        previousLegPosition: { x: 0, y: 0 },
-        idealHeadAngleFrames: 0,
-        totalFrames: 0,
-        totalDistance: 0,
-        isDrillActive: false,
-        athleteLocked: false,
-        athleteBoundingBox: null,
-        startTime: null,
-        endTime: null,
-        totalTime: 0,
-        previousFrameTime: null,
-        speedData: [],
-        accelerationData: [],
-        decelerationData: [],
-        accelerationDataRaw: [],
-        decelerationDataRaw: [],
-        headAnglePerSecond: [],
-        currentSecond: 0,
-        smoothedSpeed: 0,
-        jumpHeights: [],
-        stridelength: [],
-        agilityData: [],
-        balanceScore: [],
-        landmarkHistory: [],
-        score: [],
-        athleteHeightInMeters: null,
-        topSpeed: 0,
-        chartLabels: [],
-        headAngleData: [],
-        strideData: [],
-        jumpData: [],
-        videoId: null,
-        footworkScore: 0,
-        speedScore: 0,
-        accelerationScore: 0,
-        headAngleScore: 0,
-        postureScore: 0
+    const CONFIG = {
+        API_BASE: "https://fastapi-app-843332298202.us-central1.run.app",
+        OVERLAP_THRESHOLD: 0.5,
+        HEAD_ANGLE_MIN: 40,
+        HEAD_ANGLE_MAX: 120,
+        ACCELERATION_THRESHOLD: 0.5,
+        DECELERATION_THRESHOLD: 0.5,
+        MAX_SPEED: 10,
+        MAX_ACCEL: 10,
+        MAX_DECEL: 10,
+        MAX_JUMP: 4,
+        MAX_STRIDE: 2,
+        OUTER_LABELS: ["RUNNING", "STANDING", "CROUCHING"],
+        INNER_LABELS: ["HEAD UP", "HEAD DOWN"],
     };
 
-    // ------------------------
-    // 3. CHART INITIALIZATION AND DISPLAY FUNCTIONS
-    // ------------------------
-
-    // Custom plugin for center text in doughnut charts
-    const centerLabelPlugin = {
-        id: 'centerLabelPlugin',
-        afterDraw(chart) {
-            const { ctx, width, height } = chart;
-            ctx.save();
-            ctx.font = 'bold 20px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            if (chart.canvas.id === 'speedometerChart') {
-                const speedValue = chart.data.datasets[0].data[0] || 0;
-                ctx.fillText(`${speedValue.toFixed(2)} yards/sec`, width / 2, height / 2);
-            } else if (chart.canvas.id === 'headMovementChart') {
-                const idealPercentage = chart.data.datasets[0].data[0] || 0;
-                ctx.fillText(`${idealPercentage}% Ideal`, width / 2, height / 2);
-            }
-            ctx.restore();
-        }
+    const els = {
+        uploadButton: document.getElementById("uploadButton"),
+        analyzeButton: document.getElementById("analyzeButton"),
+        showMetricsBtn: document.getElementById("showMetrics"),
+        playProcessedButton: document.getElementById("playProcessedButton"),
+        video: document.getElementById("uploaded-video"),
+        canvas: document.getElementById("output_canvas"),
+        loadingOverlay: document.getElementById("analyzingIndicator"),
+        myChart: document.getElementById("myChart"),   // doughnut
+        myChart2: document.getElementById("myChart2"), // pentagon/line
     };
-    Chart.register(centerLabelPlugin);
-
-    // Doughnut Chart
-    // <canvas id="myChart"></canvas>
-    const ctx = document.getElementById('myChart').getContext('2d');
-
-    const OUTER_LABELS = ['RUNNING', 'STANDING', 'CROUCHING'];
-    const INNER_LABELS = ['HEAD UP', 'HEAD DOWN'];
-
-    const doughnutChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: [...OUTER_LABELS, ...INNER_LABELS],
-
-            datasets: [
-                {   // OUTER ring – 3 slices
-                    data: [0, 0, 0],              // will be filled later
-                    backgroundColor: [
-                        'rgb(102, 169, 232)',         // Running
-                        'rgb(82, 113, 255)',         // Standing
-                        'rgb(0, 74, 100)'            // Crouching
-                    ],
-                    borderColor: [
-                        'rgb(0, 0, 0)',  // white border for slice 1
-                        'rgb(0, 0, 0)',  // white border for slice 2
-                        'rgb(0, 0, 0)'   // white border for slice 3
-                    ],
-                    borderWidth: 2
-                },
-                {   // INNER ring – 2 slices
-                    data: [0, 0],                 // will be filled later
-                    backgroundColor: [
-                        'rgb(122, 222, 90)',           // Head Up
-                        'rgb(233, 57, 44)'           // Head Down
-                    ],
-                    borderColor: [
-                        'rgb(0, 0, 0)',       // black border for slice 1
-                        'rgb(0, 0, 0)'        // black border for slice 2
-                    ],
-                    borderWidth: 2
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '40%',
-            plugins: {
-                legend: { display: false },     // we’re building our own
-                tooltip: {
-                    callbacks: {
-                        label(ctx) {
-                            // pick the right label set
-                            const lbl =
-                                ctx.datasetIndex === 0
-                                    ? OUTER_LABELS[ctx.dataIndex]
-                                    : INNER_LABELS[ctx.dataIndex];
-                            return `${lbl}: ${Math.round(ctx.parsed)}%`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    // Show pentagon athletic score chart
-    function showPentagonChart() {
-        const ctx = document.getElementById('myChart2').getContext('2d');
-        if (currentChart) currentChart.destroy();
-
-        const data = [
-            appState.footworkScore || 0,
-            appState.speedScore || 0,
-            appState.accelerationScore || 0,
-            appState.headAngleScore || 0,
-            appState.postureScore || 0
-        ];
-
-        currentChart = new Chart(ctx, {
-            type: "radar",
-            data: {
-                labels: ["Footwork", "Speed", "Acceleration", "Head Angle", "Posture"],
-                datasets: [{
-                    label: "Athletic Scores",
-                    data: data,
-                    backgroundColor: "rgba(230, 42, 42, 0.2)",
-                    borderColor: "#1a2532ff",
-                    borderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',           // Move legend to top
-                        align: 'end',              // Align it to the right (end of the top line)
-                        labels: {
-                            font: {
-                                size: 22,              // Increase legend font size
-                                weight: 'bold'
-                            },
-                            color: 'rgb(0, 0, 0)'         // Optional: legend text color
-                        }
-                    }
-                },
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        max: 100,
-                        grid: {
-                            lineWidth: 3, // Increase this value for thicker radar lines
-                            color: 'rgb(82, 80, 80)'
-                        },
-                        ticks: {
-                            font: {
-                                size: 12 // increase this number to enlarge the numeric scale
-                            },
-                            color: 'rgb(82, 80, 80)',         // font color of numbers
-                            stepSize: 10,              // optional: controls spacing between ticks
-                            transparency: 0.5
-                        },
-                        pointLabels: {
-                            font: {
-                                size: 22   // Change this to your desired font size
-                            },
-                            color: 'rgb(0, 0, 0)' // Optional: label color
-                        }
-                    }
-                }
-            }
-        });
-
-        chartType = "radar";
-    }
-
-    function buildLegend(containerId, labels, colors) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = ''; // Clear previous content
-
-        labels.forEach((label, index) => {
-            const legendItem = document.createElement('div');
-
-            const colorBox = document.createElement('span');
-            colorBox.classList.add('legend-color-box');
-            colorBox.style.backgroundColor = colors[index];
-
-            const labelText = document.createElement('span');
-            labelText.classList.add('legend-label-text');
-            labelText.textContent = label;
-
-            legendItem.appendChild(colorBox);
-            legendItem.appendChild(labelText);
-
-            container.appendChild(legendItem);
-        });
-    }
-
-    // Example call for outer and inner doughnut legends:
-    buildLegend('outerLegend', OUTER_LABELS,
-        doughnutChart.data.datasets[0].backgroundColor);
-
-    buildLegend('innerLegend', INNER_LABELS,
-        doughnutChart.data.datasets[1].backgroundColor);
-
-
-    // Show unified multi-metric chart (line chart)
-    function showUnifiedChart(metricIndices = []) {
-        const ctx = document.getElementById('myChart2').getContext('2d');
-        if (currentChart) currentChart.destroy();
-
-        currentChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: appState.chartLabels || [],
-                datasets: [
-                    {
-                        label: 'Head Angle (°)',
-                        data: appState.headAngleData || [],
-                        borderColor: '#FF8C00',
-                        fill: false
-                    },
-                    {
-                        label: 'Speed (yards/sec)',
-                        data: appState.speedData || [],
-                        borderColor: '#1F43E5',
-                        fill: false
-                    },
-                    {
-                        label: 'Acceleration (yards/s²)',
-                        data: appState.accelerationData || [],
-                        borderColor: '#7DD859',
-                        fill: false
-                    },
-                    {
-                        label: 'Deceleration (yards/s²)',
-                        data: appState.decelerationData || [],
-                        borderColor: '#E93632',
-                        fill: false
-                    },
-                    {
-                        label: 'Stride Length (yards)',
-                        data: appState.strideData || [],
-                        borderColor: '#FFA500',
-                        fill: false
-                    },
-                    {
-                        label: 'Jump Height (yards)',
-                        data: appState.jumpData || [],
-                        borderColor: '#800080',
-                        fill: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                onClick: (evt, activeElements) => {
-                    if (activeElements.length > 0) {
-                        const pointIndex = activeElements[0].index;
-                        const timestamp = currentChart.data.labels[pointIndex];
-                        seekToTimestamp(timestamp);
-                    }
-                }
-            }
-        });
-
-        chartType = "line";
-
-        currentChart.data.datasets.forEach((dataset, index) => {
-            dataset.hidden = !metricIndices.includes(index);
-        });
-
-        currentChart.update();
-    }
-
-    function handleVideoEnded() {
-        autoSaveAnalytics();
-    }
-    // ------------------------
-    // 4. EVENT LISTENERS
-    // ------------------------
-
-    // Upload button: Select and preview the video
-    uploadButton.addEventListener('change', (event) => {
-        appState.videoFile = event.target.files[0];
-
-        if (appState.videoFile) {
-            const maxSizeInBytes = 30 * 1024 * 1024; // 30 MB
-
-            if ((appState.videoFile).size > maxSizeInBytes) {
-                alert("File size exceeds 30MB. Please upload a smaller video.");
-                event.target.value = ""; // Reset the input so they can re-upload
-                return;
-            }
-            const videoURL = URL.createObjectURL(appState.videoFile);
-            videoElement.src = videoURL;
-            // Wait for metadata to be loaded
-            videoElement.onloadedmetadata = () => {
-                // Video's intrinsic dimensions are now available
-                console.log("Loaded video metadata:", videoElement.videoWidth, videoElement.videoHeight);
-                canvasElement.width = videoElement.videoWidth;
-                canvasElement.height = videoElement.videoHeight;
-                canvasElement.style.width = videoElement.clientHeight + 'px';
-                canvasElement.style.height = videoElement.clientWidth + 'px';
-
-                console.log("Canvas metadata:", canvasElement.width, canvasElement.height)
-                // Other state resets
-                videoElement.style.display = 'block';
-                resetCharts();
-                resetAnalysisData();
-                resetMetricSlidersUI();
-                canvasElement.style.display = 'none';
-                playProcessedButton.style.display = 'none';
-                analyzeButton.style.display = 'block';
-            };
-
-        }
-    });
-
-    // Analyze button: Estimate height, prepare processing
-    analyzeButton.addEventListener('click', async (event) => {
-        event.preventDefault();
-
-        if (!appState.videoFile) {
-            alert("Please upload a video file first.");
-            return;
-        }
-        analyzeButton.style.display = 'none';
-        loadingOverlay.style.display = 'block';
-
-        const estimatedHeight = await estimateHeight(appState.videoFile);
-        if (estimatedHeight) {
-            appState.athleteHeightInMeters = estimatedHeight;
-            console.log(`Estimated height received: ${estimatedHeight}`);
-        } else {
-            console.error("Height estimation failed.");
-            loadingOverlay.style.display = 'none';
-            return;
-        }
-
-        await pose.initialize();
-        loadingOverlay.style.display = 'none';
-
-        // Show the play video button
-        playProcessedButton.style.display = 'block';
-
-        // Add fresh listener for this session
-        playProcessedButton.addEventListener('click', handlePlayProcessedClick);
-        videoElement.style.display = 'none';
-
-        // canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-        canvasElement.style.display = 'block';
-
-        // playProcessedButton.style.display = 'inline-block';
-
-        videoElement.currentTime = 0;
-        processVideo(videoElement);
-
-        videoElement.removeEventListener('ended', handleVideoEnded);
-        videoElement.addEventListener('ended', handleVideoEnded);
-
-    });
-
-    // Play Processed Video button
-    function handlePlayProcessedClick() {
-        if (!videoElement.paused) return;
-        showPentagonChart();
-        // videoElement.play();
-        processVideo(videoElement);
-
-        // Remove itself after first click
-        playProcessedButton.removeEventListener('click', handlePlayProcessedClick);
-    }
-
-
-    // Card click: Show filtered chart for card
-    document.querySelectorAll('.card').forEach((card, index, allCards) => {
-        card.addEventListener('click', () => {
-            setTimeout(() => {
-                const alreadyFlipped = card.classList.contains('is-flipped');
-
-                // Unflip all cards first
-                allCards.forEach(c => c.classList.remove('is-flipped'));
-
-                // If the clicked card was not flipped, flip it and update chart
-                if (!alreadyFlipped) {
-                    card.classList.add('is-flipped');
-
-                    // Show the filtered chart based on card index
-                    if (index === 0) showUnifiedChart([0]);         // Technique
-                    if (index === 1) showUnifiedChart([1, 2, 3]);    // Speed & Movement
-                    if (index === 2) showUnifiedChart([4, 5]);       // Footwork
-                } else {
-                    // If it was already flipped and now being unflipped, show the pentagon chart again
-                    showPentagonChart();
-                }
-            }, 200);
-        });
-    });
-
-    // Show all metrics → Show pentagon chart and flip all cards
-    if (showMetricsBtn) {
-        let metricsVisible = false; // Track state
-        showMetricsBtn.addEventListener('click', () => {
-            metricsVisible = !metricsVisible; // Toggle state
-
-            if (metricsVisible) {
-                showPentagonChart(); // Optional: only if you want to re-show the chart each time
-                document.querySelectorAll('.card').forEach(card => {
-                    card.classList.add('is-flipped');
-                });
-            } else {
-                document.querySelectorAll('.card').forEach(card => {
-                    card.classList.remove('is-flipped');
-                });
-            }
-        });
-    }
+    const ctx2D = els.canvas.getContext("2d");
 
     // ------------------------
-    // 5. POSE SETUP
+    // 2) In-memory state (frontend-only)
     // ------------------------
-
-    const pose = new Pose({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
-    });
-    pose.setOptions({
-        modelComplexity: 1,
-        smoothLandmarks: true,
-        enableSegmentation: false,
-        minDetectionConfidence: 0.6,
-        minTrackingConfidence: 0.6
-    });
-    pose.onResults(onResults);
-
-    // Throttle metric/chart updates to once per second
-    function throttledUpdates() {
-        const now = performance.now();
-        if (now - lastUpdateTime > 1000) {
-            updatetopmetricboxes();
-            updateDoughnutChart();
-            updateMetricSliders();
-            lastUpdateTime = now;
-        }
-    }
-
-    // Main frame-by-frame pose landmark handler
-    function onResults(results) {
-        if (!results.poseLandmarks) {
-            console.log("No landmarks detected");
-            return;
-        }
-        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-        console.log("Landmark sample:", results.poseLandmarks[0]);
-
-
-        // Continue with all metric/posture processing
-        appState.landmarkHistory.push([...results.poseLandmarks]);
-        if (appState.landmarkHistory.length > 100) {
-            appState.landmarkHistory.shift();
-        }
-
-        const posture = detectPosture(results.poseLandmarks);
-        if (['Running', 'Upright Standing', 'Crouching'].includes(posture)) {
-            appState.postureCounts[posture]++;
-        }
-
-        const currentBoundingBox = calculateBoundingBox(results.poseLandmarks);
-
-        if (!appState.athleteLocked) {
-            lockOnAthlete(results.poseLandmarks);
-        } else {
-            if (!isAthleteInFrame(results.poseLandmarks)) {
-                console.log("Lost track of the athlete, ignoring this frame");
-                return;
-            }
-            appState.athleteBoundingBox = currentBoundingBox;
-        }
-
-        const now = performance.now();
-        const timeElapsedSinceLastFrame = appState.previousFrameTime
-            ? (now - appState.previousFrameTime) / 1000
-            : 0;
-        appState.previousFrameTime = now;
-
-        const lHip = results.poseLandmarks[23];
-        const rHip = results.poseLandmarks[24];
-        const lShoulder = results.poseLandmarks[11];
-        const rShoulder = results.poseLandmarks[12];
-
-        // Safety check: skip if any are missing
-        if (!lHip || !rHip || !lShoulder || !rShoulder) return;
-        // Get midpoint of shoulders
-        const avgHipX = (lHip.x + rHip.x) / 2;
-        const avgHipY = (lHip.y + rHip.y) / 2;
-        // Get midpoint of shoulders
-        const avgShoulderX = (lShoulder.x + rShoulder.x) / 2;
-        const avgShoulderY = (lShoulder.y + rShoulder.y) / 2;
-
-        // Measure distance between eye and shoulder midpoint
-        const distance = Math.sqrt(
-            Math.pow(avgHipX.x - avgShoulderX, 2) +
-            Math.pow(avgHipY.y - avgShoulderY, 2)
-        );
-
-        // Base (reference) distance when athlete is close to the camera
-        const baseDistance = 1;
-
-        // Direct scale: more distance → bigger scale
-        let scalingFactor = distance / baseDistance;
-
-        // Clamp to a reasonable range
-        scalingFactor = Math.min(Math.max(scalingFactor, 0.5), 3);
-
-        // Calculate visual sizes
-        const lineWidth = scalingFactor * 0.5;
-        const landmarkRadius = scalingFactor * 500;
-
-        // Draw
-        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
-            color: 'white',
-            lineWidth: lineWidth
-        });
-
-        drawLandmarks(canvasCtx, results.poseLandmarks, {
-            color: 'red',
-            fillColor: 'green',
-            radius: 5
-        });
-
-
-        const headAngle = calculateHeadAngle(results.poseLandmarks);
-        if (headAngle >= 5) {
-            appState.totalFrames++;
-        }
-
-        if (headAngle >= HEAD_ANGLE_MIN && headAngle <= HEAD_ANGLE_MAX) {
-            appState.idealHeadAngleFrames++;
-        }
-
-        const currentVideoTime = Math.floor(videoElement.currentTime);
-        if (currentVideoTime > appState.currentSecond) {
-            appState.currentSecond = currentVideoTime;
-            appState.headAnglePerSecond.push(headAngle);
-            appState.chartLabels.push(appState.currentSecond);
-            appState.headAngleData.push(appState.headAnglePerSecond.at(-1) || 0);
-            appState.speedData.push(appState.smoothedSpeed);
-            appState.accelerationData.push(appState.accelerationDataRaw?.at(-1) || 0);
-            appState.decelerationData.push(appState.decelerationDataRaw?.at(-1) || 0);
-            appState.strideData.push(appState.stridelength?.at(-1)?.length || 0);
-            appState.jumpData.push(appState.jumpHeights?.at(-1)?.height || 0);
-        }
-
-        throttledUpdates();
-
-        if (results.poseLandmarks[LEFT_ANKLE_INDEX] && results.poseLandmarks[LEFT_EYE_INDEX]) {
-            analyzeFrame(results.poseLandmarks, appState.athleteHeightInMeters, timeElapsedSinceLastFrame, posture, currentVideoTime);
-        }
-
-        detectDrillStart(results.poseLandmarks);
-        detectDrillEnd();
-    }
-
-    // ------------------------
-    // 6. VIDEO PROCESSING
-    // ------------------------
-
-    function processVideo(videoElement) {
-        function processFrame() {
-            if (videoElement.paused || videoElement.ended) return;
-            if (videoElement.paused || videoElement.ended) return;
-
-            pose.send({ image: videoElement }).then(() => {
-                setTimeout(processFrame, 30);
-            }).catch(error => console.error("Error processing frame:", error));
-        }
-
-        videoElement.addEventListener('play', processFrame);
-    }
-
-    function seekToTimestamp(timestamp) {
-        videoElement.pause();
-        videoElement.currentTime = timestamp;
-        videoElement.addEventListener('seeked', function () {
-            canvasCtx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-        }, { once: true });
-    }
-
-    // ------------------------
-    // 7. ANALYTICS CALCULATIONS AND METRICS
-    // ------------------------
-
-    function analyzeFrame(landmarks, athleteHeightInMeters, timeElapsedSinceLastFrame, posture) {
-        if (!landmarks || !athleteHeightInMeters) {
-            console.warn("Missing landmarks or athlete height");
-            return;
-        }
-
-        calculateDistance(landmarks, athleteHeightInMeters);
-        detectJumps(landmarks);
-        calculatestride(landmarks);
-        calculateSteps(landmarks);
-
-        const acceleration = calculateAcceleration(appState.speedData, timeElapsedSinceLastFrame);
-        if (!isNaN(acceleration) && Math.abs(acceleration) > ACCELERATION_THRESHOLD) {
-            appState.accelerationDataRaw.push(acceleration);
-        }
-
-        const deceleration = calculateDeceleration(appState.speedData, timeElapsedSinceLastFrame);
-        if (!isNaN(deceleration) && Math.abs(deceleration) > DECELERATION_THRESHOLD) {
-            appState.decelerationDataRaw.push(deceleration);
-        }
-
-        const scores = calculateAthleticScores(posture);
-        const hasNaN = scores.some(score => isNaN(score));
-        if (!hasNaN) {
-            [
-                appState.footworkScore,
-                appState.speedScore,
-                appState.accelerationScore,
-                appState.headAngleScore,
-                appState.postureScore
-            ] = scores;
-
-            appState.score.push(scores);
-            const avg = scores.reduce((sum, val) => sum + val, 0) / scores.length;
-            document.getElementById('athleticScoreValue').textContent = `${avg.toFixed(1)}%`;
-        }
-
-        if (currentChart && chartType === "radar") {
-            currentChart.data.datasets[0].data = scores;
-            currentChart.update();
-        }
-    }
-
-    function updatetopmetricboxes() {
-        document.getElementById('drillTimeValue').textContent = `${videoElement.currentTime.toFixed(1)} SECS`;
-        document.getElementById('distanceValue').textContent = `${appState.totalDistance.toFixed(1)} YARDS`;
-        document.getElementById('stepsValue').textContent = `${appState.stepCount}`;
-    }
-
-    function updateDoughnutChart() {
-        if (!doughnutChart) return;
-
-        // ---------- INNER ring (head‑angle) ----------
-        const idealPct = Math.round(
-            (appState.idealHeadAngleFrames / appState.totalFrames) * 100
-        );
-        doughnutChart.data.datasets[1].data = [
-            idealPct,
-            100 - idealPct
-        ];
-
-        // ---------- OUTER ring (posture counts) ----------
-        const totals = appState.postureCounts;
-        const totalPosture = Object.values(totals).reduce((a, b) => a + b, 0) || 1;
-
-        const running = Math.round(((totals['Running'] || 0) / totalPosture) * 100);
-        const standing = Math.round(((totals['Upright Standing'] || 0) / totalPosture) * 100);
-        const crouching = Math.round(((totals['Crouching'] || 0) / totalPosture) * 100);
-
-        doughnutChart.data.datasets[0].data = [
-            running,
-            standing,
-            crouching
-        ];
-
-        doughnutChart.update();
-    }
-
-    function updateMetricSliders() {
-        const speed = Math.round(appState.smoothedSpeed) || 0;
-        const accel = Math.round(calculatePeakAcceleration()) || 0;
-        const decel = Math.round(calculatePeakDeceleration()) || 0;
-        const jump = calculateAverageJumpHeight() || 0;
-        const stride = calculateAverageStrideLength() || 0;
-        console.log(`speed: ${speed}`)
-        console.log(`accel: ${accel}`)
-        console.log(`decel: ${decel}`)
-        console.log(`jump: ${jump}`)
-        console.log(`stride: ${stride}`)
-        // SPEED & MOVEMENT
-        updateProgress("topSpeed", "topSpeedBar", speed, MAX_SPEED);
-        updateProgress("peakAcceleration", "peakAccelerationBar", accel, MAX_ACCEL);
-        updateProgress("peakDeceleration", "peakDecelerationBar", decel, MAX_DECEL);
-
-        // FOOTWORK
-        updateProgress("averageJumpHeight", "averageJumpHeightBar", jump, MAX_JUMP);
-        updateProgress("averageStrideLength", "averageStrideLengthBar", stride, MAX_STRIDE);
-    }
-
-    function updateProgress(textId, barId, value, maxValue) {
-        const percentage = Math.min((value / maxValue) * 100, 100); // Cap at 100%
-        document.getElementById(textId).innerText = value;
-        document.getElementById(barId).style.width = `${percentage}%`;
-    }
-
-    // ------------------------
-    // 8. FRAME-BASED METRIC CALCULATIONS
-    // ------------------------
-
-    // function detectDrillStart(landmarks) {
-    //     if (!appState.isDrillActive) {
-    //         const feetY = landmarks[LEFT_ANKLE_INDEX].y + landmarks[RIGHT_ANKLE_INDEX].y;
-    //         const hipsY = landmarks[LEFT_HIP_INDEX].y + landmarks[RIGHT_HIP_INDEX].y;
-    //         if (hipsY - feetY > 0.2) {
-    //             appState.isDrillActive = true;
-    //             appState.startTime = performance.now();
-    //             console.log("Drill started");
-    //         }
-    //     }
-    // }
-
-    // function detectDrillEnd() {
-    //     if (appState.isDrillActive && appState.totalTime > 8) {
-    //         appState.endTime = performance.now();
-    //         appState.isDrillActive = false;
-    //         console.log("Drill ended");
-    //     }
-    // }
-
-    // ------------------------
-    // 10. UTILITY FUNCTIONS
-    // ------------------------
-
-    function isAthleteInFrame(currentLandmarks) {
-        const currentBox = calculateBoundingBox(currentLandmarks);
-        const lockedBox = appState.athleteBoundingBox;
-
-        const overlapX = Math.max(
-            0,
-            Math.min(currentBox.x + currentBox.width, lockedBox.x + lockedBox.width) -
-            Math.max(currentBox.x, lockedBox.x)
-        );
-
-        const overlapY = Math.max(
-            0,
-            Math.min(currentBox.y + currentBox.height, lockedBox.y + lockedBox.height) -
-            Math.max(currentBox.y, lockedBox.y)
-        );
-
-        const overlapArea = overlapX * overlapY;
-        const currentArea = currentBox.width * currentBox.height;
-        const overlapRatio = overlapArea / currentArea;
-
-        return overlapRatio >= OVERLAP_THRESHOLD;
-    }
-
-    function calculateBoundingBox(landmarks) {
-        const xs = landmarks.map(p => p.x);
-        const ys = landmarks.map(p => p.y);
-        const minX = Math.min(...xs);
-        const maxX = Math.max(...xs);
-        const minY = Math.min(...ys);
-        const maxY = Math.max(...ys);
-        return {
-            x: minX,
-            y: minY,
-            width: maxX - minX,
-            height: maxY - minY
-        };
-    }
-
-    function lockOnAthlete(landmarks) {
-        appState.athleteBoundingBox = calculateBoundingBox(landmarks);
-        appState.athleteLocked = true;
-    }
-    // ------------------------
-    // 11. RESET & UPLOAD
-    // ------------------------
-    function resetMetricSlidersUI() {
-        updateProgress("topSpeed", "topSpeedBar", 0, MAX_SPEED);
-        updateProgress("peakAcceleration", "peakAccelerationBar", 0, MAX_ACCEL);
-        updateProgress("peakDeceleration", "peakDecelerationBar", 0, MAX_DECEL);
-        updateProgress("averageJumpHeight", "averageJumpHeightBar", 0, MAX_JUMP);
-        updateProgress("averageStrideLength", "averageStrideLengthBar", 0, MAX_STRIDE);
-        document.getElementById('athleticScoreValue').textContent = `${0}%`
-        document.getElementById('drillTimeValue').textContent = `${0} SECS`;
-        document.getElementById('distanceValue').textContent = `${0} YARDS`;
-        document.getElementById('stepsValue').textContent = `${0}`;
-    }
-
-    function resetCharts() {
-        doughnutChart.data.datasets[0].data = [0, 0, 0, 0, 0];
-        doughnutChart.data.datasets[1].data = [0, 100];
-        doughnutChart.update();
-
-        if (currentChart) {
-            currentChart.data.labels = [];
-            currentChart.data.datasets.forEach(ds => ds.data = []);
-            currentChart.update();
-        }
-    }
-
-    function resetAnalysisData() {
-        Object.assign(appState, {
-            postureCounts: { Running: 0, 'Upright Standing': 0, Crouching: 0 },
-            lastFootY: 0,
-            stepCount: 0,
-            uploadDate: '',
-            previousLegPosition: { x: 0, y: 0 },
-            idealHeadAngleFrames: 0,
-            totalFrames: 0,
-            totalDistance: 0,
-            isDrillActive: false,
-            athleteLocked: false,
-            athleteBoundingBox: null,
-            startTime: null,
-            endTime: null,
-            totalTime: 0,
-            previousFrameTime: null,
+    const state = {
+        video: null,
+        currentChart: null,
+        chartType: "radar",
+        // last overlay timing
+        lastOverlayTick: 0,
+        // derived metrics from backend response for visualizations
+        backend: {
+            // line chart series
+            chartLabels: [],
+            headAngleData: [],
             speedData: [],
             accelerationData: [],
             decelerationData: [],
-            accelerationDataRaw: [],
-            decelerationDataRaw: [],
-            headAnglePerSecond: [],
-            currentSecond: 0,
-            smoothedSpeed: 0,
-            jumpHeights: [],
-            stridelength: [],
-            agilityData: [],
-            balanceScore: [],
-            landmarkHistory: [],
-            score: [],
-            topSpeed: 0,
-            chartLabels: [],
-            headAngleData: [],
+            strideData: [],
             jumpData: [],
-            footworkScore: 0,
-            speedScore: 0,
-            accelerationScore: 0,
-            headAngleScore: 0,
-            postureScore: 0
-        });
-    }
+            // doughnut rings
+            outerRing: { Running: 0, Standing: 0, Crouching: 0 },
+            innerRing: { "Head Up": 0, "Head Down": 100 },
+            // pentagon scores
+            athleticScores: {
+                footworkScore: 0,
+                speedScore: 0,
+                accelerationScore: 0,
+                headAngleScore: 0,
+                postureScore: 0,
+            },
+            // top metrics
+            topSpeed: 0,
+            totalDistance: 0,
+            totalSteps: 0, // optional (if backend sends later; we compute from local overlay if needed)
+        },
+    };
 
-    async function autoSaveAnalytics() {
-        try {
-            const formData = new FormData();
-            formData.append('video', appState.videoFile);
-            formData.append('userId', localStorage.getItem('user_id'));
-            if (appState.uploadDate) {
-                formData.append('uploadDate', appState.uploadDate);
-            }
-            if (appState.thumbnailFile) {
-                formData.append('thumbnail', appState.thumbnailFile);
-            }
-            const uploadResponse = await fetch('https://fastapi-app-843332298202.us-central1.run.app/upload', {
-                method: 'POST',
-                body: formData,
-            });
+    // ------------------------
+    // 3) Charts init
+    // ------------------------
+    const doughnutChart = initDoughnutChart("myChart", CONFIG);
+    state.currentChart = initPentagonChart("myChart2"); // sets radar default
 
-            const uploadResult = await uploadResponse.json();
-            console.log('Video uploaded successfully:', uploadResult);
+    // Legends for doughnut
+    buildLegend("outerLegend", CONFIG.OUTER_LABELS, doughnutChart.data.datasets[0].backgroundColor);
+    buildLegend("innerLegend", CONFIG.INNER_LABELS, doughnutChart.data.datasets[1].backgroundColor);
 
-            if (!uploadResult.video_id) {
-                console.error('Video upload failed. No video_id received.');
-                return;
-            }
+    // ------------------------
+    // 4) Mediapipe overlay
+    // ------------------------
+    initPoseOverlay({
+        video: els.video,
+        canvas: els.canvas,
+        ctx2D,
+    });
 
-            appState.videoId = uploadResult.video_id;
-            const idealHeadPercentage = appState.idealHeadAngleFrames
-                ? Math.round((appState.idealHeadAngleFrames / appState.totalFrames) * 100)
-                : 0;
-            const allscores = appState.score.flat();
-            const averageAthleticScore = allscores.length > 0
-                ? allscores.reduce((sum, val) => sum + val, 0) / allscores.length
-                : 0;
+    // ------------------------
+    // 5) Button wiring (Upload stays same, Analyze/Play can change)
+    // ------------------------
+    wireUploadButton(els.uploadButton, els.video, els.canvas, () => {
+        // on metadata ready for fresh session
+        resetCharts(state, doughnutChart);
+        resetMetricSlidersUI(CONFIG);
+        // hide canvas until analyze/play
+        els.canvas.style.display = "none";
+        els.playProcessedButton.style.display = "none";
+        els.analyzeButton.style.display = "block";
+    }, (file) => {
+        state.video = file;
+    });
 
-            // Update the metric values to be saved
-            appState.averageStrideLength = calculateAverageStrideLength();
-            appState.peakAcceleration = calculatePeakAcceleration();
-            appState.peakDeceleration = calculatePeakDeceleration();
-            appState.averageJumpHeight = calculateAverageJumpHeight();
-            const analyticsData = {
-                video_Id: appState.videoId,
-                userId: localStorage.getItem('user_id'),
-                idealHeadPercentage: idealHeadPercentage,
-                averageAthleticScore: averageAthleticScore,
-                topSpeed: appState.topSpeed || 0,
-                averageJumpHeight: appState.averageJumpHeight || 0,
-                averageStrideLength: appState.averageStrideLength || 0,
-                peakAcceleration: appState.peakAcceleration || 0,
-                peakDeceleration: appState.peakDeceleration || 0
-            };
+    wireCardsAndShowAll(els.showMetricsBtn, {
+        onShowPentagon: () => showPentagonChart(state),
+        onShowTechnique: () => showUnifiedChart(state, [0]),      // Head Angle
+        onShowSpeed: () => showUnifiedChart(state, [1, 2, 3]),    // Speed, Accel, Decel
+        onShowFootwork: () => showUnifiedChart(state, [4, 5]),    // Stride, Jump
+    });
 
-            console.log("Sending analytics data:", analyticsData);
-
-            const analyticsResponse = await fetch('https://fastapi-app-843332298202.us-central1.run.app/saveAnalytics', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(analyticsData),
-            });
-
-            const analyticsResult = await analyticsResponse.json();
-            console.log('Analytics saved successfully:', analyticsResult);
-            alert('Analytics saved successfully!');
-
-        } catch (error) {
-            console.error('Error in autoSaveAnalytics:', error);
-            alert('An error occurred while saving analytics.');
+    // Analyze → call backend, render all charts from JSON, enable canvas overlay
+    setAnalyzeHandler(els.analyzeButton, async () => {
+        if (!state.video) {
+            alert("Please upload a video file first.");
+            return;
         }
-    }
 
-    async function estimateHeight(videoFile) {
-        const formData = new FormData();
-        formData.append('video', videoFile);
+        els.analyzeButton.style.display = "none";
+        els.loadingOverlay.style.display = "block";
 
         try {
-            const response = await fetch('https://fastapi-app-843332298202.us-central1.run.app/estimate_height', {
-                method: 'POST',
-                body: formData
+            const analyzeJson = await callAnalyzeVideo({
+                apiBase: CONFIG.API_BASE,
+                userId: localStorage.getItem("userId"),
+                video: state.video
             });
-            const result = await response.json();
-            return result.estimated_height;
-        } catch (error) {
-            console.error("Height estimation error:", error);
-            return null;
+
+            // Store response → state.backend
+            applyBackendResultsToState(state, analyzeJson);
+
+            // Update visuals from backend
+            updateDoughnutChartFromData(doughnutChart, state.backend);
+            updateSlidersFromData(state.backend, CONFIG);
+            updateTopMetricBoxes({
+                timeSecs: lastKnownVideoTime(els.video),
+                totalDistanceYards: state.backend.totalDistance,
+                steps: state.backend.totalSteps || 0,
+            });
+
+            // Prepare overlay
+            els.video.style.display = "none";
+            els.canvas.style.display = "block";
+            els.playProcessedButton.style.display = "block";
+
+            // One immediate frame (paused preview)
+            drawOneFrameIfPaused();
+
+        } catch (err) {
+            console.error("Analyze error:", err);
+            alert("Failed to analyze video. Please try again.");
+            els.analyzeButton.style.display = "block";
+        } finally {
+            els.loadingOverlay.style.display = "none";
         }
+    });
+
+    // Play → show pentagon, start overlay loop (Mediapipe), keep charts live if needed
+    setPlayProcessedHandler(els.playProcessedButton, () => {
+        showPentagonChart(state);
+        // Start local overlay loop (Mediapipe) while video plays
+        startOverlayLoop();
+        // For this mode we process frames from video → pose → draw overlay.
+        // We don’t recompute metrics here; backend already provided series.
+        // (If you want to sync the line chart cursor with time, add it here.)
+    });
+
+    // Click on unified line → seek video (and redraw paused frame)
+    els.myChart2.addEventListener("click", (evt) => {
+        // Only when current chart is a line chart
+        const chart = state.currentChart;
+        if (!chart || chart.config.type !== "line") return;
+
+        const points = chart.getElementsAtEventForMode(evt, "nearest", { intersect: true }, true);
+        if (points && points.length > 0) {
+            const idx = points[0].index;
+            const t = chart.data.labels[idx]; // seconds label
+            els.video.pause();
+            els.video.currentTime = Number(t) || 0;
+            els.video.addEventListener("seeked", () => {
+                drawOneFrameIfPaused();
+            }, { once: true });
+        }
+    });
+
+    // Save analytics when the video ends (optional; you already do this elsewhere)
+    els.video.addEventListener("ended", () => {
+        stopOverlayLoop();
+    });
+
+    // Helpers
+    function lastKnownVideoTime(video) {
+        return Number(video?.currentTime?.toFixed?.(1) || 0);
     }
-}
+
+    function applyBackendResultsToState(st, payload) {
+        // Defensive defaults
+        const lineSafe = (x) => Array.isArray(x) ? x : [];
+        st.backend.chartLabels = lineSafe(payload.chartLabels);
+        st.backend.headAngleData = lineSafe(payload.headAngleData);
+        st.backend.speedData = lineSafe(payload.speedData);
+        st.backend.accelerationData = lineSafe(payload.accelerationData);
+        st.backend.decelerationData = lineSafe(payload.decelerationData);
+        st.backend.strideData = lineSafe(payload.strideData);
+        st.backend.jumpData = lineSafe(payload.jumpData);
+
+        st.backend.outerRing = payload.outerRing || { Running: 0, Standing: 0, Crouching: 0 };
+        st.backend.innerRing = payload.innerRing || { "Head Up": 0, "Head Down": 100 };
+        st.backend.athleticScores = payload.athleticScores || {
+            footworkScore: 0, speedScore: 0, accelerationScore: 0, headAngleScore: 0, postureScore: 0
+        };
+
+        st.backend.topSpeed = Number(payload.topSpeed || 0);
+        st.backend.totalDistance = Number(payload.totalDistance || 0);
+        // if backend later adds steps, we’ll pick it up:
+        if (typeof payload.totalSteps === "number") st.backend.totalSteps = payload.totalSteps;
+
+        // Render unified line chart by default with all series, then we’ll filter per card
+        // (The card handlers call showUnifiedChart with indices)
+        showUnifiedChart(st, [0, 1, 2, 3, 4, 5]);
+    }
+
+    async function callAnalyzeVideo({ apiBase, userId, video }) {
+        const form = new FormData();
+        form.append("userId", userId || "");
+        form.append("video", video);
+
+        // If your backend expects additional fields (e.g., videoId/local_path),
+        // append them here:
+        // form.append("videoId", "..."); form.append("local_path", "...");
+
+        const resp = await fetch(`${apiBase}/analyze-video`, { method: "POST", body: form });
+        if (!resp.ok) {
+            const msg = await resp.text().catch(() => "");
+            throw new Error(`Analyze failed: ${resp.status} ${msg}`);
+        }
+        return resp.json();
+    }
 
 // ------------------------
 // 12. MODULE EXPORT

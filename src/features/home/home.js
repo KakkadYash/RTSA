@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!jsFile) return;
     const jsEl = document.createElement("script");
     jsEl.id = "dynamic-page-script";
+    jsEl.type = "module";
     jsEl.src = `${PAGE_ROOT}${page}/${jsFile}`;
     jsEl.onload = () => {
       const funcName = pageFunctionMap[page];
