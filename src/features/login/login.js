@@ -16,7 +16,7 @@ document.getElementById("forgotPasswordForm").addEventListener("submit", async f
     const response = await fetch("https://fastapi-app-843332298202.us-central1.run.app/forgot_password", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ email }),
     });
@@ -73,10 +73,10 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       alert(`Login failed: ${data.error}`);
     } else {
       alert("Login successful!");
-      console.log("User ID from server:", data.user_id);
+      console.log("User ID from server:", data.userId);
 
       // Store user_id and email in localStorage
-      localStorage.setItem("user_id", data.user_id);
+      localStorage.setItem("userId", data.userId);
       localStorage.setItem("user_name", data.email);
 
       // Redirect to the profile page
