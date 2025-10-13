@@ -112,7 +112,7 @@ function loadProfile() {
         return;
       }
 
-      // ✅ Read input values *now*, not at page load
+      // Read input values *now*, not at page load
       const firstName = document.getElementById("firstName").value.trim();
       const lastName = document.getElementById("lastName").value.trim();
       const age = document.getElementById("popupAge").value.trim();
@@ -132,7 +132,7 @@ function loadProfile() {
         return;
       }
 
-      // ✅ Build FormData dynamically
+      // Build FormData dynamically
       const update_data = new FormData();
       update_data.append("userId", userId);
       update_data.append("first_name", firstName);
@@ -167,7 +167,7 @@ function loadProfile() {
             );
           }
 
-          // ✅ Close the modal on success
+          // Close the modal on success
           const modal = document.getElementById("popupModal");
           modal.classList.add("hidden");
           document.body.style.overflow = "";

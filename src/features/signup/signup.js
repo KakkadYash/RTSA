@@ -14,7 +14,7 @@ document.getElementById("signUpForm").addEventListener("submit", function (event
       }
 
       fetch('https://fastapi-app-843332298202.us-central1.run.app/signup', {
-        method: 'POST',  // ✅ Change this from 'OPTIONS' to 'POST'
+        method: 'POST',  // Change this from 'OPTIONS' to 'POST'
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, username, email, password }),
       })

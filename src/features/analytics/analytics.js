@@ -267,9 +267,9 @@ import {
         return resp.json();
     }
 
-// ------------------------
-// 12. MODULE EXPORT
-// ------------------------
-window.loadAnalytics = loadAnalytics;
+    // ------------------------
+    // 12. MODULE EXPORT
+    // ------------------------
+    window.loadAnalytics = loadAnalytics;
 
-})
+})();

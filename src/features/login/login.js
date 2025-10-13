@@ -47,7 +47,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
   event.preventDefault();
 
   const loginData = {
-    username: document.getElementById("username").value,
+    email: document.getElementById("username").value,
     password: document.getElementById("password").value,
   };
 
