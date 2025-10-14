@@ -16,7 +16,7 @@ document.getElementById("forgotPasswordForm").addEventListener("submit", async f
     const response = await fetch("https://fastapi-app-843332298202.us-central1.run.app/forgot_password", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ email }),
     });

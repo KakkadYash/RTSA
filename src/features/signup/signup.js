@@ -35,7 +35,7 @@ document.getElementById("signUpForm").addEventListener("submit", async function 
     }
 
     alert('Sign-up successful! You can now log in.');
-    window.location.href = './login.html';
+    window.location.href = '../login/login.html';
   } catch (error) {
     console.error('[ERROR] Signup failed:', error);
     alert('An unexpected error occurred. Please try again.');
