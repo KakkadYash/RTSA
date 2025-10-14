@@ -4,7 +4,7 @@ function loadProfile() {
 
   if (!userId) {
     alert("User ID not found. Redirecting to login.");
-    window.location.href = "lo.html";
+    window.location.href = "../login/login.html";
     return;
   }
 

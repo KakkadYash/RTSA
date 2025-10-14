@@ -272,4 +272,4 @@ import {
 // ------------------------
 window.loadAnalytics = loadAnalytics;
 
-})
+})();
