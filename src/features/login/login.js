@@ -47,7 +47,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
   event.preventDefault();
 
   const loginData = {
-    email: document.getElementById("username").value,
+    email: document.getElementById("email").value,
     password: document.getElementById("password").value,
   };
 
@@ -73,11 +73,11 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       alert(`Login failed: ${data.error}`);
     } else {
       alert("Login successful!");
-      console.log("User ID from server:", data.user_id);
+      console.log("User ID from server:", data.userId);
 
-      // Store user_id and username in localStorage
-      localStorage.setItem("user_id", data.user_id);
-      localStorage.setItem("user_name", data.username);
+      // Store userId and email in localStorage
+      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("user_name", data.email);
 
       // Redirect to the profile page
       window.location.href = "../home/home.html";

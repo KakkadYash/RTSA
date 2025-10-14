@@ -101,6 +101,9 @@ import {
     // ------------------------
     // 3) Charts init
     // ------------------------
+    if (state.currentChart) {
+        state.currentChart.destroy();
+    }
     const doughnutChart = initDoughnutChart("myChart", CONFIG);
     state.currentChart = initPentagonChart("myChart2"); // sets radar default
 
