@@ -323,6 +323,12 @@ button#closeBtn:hover {
   overflow: hidden;
   bottom: 20em;
   right: -6em;
+  animation: pulseGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  from { box-shadow: 0 0 5px #d02720; }
+  to { box-shadow: 0 0 25px #ff4141; }
 }
 
 .scan-preview img {
@@ -407,4 +413,12 @@ button#closeBtn:hover {
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
+}
+
+.scan-preview::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(2px);
+  opacity: 0.2;
 }
