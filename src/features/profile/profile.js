@@ -1,6 +1,6 @@
 function loadProfile() {
   const calibrationBtn = document.getElementById('calibration')
-  const userId = localStorage.getItem("user_id");
+  const userId = localStorage.getItem("userId");
 
   if (!userId) {
     alert("User ID not found. Redirecting to login.");
@@ -42,11 +42,20 @@ function loadProfile() {
       document.getElementById("age").value = data.age || '';
       document.getElementById("state").value = data.state || '';
 
-      const sports = data.sports ? data.sports.split(', ') : [];
+      let sports = [];
+
+      // Handle both string or array types gracefully
+      if (Array.isArray(data.sports)) {
+        sports = data.sports;
+      } else if (typeof data.sports === "string" && data.sports.trim() !== "") {
+        sports = data.sports.split(/,\s*/); // split comma-separated string safely
+      }
+
       const sportsDropdown = document.getElementById("sports");
       for (let option of sportsDropdown.options) {
         option.selected = sports.includes(option.value);
       }
+
     } catch (error) {
       console.error("Error fetching profile data:", error);
     }
@@ -186,23 +195,12 @@ function loadProfile() {
   const calibrationOverlay = document.getElementById("calibrationOverlay");
   const overlayMessage = document.getElementById("overlayMessage");
 
-  // Debug logs
-  console.log("🧩 Calibration Input →", {
-    userId,
-    firstName,
-    lastName,
-    age,
-    height,
-    sports,
-    hasPhoto: !!fullBodyPic,
-  });
-
   scanPreview.classList.add("hidden"); // hide preview by default
 
   popupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const userId = localStorage.getItem("user_id");
+    const userId = localStorage.getItem("userId");
     if (!userId) {
       alert("User not found. Please log in again.");
       return;
@@ -214,6 +212,17 @@ function loadProfile() {
     const height = document.getElementById("height").value.trim();
     const sports = document.getElementById("popupSports").value.trim();
     const fullBodyPic = fullBodyPicInput.files[0];
+
+    // Debug logs
+    console.log("🧩 Calibration Input →", {
+      userId,
+      firstName,
+      lastName,
+      age,
+      height,
+      sports,
+      hasPhoto: !!fullBodyPic,
+    });
 
     if (!firstName || !lastName || !age || !height || !sports) {
       alert("Please fill out all required fields.");
@@ -266,24 +275,26 @@ function loadProfile() {
           overlayMessage.textContent = "Profile calibration completed successfully!";
           calibrationOverlay.classList.remove("hidden");
 
-          // Hide overlay & preview smoothly after short delay
+          // Keep success overlay visible for 8 seconds total
           setTimeout(() => {
             calibrationOverlay.classList.add("hidden");
             scanPreview.classList.add("hidden");
-          }, 2500);
-        }, 1000);
+          }, 8000);
+        }, 5000);
 
         document.getElementById("popupModal").classList.add("hidden");
         document.body.style.overflow = "";
-      } else {
+      }
+      else {
         overlayMessage.textContent =
           "Calibration failed. Please try again or upload a different image.";
         calibrationOverlay.classList.remove("hidden");
 
+        // Keep error visible for 5 seconds instead of 4
         setTimeout(() => {
           calibrationOverlay.classList.add("hidden");
           scanPreview.classList.add("hidden");
-        }, 4000);
+        }, 5000);
       }
     } catch (err) {
       scanOverlay.classList.remove("scanning");
