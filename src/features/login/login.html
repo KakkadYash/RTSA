@@ -1,99 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <link rel="stylesheet" href="login-signup.css">
-  <link rel="stylesheet" href="../../../src/shared/components.css">
-  <link rel="stylesheet" href="../../../src/shared/stylesheet.css">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="login-signup.css">
+    <link rel="stylesheet" href="../../../src/shared/components.css">
+    <link rel="stylesheet" href="../../../src/shared/stylesheet.css">
 
-</head>
+  </head>
 
-<body>
-  <main>
-    <div class="rt">
-      <img src="../../../public/assets/images/RT-Logo.png" alt="RT" class="rtLogo">
-    </div>
-
-
-
-    <!-- Login Page -->
-    <div id="loginPage" class="container vh-100 d-flex justify-content-center align-items-center">
-      <div id="login-form-wrapper">
-        <form id="loginForm">
-          <header>
-            <span class="text-center">LOGIN</span>
-            <img src="../../../public/assets/images/white line rt.png" alt="Line" class="singleLine">
-          </header>
-          <div class="input">
-            <div class="input-fields">
-              <label for="email" class="form-label">E-MAIL</label>
-              <input type="text" id="email"  autocomplete="current-password" required>
-            </div>
-          </div>
-          <div class="input">
-            <div class="input-fields">
-              <label for="password" class="form-label">PASSWORD</label>
-              <input type="password" id="password"  autocomplete="current-password" required>
-            </div>
-            <div class="pass">
-              <div class="remember">
-                <input type="checkbox" id="remember" name="remember" value="remember"><label id="remember-me-text"
-                  for="remember">REMEMBER
-                  ME</label>
-              </div>
-              <span class="auth-links" id="forgotPasswordLink">FORGOT YOUR PASSWORD?</span>
-            </div>
-            <div class="buttons">
-              <button id="signInButton" type="submit" class="button hover-animation click-animation hover-box-shadow">SIGN IN <img
-                  src="../../../public/assets/images/arrow black rt.png" alt="arrow" class="arrow"></button>
-              <div class="sign">
-                <span class="auth-links-title">DON'T HAVE AN ACCOUNT?</span>
-                <span class="auth-links">
-                  <a href="../../../src/features/signup/signup.html">CREATE ACCOUNT</a>
-                </span>
-              </div>
-            </div>
-          </div>
-        </form>
+  <body>
+    <main>
+      <div class="rt">
+        <img src="../../../public/assets/images/RT-Logo.png" alt="RT" class="rtLogo">
       </div>
-    </div>
 
 
 
-
-
-    <!-- Forgot Password Modal -->
-    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form id="forgotPasswordForm">
-            <div class="modal-header">
-              <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Your Password ?</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <label for="forgotEmail" class="form-label">Enter your email address and we will send you instructions
-                to reset your password. </label>
-              <div class="mb-3">
-                <input type="email" class="form-control" id="forgotEmail" required>
+      <!-- Login Page -->
+      <div id="loginPage" class="container vh-100 d-flex justify-content-center align-items-center">
+        <div id="login-form-wrapper">
+          <form id="loginForm">
+            <header>
+              <span class="text-center">LOGIN</span>
+              <img src="../../../public/assets/images/white line rt.png" alt="Line" class="singleLine">
+            </header>
+            <div class="input">
+              <div class="input-fields">
+                <label for="email" class="form-label">E-MAIL</label>
+                <input type="text" id="email" autocomplete="current-password" required>
               </div>
-              <div id="forgotPasswordMessage" class="text-success mt-2"></div>
             </div>
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-primary">Send Reset Link</button>
+            <div class="input">
+              <div class="input-fields">
+                <label for="password" class="form-label">PASSWORD</label>
+                <input type="password" id="password" autocomplete="current-password" required>
+              </div>
+              <div class="pass">
+                <div class="remember">
+                  <input type="checkbox" id="remember" name="remember" value="remember"><label id="remember-me-text"
+                    for="remember">REMEMBER
+                    ME</label>
+                </div>
+                <span class="auth-links" id="forgotPasswordLink">FORGOT YOUR PASSWORD?</span>
+              </div>
+              <div class="buttons">
+                <button id="signInButton" type="submit"
+                  class="button hover-animation click-animation hover-box-shadow">SIGN IN <img
+                    src="../../../public/assets/images/arrow black rt.png" alt="arrow" class="arrow"></button>
+                <div class="sign">
+                  <span class="auth-links-title">DON'T HAVE AN ACCOUNT?</span>
+                  <span class="auth-links">
+                    <a href="../../../src/features/signup/signup.html">CREATE ACCOUNT</a>
+                  </span>
+                </div>
+              </div>
             </div>
           </form>
         </div>
       </div>
-    </div>
-  </main>
 
-  <script src="login.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-</body>
+
+
+
+
+      <!-- Forgot Password Modal -->
+      <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form id="forgotPasswordForm">
+              <div class="modal-header">
+                <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Your Password ?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <label for="forgotEmail" class="form-label">Enter your email address and we will send you instructions
+                  to reset your password. </label>
+                <div class="mb-3">
+                  <input type="email" class="form-control" id="forgotEmail" required>
+                </div>
+                <div id="forgotPasswordMessage" class="text-success mt-2"></div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Send Reset Link</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="login.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+  </body>
 
 </html>

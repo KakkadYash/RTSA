@@ -51,4 +51,3 @@ document.getElementById('sport').addEventListener('click', function () {
 });
 
 
-    
