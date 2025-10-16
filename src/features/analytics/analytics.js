@@ -251,6 +251,7 @@ import {
     }
 
     async function callAnalyzeVideo({ apiBase, userId, video }) {
+        console.log("Sending to backend:", { userId, videoName: video.name });
         const form = new FormData();
         form.append("userId", userId || "");
         form.append("video", video);
@@ -262,6 +263,7 @@ import {
         const resp = await fetch(`${apiBase}/analyze-video`, { method: "POST", body: form });
         if (!resp.ok) {
             const msg = await resp.text().catch(() => "");
+            console.log("Backend raw response:", msg);
             throw new Error(`Analyze failed: ${resp.status} ${msg}`);
         }
         return resp.json();
