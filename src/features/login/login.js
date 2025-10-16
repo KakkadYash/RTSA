@@ -75,7 +75,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       alert("Login successful!");
       console.log("User ID from server:", data.userId);
 
-      // Store user_id and email in localStorage
+      // Store userId and email in localStorage
       localStorage.setItem("userId", data.userId);
       localStorage.setItem("user_name", data.email);
 
