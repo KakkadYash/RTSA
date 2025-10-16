@@ -131,6 +131,8 @@ h2 {
   border: 1px solid #FFFFFF;
   font-size: 2.2vw;
   margin: 1vw 0vw 1vw 1.5vw;
+  transition: max-height 0.25s ease-in-out;
+  overflow: hidden;
 }
 
 #userProfileForm {
@@ -311,4 +313,87 @@ button#closeBtn:hover {
 
 .hidden {
   display: none !important;
+}
+
+/* ==== SPORTS DROPDOWN ==== */
+.custom-dropdown {
+  position: relative;
+  width: 55%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown-container {
+  position: relative;
+  width: 60%;
+  background-color: #fff;
+  border-radius: 0.4vw;
+  font-size: 2vw;
+  user-select: none;
+}
+
+.dropdown-selected {
+  padding: 0.6vw 1vw;
+  background-color: #fff;
+  color: #787878;
+  border: 1px solid #ccc;
+  border-radius: 0.4vw;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown-selected::after {
+  content: "▾";
+  color: #444;
+  font-size: 1.2vw;
+}
+
+/* Dropdown list (hidden by default) */
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #000;
+  border: 1px solid #fff;
+  border-radius: 0.4vw;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 99;
+
+  /* Remove the scroll restriction */
+  max-height: none;
+  overflow-y: visible;
+
+  /* Keep animation */
+  transform: scaleY(0);
+  transform-origin: top;
+  opacity: 0;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+.dropdown-list.active {
+  transform: scaleY(1);
+  opacity: 1;
+}
+
+.dropdown-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6vw 1vw;
+  color: #fff;
+  cursor: pointer;
+}
+
+.dropdown-option:hover {
+  background-color: #D02720;
+}
+
+.dropdown-option input[type="checkbox"] {
+  width: 1.2vw;
+  height: 1.2vw;
+  accent-color: #D02720;
 }

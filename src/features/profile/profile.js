@@ -259,6 +259,45 @@ function loadProfile() {
       closeModal();
     });
   }
+  
+  // === Custom Dropdown Setup ===
+const dropdownSelected = document.getElementById("dropdownSelected");
+const dropdownList = document.getElementById("dropdownList");
+const mainBox = document.querySelector(".main-box");
+
+// Cache original height so we can restore it later
+let originalMainBoxHeight = mainBox.scrollHeight;
+let dropdownOpen = false;
+
+// Toggle dropdown open/close
+dropdownSelected.addEventListener("click", (e) => {
+  e.stopPropagation();
+
+  // Toggle dropdown visibility
+  dropdownOpen = !dropdownOpen;
+  dropdownList.classList.toggle("active", dropdownOpen);
+
+  // Measure heights dynamically
+  const dropdownHeight = dropdownList.scrollHeight;
+  if (dropdownOpen) {
+    originalMainBoxHeight = mainBox.scrollHeight;
+    mainBox.style.minHeight = `${originalMainBoxHeight + dropdownHeight}px`;
+  } else {
+    mainBox.style.minHeight = `${originalMainBoxHeight}px`;
+  }
+});
+
+// Close dropdown when clicking outside
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".dropdown-container")) {
+    if (dropdownOpen) {
+      dropdownList.classList.remove("active");
+      mainBox.style.minHeight = `${originalMainBoxHeight}px`;
+      dropdownOpen = false;
+    }
+  }
+});
+
 }
 
 // Make available globally so `home.js` can call it
