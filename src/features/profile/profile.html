@@ -46,19 +46,41 @@
         <label for="state" class="form-label">STATE OF RESIDENCE</label> <input type="text" id="state"
           class="form-control" required required autocomplete="state">
       </div>
-      <div class="data">
-        <label for="sports">SPORTS INTREST </label>
-        <select id="sports" name="sports">
-          <option value="" disabled selected>Select Sport</option>
-          <option value="Football">Football</option>
-          <option value="Baseball">Baseball</option>
-          <option value="Soccer">Soccer</option>
-          <option value="Tennis">Tennis</option>
-          <option value="Swimming">Swimming</option>
-          <option value="Track and Field">Track and Field</option>
-          <option value="Hockey">Hockey</option>
-        </select>
+
+      <!-- Sports Interest Dropdown -->
+      <div class="data custom-dropdown">
+        <label for="sports">SPORTS INTEREST</label>
+
+        <div class="dropdown-container" id="sportsDropdown" tabindex="0">
+          <div class="dropdown-selected" id="dropdownSelected">Select Sport</div>
+          <div class="dropdown-list" id="dropdownList">
+            <div class="dropdown-option">
+              <label>Football</label><input type="checkbox" value="Football">
+            </div>
+            <div class="dropdown-option">
+              <label>Baseball</label><input type="checkbox" value="Baseball">
+            </div>
+            <div class="dropdown-option">
+              <label>Soccer</label><input type="checkbox" value="Soccer">
+            </div>
+            <div class="dropdown-option">
+              <label>Tennis</label><input type="checkbox" value="Tennis">
+            </div>
+            <div class="dropdown-option">
+              <label>Swimming</label><input type="checkbox" value="Swimming">
+            </div>
+            <div class="dropdown-option">
+              <label>Track and Field</label><input type="checkbox" value="Track and Field">
+            </div>
+            <div class="dropdown-option">
+              <label>Hockey</label><input type="checkbox" value="Hockey">
+            </div>
+          </div>
+        </div>
       </div>
+
+
+
     </form>
   </div>
   <!-- Modal Popup -->
