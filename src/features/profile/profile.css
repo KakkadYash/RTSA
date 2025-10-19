@@ -315,85 +315,112 @@ button#closeBtn:hover {
   display: none !important;
 }
 
-/* ==== SPORTS DROPDOWN ==== */
-.custom-dropdown {
+.scan-preview {
   position: relative;
-  width: 55%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  width: 100%;
+  max-width: 280px;
+  margin-top: 10px;
+  border: 2px solid #d02720;
+  border-radius: 6px;
+  overflow: hidden;
+  bottom: 20em;
+  right: -6em;
+  animation: pulseGlow 2s ease-in-out infinite alternate;
 }
 
-.dropdown-container {
-  position: relative;
-  width: 60%;
-  background-color: #fff;
-  border-radius: 0.4vw;
-  font-size: 2vw;
-  user-select: none;
+@keyframes pulseGlow {
+  from { box-shadow: 0 0 5px #d02720; }
+  to { box-shadow: 0 0 25px #ff4141; }
 }
 
-.dropdown-selected {
-  padding: 0.6vw 1vw;
-  background-color: #fff;
-  color: #787878;
-  border: 1px solid #ccc;
-  border-radius: 0.4vw;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dropdown-selected::after {
-  content: "▾";
-  color: #444;
-  font-size: 1.2vw;
-}
-
-/* Dropdown list (hidden by default) */
-.dropdown-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: #000;
-  border: 1px solid #fff;
-  border-radius: 0.4vw;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  z-index: 99;
-
-  /* Remove the scroll restriction */
-  max-height: none;
-  overflow-y: visible;
-
-  /* Keep animation */
-  transform: scaleY(0);
-  transform-origin: top;
-  opacity: 0;
-  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
-}
-
-.dropdown-list.active {
-  transform: scaleY(1);
+.scan-preview img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 6px;
   opacity: 1;
+  transition: opacity 0.3s ease-in-out;
 }
 
-.dropdown-option {
+/* overlay container */
+.scan-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* scanning line animation */
+.scan-line {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #ff0000, transparent);
+  box-shadow: 0 0 12px 2px rgba(255, 0, 0, 0.7);
+  animation: scanMove 2s linear infinite;
+  opacity: 0;
+}
+
+/* show scanning */
+.scanning .scan-line {
+  opacity: 1;
+  animation: scanMove 2s linear infinite;
+}
+
+.scan-status {
+  text-align: center;
+  color: #d02720;
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+
+@keyframes scanMove {
+  0% { top: -10%; opacity: 1; }
+  50% { opacity: 1; }
+  100% { top: 110%; opacity: 0; }
+}
+
+/* Overlay for "personalizing" or "error" messages */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0.6vw 1vw;
-  color: #fff;
+  justify-content: center;
+  z-index: 2000;
   cursor: pointer;
 }
 
-.dropdown-option:hover {
-  background-color: #D02720;
+.overlay-content {
+  color: white;
+  font-size: 1.4rem;
+  font-family: 'Futura LtCn BT', sans-serif;
+  text-align: center;
+  max-width: 80%;
+  line-height: 1.6;
+  padding: 20px 30px;
+  border: 1px solid #d02720;
+  border-radius: 8px;
+  background-color: rgba(30, 30, 30, 0.9);
+  box-shadow: 0 0 10px rgba(208, 39, 32, 0.5);
+  animation: fadeIn 0.4s ease-out;
 }
 
-.dropdown-option input[type="checkbox"] {
-  width: 1.2vw;
-  height: 1.2vw;
-  accent-color: #D02720;
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.scan-preview::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(2px);
+  opacity: 0.2;
 }

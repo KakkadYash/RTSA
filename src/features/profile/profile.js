@@ -1,6 +1,6 @@
 function loadProfile() {
   const calibrationBtn = document.getElementById('calibration')
-  const userId = localStorage.getItem("user_id");
+  const userId = localStorage.getItem("userId");
 
   if (!userId) {
     alert("User ID not found. Redirecting to login.");
@@ -42,11 +42,20 @@ function loadProfile() {
       document.getElementById("age").value = data.age || '';
       document.getElementById("state").value = data.state || '';
 
-      const sports = data.sports ? data.sports.split(', ') : [];
+      let sports = [];
+
+      // Handle both string or array types gracefully
+      if (Array.isArray(data.sports)) {
+        sports = data.sports;
+      } else if (typeof data.sports === "string" && data.sports.trim() !== "") {
+        sports = data.sports.split(/,\s*/); // split comma-separated string safely
+      }
+
       const sportsDropdown = document.getElementById("sports");
       for (let option of sportsDropdown.options) {
         option.selected = sports.includes(option.value);
       }
+
     } catch (error) {
       console.error("Error fetching profile data:", error);
     }
@@ -101,89 +110,6 @@ function loadProfile() {
   fetchProfileData();
   // --- Handle Calibration (Update Profile Popup) ---
   const popupForm = document.getElementById("popupProfileForm");
-
-  if (popupForm && calibrationBtn) {
-    popupForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const userId = localStorage.getItem("user_id");
-      if (!userId) {
-        alert("User not found. Please log in again.");
-        return;
-      }
-
-      // ✅ Read input values *now*, not at page load
-      const firstName = document.getElementById("firstName").value.trim();
-      const lastName = document.getElementById("lastName").value.trim();
-      const age = document.getElementById("popupAge").value.trim();
-      const height = document.getElementById("height").value.trim();
-      const sports = document.getElementById("popupSports").value.trim();
-      const fullBodyPic = document.getElementById("fullBodyPic").files[0];
-
-      console.log("firstName", firstName);
-      console.log("lastName", lastName);
-      console.log("age", age);
-      console.log("height", height);
-      console.log("sports", sports);
-      console.log("fullBodyPic", fullBodyPic);
-
-      if (!firstName || !lastName || !age || !height || !sports) {
-        alert("Please fill out all required fields.");
-        return;
-      }
-
-      // ✅ Build FormData dynamically
-      const update_data = new FormData();
-      update_data.append("userId", userId);
-      update_data.append("first_name", firstName);
-      update_data.append("last_name", lastName);
-      update_data.append("age", age);
-      update_data.append("height_cm", height);
-      update_data.append("sport", sports);
-      if (fullBodyPic) update_data.append("fullBodyPic", fullBodyPic);
-
-      try {
-        calibrationBtn.disabled = true;
-        calibrationBtn.textContent = "Submitting...";
-
-        const response = await fetch(
-          "https://fastapi-app-843332298202.us-central1.run.app/calibration",
-          {
-            method: "POST",
-            body: update_data,
-          }
-        );
-
-        const result = await response.json();
-
-        if (response.ok) {
-          console.log("Calibration response:", result);
-          alert("Profile updated successfully!");
-
-          if (result.calibrated_height_m) {
-            console.log(
-              "Calibrated Height (m):",
-              result.calibrated_height_m.toFixed(3)
-            );
-          }
-
-          // ✅ Close the modal on success
-          const modal = document.getElementById("popupModal");
-          modal.classList.add("hidden");
-          document.body.style.overflow = "";
-        } else {
-          console.error("Error response:", result);
-          alert(result.detail || "Error during calibration.");
-        }
-      } catch (err) {
-        console.error("Calibration error:", err);
-        alert("An unexpected error occurred during calibration.");
-      } finally {
-        calibrationBtn.disabled = false;
-        calibrationBtn.textContent = "Submit";
-      }
-    });
-  }
 
 
 
@@ -259,44 +185,135 @@ function loadProfile() {
       closeModal();
     });
   }
-  
-  // === Custom Dropdown Setup ===
-const dropdownSelected = document.getElementById("dropdownSelected");
-const dropdownList = document.getElementById("dropdownList");
-const mainBox = document.querySelector(".main-box");
 
-// Cache original height so we can restore it later
-let originalMainBoxHeight = mainBox.scrollHeight;
-let dropdownOpen = false;
 
-// Toggle dropdown open/close
-dropdownSelected.addEventListener("click", (e) => {
-  e.stopPropagation();
+  // --- Handle Calibration (Update Profile Popup) ---
+  const fullBodyPicInput = document.getElementById("fullBodyPic");
+  const fullBodyPreview = document.getElementById("fullBodyPreview");
+  const scanPreview = document.querySelector(".scan-preview");
+  const scanOverlay = document.querySelector(".scan-overlay");
+  const calibrationOverlay = document.getElementById("calibrationOverlay");
+  const overlayMessage = document.getElementById("overlayMessage");
 
-  // Toggle dropdown visibility
-  dropdownOpen = !dropdownOpen;
-  dropdownList.classList.toggle("active", dropdownOpen);
+  scanPreview.classList.add("hidden"); // hide preview by default
 
-  // Measure heights dynamically
-  const dropdownHeight = dropdownList.scrollHeight;
-  if (dropdownOpen) {
-    originalMainBoxHeight = mainBox.scrollHeight;
-    mainBox.style.minHeight = `${originalMainBoxHeight + dropdownHeight}px`;
-  } else {
-    mainBox.style.minHeight = `${originalMainBoxHeight}px`;
-  }
-});
+  popupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-// Close dropdown when clicking outside
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".dropdown-container")) {
-    if (dropdownOpen) {
-      dropdownList.classList.remove("active");
-      mainBox.style.minHeight = `${originalMainBoxHeight}px`;
-      dropdownOpen = false;
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("User not found. Please log in again.");
+      return;
     }
-  }
-});
+
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const age = document.getElementById("popupAge").value.trim();
+    const height = document.getElementById("height").value.trim();
+    const sports = document.getElementById("popupSports").value.trim();
+    const fullBodyPic = fullBodyPicInput.files[0];
+
+    // Debug logs
+    console.log("🧩 Calibration Input →", {
+      userId,
+      firstName,
+      lastName,
+      age,
+      height,
+      sports,
+      hasPhoto: !!fullBodyPic,
+    });
+
+    if (!firstName || !lastName || !age || !height || !sports) {
+      alert("Please fill out all required fields.");
+      return;
+    }
+
+    // ---- Show preview + scanning when submitting ----
+    if (fullBodyPic) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        fullBodyPreview.src = event.target.result;
+        scanPreview.classList.remove("hidden");
+        scanOverlay.classList.add("scanning");
+      };
+      reader.readAsDataURL(fullBodyPic);
+    }
+
+    const update_data = new FormData();
+    update_data.append("userId", userId);
+    update_data.append("first_name", firstName);
+    update_data.append("last_name", lastName);
+    update_data.append("age", age);
+    update_data.append("height_cm", height);
+    update_data.append("sport", sports);
+    if (fullBodyPic) update_data.append("fullBodyPic", fullBodyPic);
+
+    try {
+      calibrationBtn.disabled = true;
+      calibrationBtn.textContent = "Submitting...";
+
+      const response = await fetch(
+        "https://fastapi-app-843332298202.us-central1.run.app/calibration",
+        {
+          method: "POST",
+          body: update_data,
+        }
+      );
+
+      // ✅ Debug logging right after the response is received
+      const result = await response.json();
+      console.log("📦 Calibration API response:", response.status, result);
+      scanOverlay.classList.remove("scanning"); // stop animation
+
+      if (response.ok) {
+        overlayMessage.textContent =
+          "Personalizing your profile to deliver optimized performance insights...";
+        calibrationOverlay.classList.remove("hidden");
+
+        setTimeout(() => {
+          overlayMessage.textContent = "Profile calibration completed successfully!";
+          calibrationOverlay.classList.remove("hidden");
+
+          // Keep success overlay visible for 8 seconds total
+          setTimeout(() => {
+            calibrationOverlay.classList.add("hidden");
+            scanPreview.classList.add("hidden");
+          }, 8000);
+        }, 5000);
+
+        document.getElementById("popupModal").classList.add("hidden");
+        document.body.style.overflow = "";
+      }
+      else {
+        overlayMessage.textContent =
+          "Calibration failed. Please try again or upload a different image.";
+        calibrationOverlay.classList.remove("hidden");
+
+        // Keep error visible for 5 seconds instead of 4
+        setTimeout(() => {
+          calibrationOverlay.classList.add("hidden");
+          scanPreview.classList.add("hidden");
+        }, 5000);
+      }
+    } catch (err) {
+      scanOverlay.classList.remove("scanning");
+      overlayMessage.textContent =
+        "An unexpected issue occurred. Please retry with a clear full-body image.";
+      calibrationOverlay.classList.remove("hidden");
+
+      setTimeout(() => {
+        calibrationOverlay.classList.add("hidden");
+        scanPreview.classList.add("hidden");
+      }, 4000);
+
+      console.error("Calibration error:", err);
+    } finally {
+      calibrationBtn.disabled = false;
+      calibrationBtn.textContent = "Submit";
+    }
+  });
+
 
 }
 

@@ -116,8 +116,18 @@
         <div>
           <label for="fullBodyPic">Full Body Picture:</label>
           <input type="file" id="fullBodyPic" name="fullBodyPic" accept="image/*">
-        </div>
-        <button id="calibration" type="submit">Submit</button>
+          <div class="scan-preview hidden">
+            <p id="scanStatus" class="scan-status hidden">🔍 Scanning image...</p>
+            <img id="fullBodyPreview" alt="Preview" />
+            <div class="scan-overlay">
+              <div class="scan-line"></div>
+            </div>
+          </div>
+          <!-- Overlay for calibration feedback -->
+          <div id="calibrationOverlay" class="overlay hidden">
+            <div class="overlay-content" id="overlayMessage">Processing...</div>
+          </div>
+          <button id="calibration" type="submit">Submit</button>
       </form>
     </div>
   </div>
