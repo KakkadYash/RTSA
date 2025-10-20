@@ -3,8 +3,6 @@
 
 import {
     initDoughnutChart,
-    initPentagonChart,
-    showPentagonChart,
     showUnifiedChart,
     buildLegend,
     updateDoughnutChartFromData,
@@ -93,7 +91,7 @@ import {
     // 3️⃣ CHARTS
     console.log("[INIT] Initializing charts...");
     const doughnutChart = initDoughnutChart("myChart", CONFIG);
-    state.currentChart = initPentagonChart("myChart2");
+    showUnifiedChart(state, [0, 1, 2, 3, 4, 5]); // empty at first, becomes populated after analysis
     buildLegend("outerLegend", CONFIG.OUTER_LABELS, doughnutChart.data.datasets[0].backgroundColor);
     buildLegend("innerLegend", CONFIG.INNER_LABELS, doughnutChart.data.datasets[1].backgroundColor);
 
@@ -141,10 +139,10 @@ import {
 
     // 6️⃣ METRIC CARD BUTTONS
     wireCardsAndShowAll(els.showMetricsBtn, {
-        onShowPentagon: () => { console.log("[EVENT] Show pentagon chart"); showPentagonChart(state); },
-        onShowTechnique: () => { console.log("[EVENT] Show head-angle line chart"); showUnifiedChart(state, [0]); },
-        onShowSpeed: () => { console.log("[EVENT] Show speed/accel/decel line chart"); showUnifiedChart(state, [1, 2, 3]); },
-        onShowFootwork: () => { console.log("[EVENT] Show stride/jump line chart"); showUnifiedChart(state, [4, 5]); },
+        onShowAllMetrics: () => { console.log("[EVENT] Show unified all metrics"); showUnifiedChart(state, [0, 1, 2, 3, 4, 5]); },
+        onShowTechnique: () => { console.log("[EVENT] Show head-angle only"); showUnifiedChart(state, [0]); },
+        onShowSpeed: () => { console.log("[EVENT] Show speed/accel/decel"); showUnifiedChart(state, [1, 2, 3]); },
+        onShowFootwork: () => { console.log("[EVENT] Show stride/jump"); showUnifiedChart(state, [4, 5]); },
     });
 
     // 7️⃣ ANALYZE BUTTON
@@ -220,7 +218,7 @@ import {
     // 8️⃣ PLAY PROCESSED VIDEO
     setPlayProcessedHandler(els.playProcessedButton, () => {
         console.log("[EVENT] Play processed video clicked");
-        showPentagonChart(state);
+        showUnifiedChart(state, [0,1,2,3,4,5]);
         startOverlayLoop();
     });
 

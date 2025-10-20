@@ -27,7 +27,8 @@ export function wireUploadButton(inputEl, videoEl, canvasEl, onMetadataReady, on
   });
 }
 
-export function wireCardsAndShowAll(showMetricsBtn, { onShowPentagon, onShowTechnique, onShowSpeed, onShowFootwork }) {
+export function wireCardsAndShowAll(showMetricsBtn, { onShowAllMetrics, onShowTechnique, onShowSpeed, onShowFootwork }) {
+   // Card flip logic
   // Card flip logic
   document.querySelectorAll(".card").forEach((card, index, allCards) => {
     card.addEventListener("click", () => {
@@ -41,7 +42,7 @@ export function wireCardsAndShowAll(showMetricsBtn, { onShowPentagon, onShowTech
           if (index === 1) onShowSpeed?.();     // Speed & Movement
           if (index === 2) onShowFootwork?.();  // Footwork
         } else {
-          onShowPentagon?.();
+          onShowAllMetrics?.(); // Restore unified full chart when card is unselected
         }
       }, 200);
     });
@@ -53,7 +54,7 @@ export function wireCardsAndShowAll(showMetricsBtn, { onShowPentagon, onShowTech
     showMetricsBtn.addEventListener("click", () => {
       metricsVisible = !metricsVisible;
       if (metricsVisible) {
-        onShowPentagon?.();
+        onShowAllMetrics?.(); // show unified with all series
         document.querySelectorAll(".card").forEach(c => c.classList.add("is-flipped"));
       } else {
         document.querySelectorAll(".card").forEach(c => c.classList.remove("is-flipped"));
