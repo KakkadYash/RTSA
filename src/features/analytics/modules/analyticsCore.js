@@ -54,16 +54,23 @@ export function drawOneFrameIfPaused() {
   ctx2D.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
 }
 
-async function processFrameLoop() {
-  if (!playing || videoEl.paused || videoEl.ended) return;
+let isProcessingFrame = false;
+
+export async function processFrameLoop() {
+  if (isProcessingFrame) return; // prevent overlap
+  isProcessingFrame = true;
+
   try {
     await pose.send({ image: videoEl });
-  } catch (e) {
-    console.error("Mediapipe send error:", e);
+  } catch (err) {
+    console.error("Mediapipe send error:", err);
+  } finally {
+    isProcessingFrame = false;
   }
-  // ~30–33 fps target
-  setTimeout(processFrameLoop, 30);
+
+  requestAnimationFrame(processFrameLoop);
 }
+
 
 function onResults(results) {
   if (!results.poseLandmarks) {

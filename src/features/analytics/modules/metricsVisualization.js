@@ -140,37 +140,68 @@ export function showPentagonChart(state) {
   state.chartType = "radar";
 }
 
-export function showUnifiedChart(state, metricIndices = []) {
-  const canvas = document.getElementById("myChart2");
-  const ctx = canvas.getContext("2d");
-  if (state.currentChart) state.currentChart.destroy();
+ export function showUnifiedChart(state, metricIndices = []) {
+   const canvas = document.getElementById("myChart2");
+   const ctx = canvas.getContext("2d");
+   if (state.currentChart) state.currentChart.destroy();
 
   state.currentChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: state.backend.chartLabels || [],
-      datasets: [
-        { label: "Head Angle (°)",          data: state.backend.headAngleData || [],   borderColor: "#FF8C00", fill: false },
-        { label: "Speed (yards/sec)",       data: state.backend.speedData || [],       borderColor: "#1F43E5", fill: false },
-        { label: "Acceleration (yards/s²)", data: state.backend.accelerationData || [],borderColor: "#7DD859", fill: false },
-        { label: "Deceleration (yards/s²)", data: state.backend.decelerationData || [],borderColor: "#E93632", fill: false },
-        { label: "Stride Length (yards)",   data: state.backend.strideData || [],      borderColor: "#FFA500", fill: false },
-        { label: "Jump Height (yards)",     data: state.backend.jumpData || [],        borderColor: "#800080", fill: false },
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
-    }
+     type: "line",
+     data: {
+       labels: state.backend.chartLabels || [],
+       datasets: [
+         { label: "Head Angle (°)",          data: state.backend.headAngleData || [],    borderColor: "#FF8C00", fill: false },
+         { label: "Speed (yards/sec)",       data: state.backend.speedData || [],        borderColor: "#1F43E5", fill: false },
+         { label: "Acceleration (yards/s²)", data: state.backend.accelerationData || [], borderColor: "#7DD859", fill: false },
+         { label: "Deceleration (yards/s²)", data: state.backend.decelerationData || [], borderColor: "#E93632", fill: false },
+         { label: "Stride Length (yards)",   data: state.backend.strideData || [],       borderColor: "#FFA500", fill: false },
+         { label: "Jump Height (yards)",     data: state.backend.jumpData || [],         borderColor: "#800080", fill: false },
+       ]
+     },
+     options: {
+       responsive: true,
+       maintainAspectRatio: false,
+      interaction: { mode: "nearest", intersect: true },
+      elements: {
+        point: { radius: 3, hitRadius: 10 },
+        line:  { tension: 0.2 }
+      },
+      plugins: {
+        legend: {
+          position: "top",
+          labels: { usePointStyle: true }
+          // Default legend click already allows multi-select toggling.
+        },
+        tooltip: {
+          callbacks: {
+            title: (items) => {
+              const i = items?.[0]?.dataIndex ?? 0;
+              const t = state.currentChart?.data?.labels?.[i];
+              return `t = ${Number(t || 0).toFixed(2)} s`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: "Time (s)" },
+          ticks: { autoSkip: true, maxTicksLimit: 10 }
+        },
+        y: {
+          title: { display: true, text: "Value" }
+        }
+      }
+     }
   });
 
-  state.chartType = "line";
-  // filter visibility
-  state.currentChart.data.datasets.forEach((ds, idx) => {
-    ds.hidden = !metricIndices.includes(idx);
-  });
-  state.currentChart.update();
-}
+   state.chartType = "line";
+   // filter visibility
+   state.currentChart.data.datasets.forEach((ds, idx) => {
+    ds.hidden = metricIndices.length ? !metricIndices.includes(idx) : false;
+   });
+   state.currentChart.update();
+ }
+
 
 export function buildLegend(containerId, labels, colors) {
   const container = document.getElementById(containerId);
