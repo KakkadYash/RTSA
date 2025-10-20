@@ -87,6 +87,12 @@
     align-items: flex-start;
   }
 
+  .modal-header {
+    display: flex;
+    width: 12em;
+    justify-content: space-around;
+  }
+
   .avatar {
     width: 10em;
     height: 10em;
@@ -486,14 +492,17 @@
    PRINT / PDF EXPORT OPTIMIZATION (One-Page Layout)
    ========================================================= */
 @media print {
-  html, body {
+
+  html,
+  body {
     margin: 0 !important;
     padding: 0 !important;
     background: #ffffff !important;
     color: #000 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    zoom: 0.9; /* Adjust between 0.8–0.95 depending on your content */
+    zoom: 0.9;
+    /* Adjust between 0.8–0.95 depending on your content */
   }
 
   /* Core container scaling */
@@ -508,7 +517,12 @@
   }
 
   /* Flatten all sections */
-  .header, .metrics, .ai-section, .analysis, .drills-bio-section, .footer {
+  .header,
+  .metrics,
+  .ai-section,
+  .analysis,
+  .drills-bio-section,
+  .footer {
     page-break-inside: avoid !important;
     page-break-before: avoid !important;
     page-break-after: avoid !important;
@@ -516,7 +530,10 @@
   }
 
   /* Typography adjustments */
-  h1, h2, h3, p {
+  h1,
+  h2,
+  h3,
+  p {
     color: #000 !important;
   }
 
@@ -526,7 +543,13 @@
   }
 
   /* Simplify layout for print */
-  .metric-card, .analysis-box, .top-drills, .right-column, .bio, .feedback, .achievements {
+  .metric-card,
+  .analysis-box,
+  .top-drills,
+  .right-column,
+  .bio,
+  .feedback,
+  .achievements {
     background: #fff !important;
     border: 1px solid #ddd !important;
     color: #000 !important;
@@ -534,7 +557,10 @@
   }
 
   /* Hide UI buttons and modals */
-  .share-button, .close-button, .share-modal, .modal-button {
+  .share-button,
+  .close-button,
+  .share-modal,
+  .modal-button {
     display: none !important;
   }
 
