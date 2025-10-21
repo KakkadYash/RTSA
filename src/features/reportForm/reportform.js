@@ -6,11 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const openPreviewBtn = document.getElementById("openPreviewButton");
   const modal = document.getElementById("reportModal");
   const reportFrame = document.getElementById("reportFrame");
-  const closePreviewBtn = document.getElementById("closePreview"); // will exist inside iframe
   const shareModal = document.getElementById("shareModal");
-  const closeShareModalBtn = document.getElementById("closeShareModal");
-  const generateLinkBtn = document.getElementById("generateLink");
-  const exportPdfBtn = document.getElementById("exportPDF");
+
 
   const fields = {
     email: document.getElementById("email"),
@@ -43,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (shareButtonInIframe) {
         shareButtonInIframe.addEventListener("click", () => {
+          console.log('Clicked Share Report Button')
           shareModal?.classList.remove("hidden");
         });
       }

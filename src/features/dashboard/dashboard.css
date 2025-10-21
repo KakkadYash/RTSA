@@ -1,4 +1,6 @@
-@import url(/src/shared/stylesheet.css);
+@import url("../../../src/shared/stylesheet.css");
+@import url("../../../src/shared/components.css");
+
 
 #bg {
   background-image: url(../../../public/assets/images/route.png), url(../../../public/assets/images/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../../public/assets/images/Dashes.png);

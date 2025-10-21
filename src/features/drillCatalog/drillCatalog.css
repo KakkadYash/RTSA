@@ -1,4 +1,5 @@
-@import url(/src/shared/stylesheet.css);
+@import url("../../../src/shared/stylesheet.css");
+@import url("../../../src/shared/components.css");
 
 .library {
     padding-top: 10px;
