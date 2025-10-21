@@ -143,11 +143,15 @@ function loadDashboard() {
     currentMetricIndex = (currentMetricIndex + 1) % metricLabels.length;
     renderChart(currentMetricIndex);
   });
-  const one_page_report=document.getElementById('one-page-report');
-  
-  one_page_report.addEventListener('click',()=>{
-    window.open('../../../src/features/reportForm/reportform.html', '_blank');
-  })
+  const reportBtn = document.getElementById("one-page-report");
+  if (reportBtn) {
+    reportBtn.addEventListener("click", () => {
+      console.log('clicked one-page-report')
+      window.open("../../../src/features/reportForm/reportform.html", "_blank");
+    });
+  } else {
+    console.warn("⚠️ One Page Report button not found.");
+  }
 }
 
 // Required so home.js can access it globally

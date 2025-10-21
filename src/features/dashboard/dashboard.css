@@ -26,6 +26,7 @@ main span {
 button#one-page-report {
     width: 6em;
     font-size: 0.4em;
+    z-index: 69;
 }
 
 .hello {
