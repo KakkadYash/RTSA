@@ -123,6 +123,11 @@ function loadProfile() {
   })
 
   let focusableElements, firstFocusableElement, lastFocusableElement;
+  // Focus trap setup
+  const focusableSelectors = [
+    'a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])',
+    'textarea:not([disabled])', 'button:not([disabled])', '[tabindex]:not([tabindex="-1"])'
+  ].join(',');
 
   function trapFocus(element) {
     focusableElements = element.querySelectorAll(focusableSelectors);
@@ -164,11 +169,6 @@ function loadProfile() {
   }
 
 
-  // Focus trap setup
-  const focusableSelectors = [
-    'a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])',
-    'textarea:not([disabled])', 'button:not([disabled])', '[tabindex]:not([tabindex="-1"])'
-  ].join(',');
 
 
   function closeModal() {
@@ -319,9 +319,5 @@ function loadProfile() {
 
 // Make available globally so `home.js` can call it
 window.loadProfile = loadProfile;
-
-
-
-
 
 

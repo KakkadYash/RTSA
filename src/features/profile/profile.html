@@ -23,7 +23,7 @@
     <div class="subHeader">
       <h3>PERSONAL INFORMATION</h3>
       <div class="button-wrapper">
-        <button id="openModalBtn" class="button hover-animation click-animation hover-box-shadow">Update Photo</button>
+        <button type="button" id="openModalBtn" class="button hover-animation click-animation hover-box-shadow">Update Photo</button>
         <button class="button hover-animation click-animation hover-box-shadow" type="submit" id="saveButton"
           form="userProfileForm">SAVE
           <img src="../../../public/assets/images/save-icon.png" alt="save" class="save">
@@ -36,10 +36,10 @@
           required>
       </div>
       <div class="data">
-        <label for="email" class="form-label">EMAIL</label> <input type="text" id="email" class="form-control" required>
+        <label for="email" class="form-label">EMAIL</label> <input type="email" id="email" class="form-control" required>
       </div>
       <div class="data">
-        <label for="age" class="form-label">AGE OF ATHELETE</label> <input type="text" id="age" class="form-control"
+        <label for="age" class="form-label">AGE OF ATHLETE</label> <input type="text" id="age" class="form-control"
           required required autocomplete="age">
       </div>
       <div class="data">
@@ -47,7 +47,7 @@
           class="form-control" required required autocomplete="state">
       </div>
       <div class="data">
-        <label for="sports">SPORTS INTREST </label>
+        <label for="sports">SPORTS INTEREST </label>
         <select id="sports" name="sports">
           <option value="" disabled selected>Select Sport</option>
           <option value="Football">Football</option>

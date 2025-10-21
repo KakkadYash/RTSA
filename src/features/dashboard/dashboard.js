@@ -146,7 +146,7 @@ function loadDashboard() {
   const one_page_report=document.getElementById('one-page-report');
   
   one_page_report.addEventListener('click',()=>{
-    window.open('../../../src/features/report/reportform.html', '_blank');
+    window.open('../../../src/features/reportForm/reportform.html', '_blank');
   })
 }
 

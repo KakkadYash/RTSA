@@ -576,3 +576,144 @@
     margin: 0.5in;
   }
 }
+
+
+/* Share Modal Styles */
+/* =========================================================
+   Reaction Technologies - Share Modal (Pro Dark UI)
+   ========================================================= */
+
+.share-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  transition: opacity 0.3s ease;
+}
+
+.share-modal.hidden {
+  display: none;
+  opacity: 0;
+}
+
+/* Modal Content Box */
+.share-modal-content {
+  background: rgba(25, 25, 25, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 3px solid var(--rt-red);
+  border-radius: 16px;
+  width: 380px;
+  padding: 24px 28px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1em;
+  position: relative;
+  animation: fadeInScale 0.25s ease;
+  color: var(--rt-text-primary);
+  height: 11em;
+}
+
+/* Subtle Pop-in Animation */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+.share-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+/* Modal Title */
+.share-modal-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+  letter-spacing: 0.6px;
+  text-align: left;
+}
+
+/* Buttons Layout */
+.share-modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+  margin-top: 6px;
+}
+
+/* Unified Button Style */
+.share-modal-buttons button {
+  background-color: #E50914;
+  padding: 12px;
+  font-size: 15px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* RT Button Colors */
+.generate-link-button {
+  background: var(--rt-green);
+  color: #fff;
+}
+
+.generate-link-button:hover {
+  background: #FF3131;
+  box-shadow: 0 0 15px #ff0000;
+}
+
+.export-pdf-button {
+  background: var(--rt-red);
+  color: #fff;
+}
+
+.export-pdf-button:hover {
+  background: #FF3131;
+  box-shadow: 0 0 15px #ff0000;
+}
+
+/* Close (X) Button */
+.close-share-modal {
+  background: transparent;
+  border: none;
+  font-size: 1.5em;
+  color: white;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.close-share-modal:hover {
+  color: red;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .share-modal-content {
+    width: 90%;
+    padding: 20px;
+  }
+}
