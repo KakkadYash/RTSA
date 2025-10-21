@@ -24,9 +24,16 @@ main span {
 }
 
 button#one-page-report {
-    width: 6em;
-    font-size: 0.4em;
-    z-index: 69;
+  width: 7em;
+  height: 3em;
+  font-size: 1.5em;
+}
+
+.header-wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .hello {
