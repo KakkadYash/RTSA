@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     drillCatalog: "loadDrillCatalog",
     // Add more if needed
   };
-
+ 
   /**
    * Load HTML content into content area.
    */
@@ -35,37 +35,12 @@ document.addEventListener("DOMContentLoaded", () => {
     removeElementById("dynamic-page-style");
 
     if (!cssFile) return;
-    const href = `${PAGE_ROOT}${page}/${cssFile}`;
-
-    // --- Step 1: Check if already preloaded ---
-    let preloadEl = document.querySelector(`link[rel="preload"][href="${href}"]`);
-
-    if (!preloadEl) {
-      // --- Step 2: Create preload link ---
-      preloadEl = document.createElement("link");
-      preloadEl.rel = "preload";
-      preloadEl.as = "style";
-      preloadEl.href = href;
-
-      // --- Step 3: Once loaded, convert to active stylesheet ---
-      preloadEl.onload = () => {
-        preloadEl.rel = "stylesheet";
-        preloadEl.removeAttribute("as");
-        preloadEl.id = "dynamic-page-style";
-        console.log(`[PRELOAD] Activated stylesheet: ${cssFile}`);
-      };
-
-      document.head.appendChild(preloadEl);
-    } else {
-      // --- Step 4: If already preloaded, attach as stylesheet directly ---
-      const cssEl = document.createElement("link");
-      cssEl.id = "dynamic-page-style";
-      cssEl.rel = "stylesheet";
-      cssEl.href = href;
-      document.head.appendChild(cssEl);
-    }
+    const cssEl = document.createElement("link");
+    cssEl.id = "dynamic-page-style";
+    cssEl.rel = "stylesheet";
+    cssEl.href = `${PAGE_ROOT}${page}/${cssFile}`;
+    document.head.appendChild(cssEl);
   }
-
 
   /**
    * Dynamically load JS file and execute page init function if defined.
@@ -87,7 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     };
-    ;
     jsEl.onerror = () => console.error(`Failed to load JS for ${page}`);
     document.body.appendChild(jsEl);
   }
@@ -111,8 +85,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!page) return;
 
     try {
-      loadCSS(page, cssFile);
       await loadHTML(page);
+      loadCSS(page, cssFile);
       loadJS(page, jsFile);
       updateActiveTab(link);
     } catch (error) {
