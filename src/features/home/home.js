@@ -81,9 +81,13 @@ document.addEventListener("DOMContentLoaded", () => {
     jsEl.onload = () => {
       const funcName = pageFunctionMap[page];
       if (funcName && typeof window[funcName] === "function") {
-        window[funcName](); // Call page-specific init function
+        // Defer execution to next browser paint to ensure injected DOM exists
+        requestAnimationFrame(() => {
+          window[funcName]();
+        });
       }
     };
+    ;
     jsEl.onerror = () => console.error(`Failed to load JS for ${page}`);
     document.body.appendChild(jsEl);
   }
