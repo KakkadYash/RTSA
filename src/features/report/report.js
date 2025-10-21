@@ -1,4 +1,7 @@
-
+  const closePreviewBtn = document.getElementById("closePreview"); // will exist inside iframe
+  const closeShareModalBtn = document.getElementById("closeShareModal");
+  const generateLinkBtn = document.getElementById("generateLink");
+  const exportPdfBtn = document.getElementById("exportPDF");
   /* =====================================================
      SHARE MODAL LOGIC
   ===================================================== */
@@ -36,3 +39,36 @@
       prompt("Copy this link:", link);
     }
   });
+
+    if (openPreviewBtn && modal && reportFrame) {
+    openPreviewBtn.addEventListener("click", () => {
+      modal.classList.remove("hidden");
+      reportLoaded = false;
+      reportFrame.src = "../../../src/features/report/report.html";
+    });
+
+    reportFrame.addEventListener("load", () => {
+      reportDoc = reportFrame.contentDocument || reportFrame.contentWindow.document;
+      reportLoaded = true;
+
+      // Bind iframe buttons (share + close)
+      const shareButtonInIframe = reportDoc.getElementById("shareButton");
+      const closePreviewInIframe = reportDoc.getElementById("closePreview");
+
+      if (shareButtonInIframe) {
+        shareButtonInIframe.addEventListener("click", () => {
+          console.log('Clicked Share Report Button')
+          shareModal?.classList.remove("hidden");
+        });
+      }
+
+      if (closePreviewInIframe) {
+        closePreviewInIframe.addEventListener("click", () => {
+          modal.classList.add("hidden");
+        });
+      }
+
+      updateReport();
+      renderAchievements();
+    });
+  }

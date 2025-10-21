@@ -1,6 +1,6 @@
-@import url(/src/features/report/reportform.css);
-@import url(../../../src/shared/components.css);
-@import url(../../../src/shared/stylesheet.css);
+@import url("../../../src/shared/stylesheet.css");
+@import url("../../../src/shared/components.css");
+
 /* =========================================================
    Reaction Technologies Pro Theme
    File: report-theme-pro.css
@@ -89,8 +89,12 @@
 
   .modal-header {
     display: flex;
-    width: 12em;
+    width: 15em;
     justify-content: space-around;
+  }
+
+  button#shareButton {
+    font-size: 1.5em;
   }
 
   .avatar {
@@ -716,4 +720,14 @@
     width: 90%;
     padding: 20px;
   }
+}
+
+button#closePreview {
+  background-color: transparent;
+  color: rgb(136 136 136);
+  font-size: 2em;
+  border: none;
+}
+button#closePreview:hover {
+    color: red;
 }

@@ -1,4 +1,6 @@
-@import url(/src/shared/stylesheet.css);
+@import url("../../../src/shared/stylesheet.css");
+@import url("../../../src/shared/components.css");
+
 
 .library {
   display: flex;

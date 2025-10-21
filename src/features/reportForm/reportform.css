@@ -1,5 +1,5 @@
-@import url('../../../src/shared/stylesheet.css');
-@import url('../../../src/shared/components.css');
+@import url("../../../src/shared/stylesheet.css");
+@import url("../../../src/shared/components.css");
 
 body {
   font-family: Arial, sans-serif;
