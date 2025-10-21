@@ -70,8 +70,7 @@ video {
 }
 
 #output_canvas {
-    /* width: 100%;
-    height: 100%; */
+    height: 22em;
     border-radius: 2%;
     border: 0.1em solid #000000;
 }
