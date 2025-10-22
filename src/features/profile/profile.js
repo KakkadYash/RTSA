@@ -313,7 +313,34 @@ function loadProfile() {
       calibrationBtn.textContent = "Submit";
     }
   });
+const customSelect = document.getElementById('sportsCustom');
+  const optionsList = document.getElementById('sportsOptions');
+  const checkboxes = optionsList.querySelectorAll('input[type="checkbox"]');
+  const mainBox = document.querySelector('.main-box'); // Adjust if needed
+  const options=document.querySelectorAll('#sportsOptions label')
 
+  // Toggle dropdown
+  customSelect.addEventListener('click', () => {
+    optionsList.classList.toggle('hidden');
+    mainBox.classList.toggle('extended-main-box')
+  });
+  
+  // Update selected options in select box
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      const selected = [];
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          selected.push(cb.value);
+          // options.classList.toggle('selected')
+        }
+      });
+
+      customSelect.textContent = selected.length > 0
+        ? selected.join(', ')
+        : 'Select Sport';
+    });
+  });
 
 }
 

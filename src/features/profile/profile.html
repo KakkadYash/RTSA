@@ -23,7 +23,8 @@
     <div class="subHeader">
       <h3>PERSONAL INFORMATION</h3>
       <div class="button-wrapper">
-        <button type="button" id="openModalBtn" class="button hover-animation click-animation hover-box-shadow">Update Photo</button>
+        <button type="button" id="openModalBtn" class="button hover-animation click-animation hover-box-shadow">Update
+          Photo</button>
         <button class="button hover-animation click-animation hover-box-shadow" type="submit" id="saveButton"
           form="userProfileForm">SAVE
           <img src="../../../public/assets/images/save-icon.png" alt="save" class="save">
@@ -36,7 +37,8 @@
           required>
       </div>
       <div class="data">
-        <label for="email" class="form-label">EMAIL</label> <input type="email" id="email" class="form-control" required>
+        <label for="email" class="form-label">EMAIL</label> <input type="email" id="email" class="form-control"
+          required>
       </div>
       <div class="data">
         <label for="age" class="form-label">AGE OF ATHLETE</label> <input type="text" id="age" class="form-control"
@@ -47,17 +49,20 @@
           class="form-control" required required autocomplete="state">
       </div>
       <div class="data">
-        <label for="sports">SPORTS INTEREST </label>
-        <select id="sports" name="sports">
-          <option value="" disabled selected>Select Sport</option>
-          <option value="Football">Football</option>
-          <option value="Baseball">Baseball</option>
-          <option value="Soccer">Soccer</option>
-          <option value="Tennis">Tennis</option>
-          <option value="Swimming">Swimming</option>
-          <option value="Track and Field">Track and Field</option>
-          <option value="Hockey">Hockey</option>
-        </select>
+        <label for="sportsCustom">SPORTS INTEREST</label>
+        <div class="custom-select-container">
+          <div class="custom-select" id="sportsCustom">Select Sport</div>
+          <div class="custom-options hidden" id="sportsOptions">
+            <label><span>Football</span><input type="checkbox" value="Football"></label>
+            <label><span>Basketball</span><input type="checkbox" value="Basketball"></label>
+            <label><span>Soccer</span><input type="checkbox" value="Soccer"></label>
+            <label><span>Baseball</span><input type="checkbox" value="Baseball"></label>
+            <label><span>Tennis</span><input type="checkbox" value="Tennis"></label>
+          </div>
+        </div>
+
+        <!-- Hidden input for form submission -->
+        <input type="hidden" name="sports" id="sports">
       </div>
 
 
