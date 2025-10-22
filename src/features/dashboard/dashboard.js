@@ -154,6 +154,12 @@ if (reportBtn) {
 } else {
   console.warn("⚠️ One Page Report button not found.");
 }
-
+document.addEventListener("click", function (e) {
+  const reportBtn = e.target.closest("#one-page-report");
+  if (reportBtn) {
+    console.log("clicked one-page-report");
+    window.open("../../../src/features/reportForm/reportform.html", "_blank");
+  }
+});
 // Required so home.js can access it globally
 window.loadDashboard = loadDashboard;
