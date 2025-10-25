@@ -25,7 +25,7 @@
       <div class="button-wrapper">
         <button type="button" id="openModalBtn" class="button hover-animation click-animation hover-box-shadow">Update
           Photo</button>
-        <button type='button' class="button hover-animation click-animation hover-box-shadow" type="submit" id="saveButton"
+        <button class="button hover-animation click-animation hover-box-shadow" type="submit" id="saveButton"
           form="userProfileForm">SAVE
           <img src="../../../public/assets/images/save-icon.png" alt="save" class="save">
         </button>
@@ -48,73 +48,25 @@
         <label for="state" class="form-label">STATE OF RESIDENCE</label> <input type="text" id="state"
           class="form-control" required required autocomplete="state">
       </div>
-      <div class="data">
-        <label for="sportsCustom">SPORTS INTEREST</label>
-        <div class="custom-select-container">
-          <div class="custom-select" id="sportsCustom">Select Sport</div>
-          <div class="custom-options hidden" id="sportsOptions">
+      <div class="data custom-dropdown">
+        <label for="sports">SPORTS INTEREST</label>
+
+        <div class="dropdown-container" id="sportsDropdown">
+          <div class="dropdown-selected">Select Sport</div>
+          <div class="dropdown-options hidden">
             <label><span>Football</span><input type="checkbox" value="Football"></label>
-            <label><span>Basketball</span><input type="checkbox" value="Basketball"></label>
+            <label><span>Basetball</span><input type="checkbox" value="Baseball"></label>
             <label><span>Soccer</span><input type="checkbox" value="Soccer"></label>
             <label><span>Baseball</span><input type="checkbox" value="Baseball"></label>
             <label><span>Tennis</span><input type="checkbox" value="Tennis"></label>
           </div>
         </div>
 
-        <!-- Hidden input for form submission -->
-        <input type="hidden" name="sports" id="sports">
+        <input type="hidden" id="sports" name="sports">
       </div>
-
-
 
     </form>
   </div>
-  <!-- Modal Popup -->
-  <div id="popupModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"
-    aria-hidden="true">
-    <div class="modal-content" tabindex="-1">
-      <div class="heading">
-        <h2 id="modalTitle">Update Profile</h2>
-        <button type='button' id="closeBtn" class="close-btn click-animation hover-animation"
-          aria-label="Close modal">&times;</button>
-      </div>
-      <form id="popupProfileForm">
-        <div>
-          <label for="firstName">First Name:</label>
-          <input type="text" id="firstName" name="firstName" required>
-        </div>
-        <div>
-          <label for="lastName">Last Name:</label>
-          <input type="text" id="lastName" name="lastName" required>
-        </div>
-        <div>
-          <label for="age">Age:</label>
-          <input type="number" id="popupAge" name="age" min="0" required>
-        </div>
-        <div>
-          <label for="height">Height (cm):</label>
-          <input type="number" id="height" name="height" min="0" required>
-        </div>
-        <div>
-          <label for="sports">Sports:</label>
-          <input type="text" id="popupSports" name="sports">
-        </div>
-        <div>
-          <label for="fullBodyPic">Full Body Picture:</label>
-          <input type="file" id="fullBodyPic" name="fullBodyPic" accept="image/*">
-          <div class="scan-preview hidden">
-            <p id="scanStatus" class="scan-status hidden">🔍 Scanning image...</p>
-            <img id="fullBodyPreview" alt="Preview" />
-            <div class="scan-overlay">
-              <div class="scan-line"></div>
-            </div>
-          </div>
-          <!-- Overlay for calibration feedback -->
-          <div id="calibrationOverlay" class="overlay hidden">
-            <div class="overlay-content" id="overlayMessage">Processing...</div>
-          </div>
-          <button type='button' id="calibration" type="submit">Submit</button>
-      </form>
-    </div>
-  </div>
 </div>
+<!-- Dynamic Calibration Modal Container -->
+<div id="calibrationModalContainer" class="hidden"></div>

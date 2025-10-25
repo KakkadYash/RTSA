@@ -27,11 +27,6 @@
 
 }
 
-#popupProfileForm {
-  display: flex;
-  justify-content: space-between;
-  height: 100%;
-}
 
 .info div {
   margin-left: 1vw;
@@ -78,12 +73,7 @@ img#img-preview {
   ;
 }
 
-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
+
 
 /* Player Info */
 .user {
@@ -134,12 +124,15 @@ h2 {
   margin: 1vw 0vw 1vw 1.5vw;
   transition: max-height 0.25s ease-in-out;
   overflow: hidden;
+  height: 20em;
 }
 
 #userProfileForm {
+  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
 }
 
 .subHeader {
@@ -181,7 +174,7 @@ h3 {
 }
 
 .data {
-  width: 55%;
+  width: 60%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -197,10 +190,11 @@ h3 {
   float: right;
   opacity: 100%;
   height: 40px;
+  width: 50%;
   font-size: 30px;
-  color: #FFFFFF;
-  background-color: #000000;
-  width: 60%;
+  color: white;
+  background-color: #111111;
+  border: 2px solid red;
 }
 
 .info {
@@ -227,304 +221,215 @@ select {
   justify-content: space-around;
 }
 
-/* Modal styles */
-.modal {
-  position: fixed;
-  z-index: 1000;
-  /* high to overlay */
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  /* dim background */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.modal-content {
-  background-color: #222;
-  color: white;
-  padding: 0em 1em 1em;
-  border-radius: 8px;
-  width: 320px;
-  max-width: 90vw;
-  outline: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  font-size: 1.2rem;
-  width: 30em;
-  height: 35em;
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-}
-
-.close-btn {
-  background: transparent;
-  border: none;
-  font-size: 4rem;
-  color: white;
-  cursor: pointer;
-}
-
-button#closeBtn:hover {
-  color: red;
-}
-
-.heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.modal form label {
-  display: block;
-  font-size: 1.2em;
-  font-weight: normal;
-  letter-spacing: 1px;
-}
-
-.modal form input[type="text"],
-.modal form input[type="number"],
-.modal form input[type="file"] {
-  width: 100%;
-  padding: 6px 8px;
-  margin-top: 4px;
-  border-radius: 4px;
-  border: 1px solid #444;
-  background-color: #000;
-  color: white;
-}
-
-.modal form button[type="submit"] {
-  margin-top: 15px;
-  width: 100%;
-  background-color: #D02720;
-  border: none;
-  padding: 10px;
-  color: white;
-  font-size: 1.2rem;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.modal form button[type="submit"]:hover {
-  background-color: #a02018;
-}
-
-.hidden {
-  display: none !important;
-}
-
-.scan-preview {
+/* === Custom Dropdown === */
+.custom-dropdown {
   position: relative;
-  width: 100%;
-  max-width: 280px;
-  margin-top: 10px;
-  border: 2px solid #d02720;
-  border-radius: 6px;
-  overflow: hidden;
-  bottom: 20em;
-  right: -6em;
-  animation: pulseGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes pulseGlow {
-  from {
-    box-shadow: 0 0 5px #d02720;
-  }
-
-  to {
-    box-shadow: 0 0 25px #ff4141;
-  }
-}
-
-.scan-preview img {
-  width: 100%;
-  display: block;
-  object-fit: cover;
-  border-radius: 6px;
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out;
-}
-
-/* overlay container */
-.scan-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-/* scanning line animation */
-.scan-line {
-  position: absolute;
-  top: -10%;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, transparent, #ff0000, transparent);
-  box-shadow: 0 0 12px 2px rgba(255, 0, 0, 0.7);
-  animation: scanMove 2s linear infinite;
-  opacity: 0;
-}
-
-/* show scanning */
-.scanning .scan-line {
-  opacity: 1;
-  animation: scanMove 2s linear infinite;
-}
-
-.scan-status {
-  text-align: center;
-  color: #d02720;
-  font-size: 0.9rem;
-  margin-top: 6px;
-}
-
-@keyframes scanMove {
-  0% {
-    transform: translateY(-10%);
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateY(110%);
-    opacity: 0;
-  }
-}
-
-/* Overlay for "personalizing" or "error" messages */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.85);
+  width: 61%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  cursor: pointer;
+  justify-content: space-between;
+  font-family: 'Futura LtCn BT', sans-serif;
 }
 
-.overlay-content {
-  color: white;
-  font-size: 1.4rem;
-  font-family: 'Futura LtCn BT', sans-serif;
-  text-align: center;
-  max-width: 80%;
-  line-height: 1.6;
-  padding: 20px 30px;
+.dropdown-container {
+  position: relative;
+  width: 51%;
+  background-color: #111111;
   border: 1px solid #d02720;
-  border-radius: 8px;
-  background-color: rgba(30, 30, 30, 0.9);
-  box-shadow: 0 0 10px rgba(208, 39, 32, 0.5);
-  animation: fadeIn 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.scan-preview::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(2px);
-  opacity: 0.2;
-}
-
-.custom-select-container {
-  position: relative;
-  width: 60%;
-  height: auto;
-  font-family: 'Futura LtCn BT', sans-serif;
-}
-
-.custom-select {
-  height: 3vw;
-  padding: 0 1vw;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  background-color: #111;
-  border: 2px solid #fff;
+  border-radius: 6px;
   color: #fff;
-  font-size: 1.6vw;
+  font-size: 1.8vw;
   cursor: pointer;
-  border-radius: 0.4vw;
-  width: 100%;
-  justify-content: space-around;
+  user-select: none;
+  transition: all 0.2s ease-in-out;
+
 }
 
-.custom-options {
-  display: flex;
-  flex-direction: column;
-  max-height: 16em; /*Scroll limit*/
-  overflow-y: auto;
-  margin-top: 0.2em;
-  position: absolute;
-  width: 100%;
-  background-color: #1a1a1a;
-  border: 2px solid #D02720;
-  padding: 0.5vw;
-  border-radius: 0.4vw;
-  z-index: 20;
-  gap: 0.5em;
+.dropdown-container:hover {
+  box-shadow: 0 0 10px rgba(208, 39, 32, 0.5);
 }
 
-
-span {
-  width: 25%;
-}
-
-.custom-options label {
+.dropdown-selected {
+  height: 2em;
   display: flex;
   justify-content: center;
-  padding: 0.6vw 1vw;
-  font-size: 1.4vw;
-  background-color: #222;
+  align-items: center;
   color: white;
-  border-radius: 0.3vw;
+}
+
+.dropdown-selected::after {
+  content: "▼";
+  font-size: 1.2vw;
+  margin-left: 1vw;
+  transition: transform 0.3s ease;
+}
+
+/* When JS adds the class .arrow-black */
+.dropdown-selected.arrow-black::after {
+  color: #111111;
+  transform: rotate(180deg);
+  /* optional arrow flip */
+}
+
+.dropdown-container.active .dropdown-selected::after {
+  transform: rotate(-180deg);
+}
+
+.dropdown-options {
+  position: absolute;
+  bottom: 110%;
+  width: 100%;
+  background-color: #111;
+  border: 1px solid #d02720;
+  border-radius: 6px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  /* padding: 0.5vw 0; */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.dropdown-options label {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: #fff;
+  padding: 0.6vw 1vw;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  font-size: 1.6vw;
+  transition: background 0.2s;
   flex-direction: row;
 }
 
-.custom-options label:hover {
-  background-color: #e62a2a;
+.dropdown-options label:hover {
+  background-color: rgba(208, 39, 32, 0.8);
 }
 
-.custom-options input[type="checkbox"] {
-  accent-color: #D02720;
+.dropdown-options input[type="checkbox"] {
+  accent-color: #e62a2a;
   transform: scale(1.3);
-  margin-left: 1vw;
-  cursor: pointer;
 }
 
-.custom-options.hidden {
+/* Hide options by default */
+.dropdown-options.hidden {
   display: none;
 }
 
-.extended-main-box{
-  height: 140%;
+.dropdown-options span {
+  width: 5em;
 }
 
-.selected{
-  background-color: #e62a2a;
+
+/* ✅ When checkbox is checked — highlight row */
+.dropdown-options input[type="checkbox"]:checked+span,
+.dropdown-options input[type="checkbox"]:checked~span {
+  color: white;
 }
+
+
+.dropdown-options input[type="checkbox"]:checked {
+  accent-color: black;
+}
+
+.dropdown-options input[type="checkbox"]:checked::before {
+  background-color: black !important;
+}
+
+
+.dropdown-options input[type="checkbox"]:checked~span,
+.dropdown-options input[type="checkbox"]:checked:checked~span {
+  background-color: rgba(208, 39, 32, 0.8);
+}
+
+
+.dropdown-options input[type="checkbox"]:checked+span,
+.dropdown-options label:has(input:checked) {
+  background-color: rgba(208, 39, 32, 0.8);
+}
+
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #111 inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+}
+
+
+/* When JS adds the class .arrow-black */
+.dropdown-selected.arrow-black::after {
+  color: #111111;
+  transform: rotate(180deg);
+  /* optional arrow flip */
+}
+
+.dropdown-container.active .dropdown-selected::after {
+  transform: rotate(-180deg);
+}
+
+.dropdown-options {
+  position: absolute;
+  bottom: 110%;
+  width: 100%;
+  background-color: #111;
+  border: 1px solid #d02720;
+  border-radius: 6px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  /* padding: 0.5vw 0; */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.dropdown-options label {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: #fff;
+  padding: 0.6vw 1vw;
+  cursor: pointer;
+  font-size: 1.6vw;
+  transition: background 0.2s;
+  flex-direction: row;
+}
+
+.dropdown-options label:hover {
+  background-color: rgba(208, 39, 32, 0.8);
+}
+
+.dropdown-options input[type="checkbox"] {
+  accent-color: #e62a2a;
+  transform: scale(1.3);
+}
+
+/* Hide options by default */
+.dropdown-options.hidden {
+  display: none;
+}
+
+.dropdown-options span {
+  width: 5em;
+}
+
+
+/* === Dropdown Option Highlight + Checkbox Color === */
+
+/* Each option row */
+.dropdown-options label {
+  margin: 0.2em 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  /* padding: 0.6vw 1vw; */
+  cursor: pointer;
+  font-size: 1.6vw;
+  transition: background 0.25s ease, color 0.25s ease;
+  flex-direction: row;
+}
+
+/* Hover highlight */
+.dropdown-options label:hover {
+  background-color: rgba(208, 39, 32, 0.3);
+}
+
