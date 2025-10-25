@@ -119,4 +119,45 @@ function initCalibrationFormHandler() {
       setTimeout(() => overlay.classList.add("hidden"), 1500);
     }
   });
+  function initImagePreview() {
+    const fileInput = document.getElementById("fullBodyPic");
+    const previewContainer = document.querySelector(".scan-preview");
+    const previewImage = document.getElementById("fullBodyPreview");
+    const scanLine = document.querySelector(".scan-line");
+    const scanStatus = document.getElementById("scanStatus");
+
+    if (!fileInput || !previewContainer) return;
+
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Show preview container
+      previewContainer.classList.remove("hidden");
+
+      // Create and display image preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        previewImage.src = event.target.result;
+        previewImage.style.opacity = "1";
+      };
+      reader.readAsDataURL(file);
+
+      // Trigger scanning animation
+      scanStatus.classList.remove("hidden");
+      previewContainer.classList.add("scanning");
+
+      // Stop scanning after 3 seconds
+      setTimeout(() => {
+        previewContainer.classList.remove("scanning");
+        scanStatus.classList.add("hidden");
+      }, 3000);
+    });
+  }
+
 }
+document.addEventListener("DOMContentLoaded", () => {
+  initCalibrationModalEvents();
+  initCalibrationFormHandler();
+  initImagePreview();
+});

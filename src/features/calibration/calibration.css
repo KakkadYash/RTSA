@@ -205,9 +205,17 @@ button#closeBtn:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 10000;
+  /* ⬆ higher than modal */
   cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
 }
+
+.overlay:not(.hidden) {
+  opacity: 1;
+}
+
 
 .overlay-content {
   color: white;
