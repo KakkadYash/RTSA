@@ -1,48 +1,9 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("popupProfileForm");
-
-  if (form) {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault(); // ⛔ stop default page reload
-      console.log("[CALIBRATION] Form submitted");
-
-      const overlay = document.getElementById("calibrationOverlay");
-      const overlayMessage = document.getElementById("overlayMessage");
-
-      overlay.classList.remove("hidden");
-      overlayMessage.textContent = "Calibrating height... please wait ⏳";
-
-      const formData = new FormData(form);
-      const userId = localStorage.getItem("userId");
-      formData.append("userId", userId);
-
-      try {
-        const res = await fetch(`${API_BASE}/calibration`, {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        console.log("[CALIBRATION] Success:", data);
-
-        overlayMessage.textContent = "✅ Calibration successful!";
-      } catch (err) {
-        console.error("[CALIBRATION] Error:", err);
-        overlayMessage.textContent = "❌ Calibration failed. Please retry.";
-      } finally {
-        setTimeout(() => {
-          overlay.classList.add("hidden");
-        }, 1500);
-      }
-    });
-  }
-});
+const API_BASE = "https://fastapi-app-843332298202.us-central1.run.app";
+const modal = document.getElementById("popupModal");
+const container = document.getElementById("calibrationModalContainer");
 
 function initCalibrationModalEvents() {
-  const modal = document.getElementById("popupModal");
   const closeBtn = document.getElementById("closeBtn");
-  const container = document.getElementById("calibrationModalContainer");
 
   // Retry logic in case DOM isn't ready yet
   if (!modal || !closeBtn) {
@@ -57,7 +18,6 @@ function initCalibrationModalEvents() {
   closeBtn.addEventListener("click", () => {
     modal.classList.add("hidden");
     container.classList.add("hidden");
-    document.body.style.overflow = "";
   });
 
   // Close by clicking outside modal
@@ -65,10 +25,10 @@ function initCalibrationModalEvents() {
     if (e.target === modal) {
       modal.classList.add("hidden");
       container.classList.add("hidden");
-      document.body.style.overflow = "";
     }
   });
 }
+
 function initCalibrationFormHandler() {
   const form = document.getElementById("popupProfileForm");
 
@@ -85,11 +45,21 @@ function initCalibrationFormHandler() {
     e.stopPropagation(); // stop other listeners
     console.log("[CALIBRATION] Form submitted");
 
-    const overlay = document.getElementById("calibrationOverlay");
-    const overlayMessage = document.getElementById("overlayMessage");
+    const previewContainer = document.querySelector(".scan-preview");
+    const previewImage = document.getElementById("fullBodyPreview");
+    const scanStatus = document.getElementById("scanStatus");
 
-    overlay.classList.remove("hidden");
-    overlayMessage.textContent = "Calibrating height... please wait ⏳";
+    // Show preview + scanning animation when Submit is clicked
+    if (previewContainer && previewImage) {
+      previewContainer.classList.remove("hidden");
+      previewImage.classList.remove("hidden");
+      previewContainer.classList.add("scanning");
+    }
+    if (scanStatus) {
+      scanStatus.textContent = "🔍 Scanning image...";
+      scanStatus.classList.remove("hidden");
+    }
+
 
     const formData = new FormData(form);
     const userId = localStorage.getItem("userId");
@@ -97,8 +67,6 @@ function initCalibrationFormHandler() {
 
     try {
       // 🌐 Always use deployed Cloud Run API
-      const API_BASE = "https://fastapi-app-843332298202.us-central1.run.app";
-
 
       console.log("[CALIBRATION] Sending request to:", `${API_BASE}/calibration`);
 
@@ -110,54 +78,71 @@ function initCalibrationFormHandler() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       console.log("[CALIBRATION] Success:", data);
+      if (res.status === 200) {
+        // ✅ Stop scanning animation
+        if (previewContainer) {
+          previewContainer.classList.remove("scanning");
+          previewContainer.classList.add("success"); // 🟢 new glow effect
+        }
 
-      overlayMessage.textContent = "✅ Calibration successful!";
+        if (scanStatus) {
+          scanStatus.textContent = "✅ Calibration successful!";
+          scanStatus.style.color = "#00ff88"; // optional: make text green
+        }
+
+        // ✅ After 2s, hide preview + modal
+        setTimeout(() => {
+          if (scanStatus) {
+            scanStatus.classList.add("hidden");
+            scanStatus.style.color = ""; // reset color
+          }
+          if (previewContainer) {
+            previewContainer.classList.remove("success"); // remove green pulse
+            previewContainer.classList.add("hidden");
+          }
+          if (previewImage) previewImage.src = "";
+
+          modal.classList.add("hidden");
+          container.classList.add("hidden");
+          document.body.style.overflow = ""; // restore scroll
+        }, 2000);
+      }
+
+
     } catch (err) {
+      if (previewContainer) previewContainer.classList.remove("scanning");
+      if (scanStatus) {
+        scanStatus.textContent = "❌ Calibration failed. Please retry.";
+        setTimeout(() => scanStatus.classList.add("hidden"), 2000);
+      }
+
       console.error("[CALIBRATION] Error:", err);
-      overlayMessage.textContent = "❌ Calibration failed. Please retry.";
     } finally {
-      setTimeout(() => overlay.classList.add("hidden"), 1500);
+      // ✅ Clean up scanning state if still active
+      if (previewContainer) previewContainer.classList.remove("scanning");
     }
   });
-  function initImagePreview() {
+}
+
+function initImagePreview() {
+  setTimeout(() => {
     const fileInput = document.getElementById("fullBodyPic");
     const previewContainer = document.querySelector(".scan-preview");
     const previewImage = document.getElementById("fullBodyPreview");
-    const scanLine = document.querySelector(".scan-line");
-    const scanStatus = document.getElementById("scanStatus");
 
-    if (!fileInput || !previewContainer) return;
+    if (!fileInput || !previewContainer || !previewImage) return;
 
     fileInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
-      // Show preview container
-      previewContainer.classList.remove("hidden");
-
-      // Create and display image preview
       const reader = new FileReader();
       reader.onload = (event) => {
         previewImage.src = event.target.result;
-        previewImage.style.opacity = "1";
+        console.log("[PREVIEW] Image ready but hidden until submit");
       };
       reader.readAsDataURL(file);
-
-      // Trigger scanning animation
-      scanStatus.classList.remove("hidden");
-      previewContainer.classList.add("scanning");
-
-      // Stop scanning after 3 seconds
-      setTimeout(() => {
-        previewContainer.classList.remove("scanning");
-        scanStatus.classList.add("hidden");
-      }, 3000);
     });
-  }
-
+  }, 200);
 }
-document.addEventListener("DOMContentLoaded", () => {
-  initCalibrationModalEvents();
-  initCalibrationFormHandler();
-  initImagePreview();
-});
+
