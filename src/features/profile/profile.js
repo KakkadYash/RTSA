@@ -32,16 +32,15 @@ function loadProfile() {
       script.src = "../../../src/features/calibration/calibration.js";
       script.onload = () => {
         // ✅ Once calibration.js is loaded, initialize modal + form events
-        if (typeof initCalibrationModalEvents === "function") {
-          initCalibrationModalEvents();
-        } else {
-          console.warn("⚠️ initCalibrationModalEvents not found yet");
-        }
+        if (typeof initCalibrationModalEvents === "function") initCalibrationModalEvents();
+        if (typeof initCalibrationFormHandler === "function") initCalibrationFormHandler();
 
-        if (typeof initCalibrationFormHandler === "function") {
-          initCalibrationFormHandler();
+        // ✅ Initialize image preview AFTER modal HTML has been injected
+        if (typeof initImagePreview === "function") {
+          console.log("🖼️ Initializing image preview after modal load");
+          initImagePreview();
         } else {
-          console.warn("⚠️ initCalibrationFormHandler not found yet");
+          console.warn("⚠️ initImagePreview not found yet");
         }
 
         resolve();
@@ -54,70 +53,69 @@ function loadProfile() {
 
 
   // ====== Helper: Open Modal After It’s Loaded ======
-// ====== Helper: Open Modal After It’s Loaded ======
-async function handleOpenModal() {
-  console.log("Clicked Upload Photo Button on Profile page");
+  // ====== Helper: Open Modal After It’s Loaded ======
+  async function handleOpenModal() {
+    console.log("Clicked Upload Photo Button on Profile page");
 
-  // 1️⃣ Load modal HTML, CSS, and JS
-  await loadCalibrationModal();
+    // 1️⃣ Load modal HTML, CSS, and JS
+    await loadCalibrationModal();
 
-  // 2️⃣ Verify modal loaded
-  const modal = document.getElementById("popupModal");
-  if (!modal) {
-    console.error("❌ Modal not found after loading calibration.html");
-    return;
-  }
-
-  // 3️⃣ Extract existing profile data
-  const fullName = document.getElementById("name").value || "";
-  const nameParts = fullName.split(" ");
-
-  const first_name = nameParts[0] || "";
-  const last_name = nameParts.slice(1).join(" ") || "";
-  const age = document.getElementById("age").value || "";
-
-  // Handle dropdown or text-based sport field
-  const sportsField = document.getElementById("sports");
-  let sportValue = "";
-  if (sportsField) {
-    // For custom dropdown with hidden input
-    if (sportsField.tagName === "INPUT") {
-      sportValue = sportsField.value || "";
-    } else if (sportsField.multiple) {
-      sportValue = Array.from(sportsField.selectedOptions).map(opt => opt.value).join(", ");
-    } else {
-      sportValue = sportsField.value || "";
+    // 2️⃣ Verify modal loaded
+    const modal = document.getElementById("popupModal");
+    if (!modal) {
+      console.error("❌ Modal not found after loading calibration.html");
+      return;
     }
+
+    // 3️⃣ Extract existing profile data
+    const fullName = document.getElementById("name").value || "";
+    const nameParts = fullName.split(" ");
+
+    const first_name = nameParts[0] || "";
+    const last_name = nameParts.slice(1).join(" ") || "";
+    const age = document.getElementById("age").value || "";
+
+    // Handle dropdown or text-based sport field
+    const sportsField = document.getElementById("sports");
+    let sportValue = "";
+    if (sportsField) {
+      // For custom dropdown with hidden input
+      if (sportsField.tagName === "INPUT") {
+        sportValue = sportsField.value || "";
+      } else if (sportsField.multiple) {
+        sportValue = Array.from(sportsField.selectedOptions).map(opt => opt.value).join(", ");
+      } else {
+        sportValue = sportsField.value || "";
+      }
+    }
+
+    // 4️⃣ Fill the calibration modal fields
+    // Match backend field names (snake_case)
+    const modalFirst = document.getElementById("first_name") || document.getElementById("firstName");
+    const modalLast = document.getElementById("last_name") || document.getElementById("lastName");
+    const modalAge = document.getElementById("popupAge");
+    const modalHeight = document.getElementById("height_cm") || document.getElementById("height");
+    const modalSport = document.getElementById("sport") || document.getElementById("popupSports");
+
+    if (modalFirst) modalFirst.value = first_name;
+    if (modalLast) modalLast.value = last_name;
+    if (modalAge) modalAge.value = age;
+    if (modalSport) modalSport.value = sportValue;
+
+    // Optional: prefill height if already known (from calibration cache)
+    const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+    if (modalHeight && userData.calibrated_height_m) {
+      modalHeight.value = (userData.calibrated_height_m * 100).toFixed(1);
+    }
+
+    // 5️⃣ Show modal and freeze background scroll
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden", "false");
+
+    // 6️⃣ Initialize modal & form behavior (once HTML is ready)
+    if (typeof initCalibrationModalEvents === "function") initCalibrationModalEvents();
+    if (typeof initCalibrationFormHandler === "function") initCalibrationFormHandler();
   }
-
-  // 4️⃣ Fill the calibration modal fields
-  // Match backend field names (snake_case)
-  const modalFirst = document.getElementById("first_name") || document.getElementById("firstName");
-  const modalLast = document.getElementById("last_name") || document.getElementById("lastName");
-  const modalAge = document.getElementById("popupAge");
-  const modalHeight = document.getElementById("height_cm") || document.getElementById("height");
-  const modalSport = document.getElementById("sport") || document.getElementById("popupSports");
-
-  if (modalFirst) modalFirst.value = first_name;
-  if (modalLast) modalLast.value = last_name;
-  if (modalAge) modalAge.value = age;
-  if (modalSport) modalSport.value = sportValue;
-
-  // Optional: prefill height if already known (from calibration cache)
-  const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-  if (modalHeight && userData.calibrated_height_m) {
-    modalHeight.value = (userData.calibrated_height_m * 100).toFixed(1);
-  }
-
-  // 5️⃣ Show modal and freeze background scroll
-  modal.classList.remove("hidden");
-  modal.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
-
-  // 6️⃣ Initialize modal & form behavior (once HTML is ready)
-  if (typeof initCalibrationModalEvents === "function") initCalibrationModalEvents();
-  if (typeof initCalibrationFormHandler === "function") initCalibrationFormHandler();
-}
 
 
   // ====== Register Click Event (AFTER defining functions) ======
