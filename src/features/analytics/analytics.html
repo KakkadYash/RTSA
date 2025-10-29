@@ -41,14 +41,16 @@
     <div class="btns-container">
       <div>
         <input type="file" id="uploadButton" accept="video/*" hidden="">
-        <label id="uploadvideo" for="uploadButton" class="button hover-animation click-animation hover-box-shadow">UPLOAD VIDEO</label>
+        <label id="uploadvideo" for="uploadButton"
+          class="button hover-animation click-animation hover-box-shadow">UPLOAD VIDEO</label>
       </div>
 
 
       <!-- Analyze button and replace buttons -->
       <div class="replacebtns">
         <div>
-          <button class="button hover-animation click-animation hover-box-shadow" id="analyzeButton" type="button">ANALYZE VIDEO</button>
+          <button class="button hover-animation click-animation hover-box-shadow" id="analyzeButton"
+            type="button">ANALYZE VIDEO</button>
         </div>
         <!-- Analyzing indicator (hidden initially) -->
         <div id="analyzingIndicator">
@@ -58,13 +60,15 @@
 
         <!-- Button to start processed playback (revealed after analysis) -->
         <div class="playprocess .hover-animation .click-animation .hover-box-shadow">
-          <button id="playProcessedButton" class="button hover-animation click-animation hover-box-shadow" type="button" controls>PLAY VIDEO</button>
+          <button id="playProcessedButton" class="button hover-animation click-animation hover-box-shadow" type="button"
+            controls>PLAY VIDEO</button>
         </div>
       </div>
 
 
       <div>
-        <button class="button hover-animation click-animation hover-box-shadow" id="showMetrics" type="button" onclick="flipAllCards()">ALL METRICS</button>
+        <button class="button hover-animation click-animation hover-box-shadow" id="showMetrics" type="button">ALL
+          METRICS</button>
       </div>
     </div>
 
@@ -110,7 +114,8 @@
               <div class="card-metrics-container">
                 <div class="slideContainer">
                   <div class="sliderHead">
-                    <label for="speed" class="tooltip-label">SPEED<span class="tooltip-text">The highest speed a player
+                    <label for="speed" class="tooltip-label">TOP SPEED<span class="tooltip-text">The highest speed a
+                        player
                         reaches. Measured in yards per second
                         (yd/sec)</span></label>
                     <div id="topSpeed">0</div>
@@ -168,7 +173,7 @@
               <div class="card-metrics-container">
                 <div class="slideContainer">
                   <div class="sliderHead">
-                    <label for="jumpHeight" class="tooltip-label">AVG
+                    <label for="jumpHeight" class="tooltip-label">MAX
                       JUMP HEIGHT<span class="tooltip-text">The average height reached across all recorded jumps during
                         the session. Measured
                         in yards (yd).</span></label>
@@ -180,7 +185,7 @@
                 </div>
                 <div class="slideContainer">
                   <div class="sliderHead">
-                    <label for="strideLength" class="tooltip-label">AVG
+                    <label for="strideLength" class="tooltip-label">MAX
                       STRIDE LENGTH<span class="tooltip-text">The average distance covered in each step while running or
                         sprinting during the session. Measured in yards (yd).</span></label>
                     <div id="averageStrideLength">0</div>

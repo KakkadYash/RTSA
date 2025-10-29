@@ -140,38 +140,45 @@ export function showPentagonChart(state) {
   state.chartType = "radar";
 }
 
- export function showUnifiedChart(state, metricIndices = []) {
-   const canvas = document.getElementById("myChart2");
-   const ctx = canvas.getContext("2d");
-   if (state.currentChart) state.currentChart.destroy();
+export function showUnifiedChart(state, metricIndices = []) {
+  const canvas = document.getElementById("myChart2");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
 
+  // ✅ Always destroy any existing chart before reusing canvas
+  if (state.currentChart) {
+    try {
+      state.currentChart.destroy();
+    } catch (err) {
+      console.warn("Chart destroy failed:", err);
+    }
+    state.currentChart = null;
+  }
+
+  // Optional: clear canvas context manually
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Now safely create a fresh Chart instance
   state.currentChart = new Chart(ctx, {
-     type: "line",
-     data: {
-       labels: state.backend.chartLabels || [],
-       datasets: [
-         { label: "Head Angle (°)",          data: state.backend.headAngleData || [],    borderColor: "#FF8C00", fill: false },
-         { label: "Speed (yards/sec)",       data: state.backend.speedData || [],        borderColor: "#1F43E5", fill: false },
-         { label: "Acceleration (yards/s²)", data: state.backend.accelerationData || [], borderColor: "#7DD859", fill: false },
-         { label: "Deceleration (yards/s²)", data: state.backend.decelerationData || [], borderColor: "#E93632", fill: false },
-         { label: "Stride Length (yards)",   data: state.backend.strideData || [],       borderColor: "#FFA500", fill: false },
-         { label: "Jump Height (yards)",     data: state.backend.jumpData || [],         borderColor: "#800080", fill: false },
-       ]
-     },
-     options: {
-       responsive: true,
-       maintainAspectRatio: false,
+    type: "line",
+    data: {
+      labels: state.backend.chartLabels || [],
+      datasets: [
+        { label: "Head Angle (°)",          data: state.backend.headAngleData || [],    borderColor: "#FF8C00", fill: false },
+        { label: "Speed (yards/sec)",       data: state.backend.speedData || [],        borderColor: "#1F43E5", fill: false },
+        { label: "Acceleration (yards/s²)", data: state.backend.accelerationData || [], borderColor: "#7DD859", fill: false },
+        { label: "Deceleration (yards/s²)", data: state.backend.decelerationData || [], borderColor: "#E93632", fill: false },
+        { label: "Stride Length (yards)",   data: state.backend.strideData || [],       borderColor: "#FFA500", fill: false },
+        { label: "Jump Height (yards)",     data: state.backend.jumpData || [],         borderColor: "#800080", fill: false },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
       interaction: { mode: "nearest", intersect: true },
-      elements: {
-        point: { radius: 3, hitRadius: 10 },
-        line:  { tension: 0.2 }
-      },
+      elements: { point: { radius: 3, hitRadius: 10 }, line: { tension: 0.2 } },
       plugins: {
-        legend: {
-          position: "top",
-          labels: { usePointStyle: true }
-          // Default legend click already allows multi-select toggling.
-        },
+        legend: { position: "top", labels: { usePointStyle: true } },
         tooltip: {
           callbacks: {
             title: (items) => {
@@ -183,24 +190,18 @@ export function showPentagonChart(state) {
         }
       },
       scales: {
-        x: {
-          title: { display: true, text: "Time (s)" },
-          ticks: { autoSkip: true, maxTicksLimit: 10 }
-        },
-        y: {
-          title: { display: true, text: "Value" }
-        }
+        x: { title: { display: true, text: "Time (s)" }, ticks: { autoSkip: true, maxTicksLimit: 10 } },
+        y: { title: { display: true, text: "Value" } }
       }
-     }
+    }
   });
 
-   state.chartType = "line";
-   // filter visibility
-   state.currentChart.data.datasets.forEach((ds, idx) => {
+  state.chartType = "line";
+  state.currentChart.data.datasets.forEach((ds, idx) => {
     ds.hidden = metricIndices.length ? !metricIndices.includes(idx) : false;
-   });
-   state.currentChart.update();
- }
+  });
+  state.currentChart.update();
+}
 
 
 export function buildLegend(containerId, labels, colors) {
@@ -238,12 +239,38 @@ export function updateDoughnutChartFromData(doughnutChart, backend) {
   doughnutChart.update();
 }
 
-export function updateSlidersFromData(backend, CONFIG) {
-  const speed = Math.round(backend.topSpeed || 0);
-  const accel = Math.round(maxOrZero(backend.accelerationData)); // peak accel
-  const decel = Math.round(Math.abs(minOrZero(backend.decelerationData))); // peak decel magnitude
-  const jump  = round2(avgOrZero(backend.jumpData));
-  const stride= round2(avgOrZero(backend.strideData));
+export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
+  // slice arrays to "uptoIndex" (for progressive updates while playing)
+  const slicer = (arr) => {
+    if (!Array.isArray(arr)) return [];
+    return (uptoIndex === null) ? arr : arr.slice(0, Math.max(0, uptoIndex + 1));
+  };
+
+  const speedArr = slicer(backend.speedData);
+  const accelArr = slicer(backend.accelerationData);
+  const decelArr = slicer(backend.decelerationData);
+  const jumpArr  = slicer(backend.jumpData);
+  const strideArr= slicer(backend.strideData);
+
+  const mm = backend.maxMetrics || {};
+  const speed = Math.round( // prefer backend.topSpeed or mm.maxSpeed
+    Number.isFinite(backend.topSpeed) && backend.topSpeed > 0
+      ? backend.topSpeed
+      : (Number.isFinite(mm.maxSpeed) ? mm.maxSpeed : maxOrZero(speedArr))
+  );
+
+  const accel = Math.round(
+    Number.isFinite(mm.maxAcceleration) ? mm.maxAcceleration : maxOrZero(accelArr)
+  );
+
+  const decel = Math.round(
+    Math.abs(
+      Number.isFinite(mm.maxDeceleration) ? mm.maxDeceleration : minOrZero(decelArr)
+    )
+  );
+
+  const jump  = round2(avgOrZero(jumpArr));
+  const stride= round2(avgOrZero(strideArr));
 
   updateProgress("topSpeed", "topSpeedBar", speed, CONFIG.MAX_SPEED);
   updateProgress("peakAcceleration", "peakAccelerationBar", accel, CONFIG.MAX_ACCEL);
@@ -251,13 +278,14 @@ export function updateSlidersFromData(backend, CONFIG) {
   updateProgress("averageJumpHeight", "averageJumpHeightBar", jump, CONFIG.MAX_JUMP);
   updateProgress("averageStrideLength", "averageStrideLengthBar", stride, CONFIG.MAX_STRIDE);
 
-  // athletic score text
+  // athletic score text stays as-is (uses full aggregated scores already)
   const scores = backend.athleticScores || {};
   const avgScore = avgOrZero([
     scores.footworkScore, scores.speedScore, scores.accelerationScore, scores.headAngleScore, scores.postureScore
   ]);
   document.getElementById("athleticScoreValue").textContent = `${round1(avgScore)}%`;
 }
+
 
 export function updateTopMetricBoxes({ timeSecs, totalDistanceYards, steps }) {
   document.getElementById("drillTimeValue").textContent = `${Number(timeSecs || 0).toFixed(1)} SECS`;
