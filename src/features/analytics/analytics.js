@@ -29,7 +29,7 @@ import {
 (function loadAnalytics() {
     console.log("[INIT] Analytics page loaded");
 
-    // 1️⃣ CONSTANTS
+    // CONSTANTS
     const CONFIG = {
         API_BASE: "https://fastapi-app-843332298202.us-central1.run.app",
         OVERLAP_THRESHOLD: 0.5,
@@ -59,7 +59,7 @@ import {
     };
     const ctx2D = els.canvas.getContext("2d");
 
-    // 2️⃣ STATE
+    // STATE
     const state = {
         video: null,
         currentChart: null,
@@ -82,24 +82,28 @@ import {
             totalDistance: 0,
             totalSteps: 0
         },
+        cached: {
+            metrics: null, // holds full backend metrics until Play is clicked
+            ready: false
+        },
     };
 
     if (state.currentChart) state.currentChart.destroy();
     if (Chart.getChart("myChart")) Chart.getChart("myChart").destroy();
     if (Chart.getChart("myChart2")) Chart.getChart("myChart2").destroy();
 
-    // 3️⃣ CHARTS
+    // CHARTS
     console.log("[INIT] Initializing charts...");
     const doughnutChart = initDoughnutChart("myChart", CONFIG);
     showUnifiedChart(state, [0, 1, 2, 3, 4, 5]); // empty at first, becomes populated after analysis
     buildLegend("outerLegend", CONFIG.OUTER_LABELS, doughnutChart.data.datasets[0].backgroundColor);
     buildLegend("innerLegend", CONFIG.INNER_LABELS, doughnutChart.data.datasets[1].backgroundColor);
 
-    // 4️⃣ OVERLAY
+    // OVERLAY
     console.log("[INIT] Initializing Mediapipe overlay...");
     initPoseOverlay({ video: els.video, canvas: els.canvas, ctx2D });
 
-    // 5️⃣ UPLOAD BUTTON
+    // UPLOAD BUTTON
     wireUploadButton(
         els.uploadButton,
         els.video,
@@ -137,15 +141,36 @@ import {
         }
     );
 
-    // 6️⃣ METRIC CARD BUTTONS
+    // METRIC CARD BUTTONS
     wireCardsAndShowAll(els.showMetricsBtn, {
-        onShowAllMetrics: () => { console.log("[EVENT] Show unified all metrics"); showUnifiedChart(state, [0, 1, 2, 3, 4, 5]); },
-        onShowTechnique: () => { console.log("[EVENT] Show head-angle only"); showUnifiedChart(state, [0]); },
-        onShowSpeed: () => { console.log("[EVENT] Show speed/accel/decel"); showUnifiedChart(state, [1, 2, 3]); },
-        onShowFootwork: () => { console.log("[EVENT] Show stride/jump"); showUnifiedChart(state, [4, 5]); },
+        onShowAllMetrics: () => {
+            console.log("[EVENT] Show unified all metrics");
+            const existing = Chart.getChart("myChart2");
+            if (existing) existing.destroy();
+            showUnifiedChart(state, [0, 1, 2, 3, 4, 5]);
+        },
+        onShowTechnique: () => {
+            console.log("[EVENT] Show head-angle only");
+            const existing = Chart.getChart("myChart2");
+            if (existing) existing.destroy();
+            showUnifiedChart(state, [0]);
+        },
+        onShowSpeed: () => {
+            console.log("[EVENT] Show speed/accel/decel");
+            const existing = Chart.getChart("myChart2");
+            if (existing) existing.destroy();
+            showUnifiedChart(state, [1, 2, 3]);
+        },
+        onShowFootwork: () => {
+            console.log("[EVENT] Show stride/jump");
+            const existing = Chart.getChart("myChart2");
+            if (existing) existing.destroy();
+            showUnifiedChart(state, [4, 5]);
+        },
     });
 
-    // 7️⃣ ANALYZE BUTTON
+
+    // ANALYZE BUTTON
     setAnalyzeHandler(els.analyzeButton, async () => {
         console.log("[EVENT] Analyze button clicked");
         try {
@@ -191,17 +216,11 @@ import {
             console.log("[DATA] Full metrics JSON loaded from GCS:", fullData);
 
             applyBackendResultsToState(state, fullData.metrics);
-            updateDoughnutChartFromData(doughnutChart, state.backend);
-            updateSlidersFromData(state.backend, CONFIG);
-            updateTopMetricBoxes({
-                timeSecs: state.video?.duration,
-                totalDistanceYards: state.backend.totalDistance,
-                steps: state.backend.totalSteps || 0
-            });
             console.log("[UI] Charts and sliders updated with backend data.");
 
             els.video.style.display = "none";
             els.canvas.style.display = "block";
+            els.analyzeButton.style.display = "none";
             els.playProcessedButton.style.display = "block";
             drawOneFrameIfPaused();
 
@@ -215,14 +234,91 @@ import {
         }
     });
 
-    // 8️⃣ PLAY PROCESSED VIDEO
+    //  PLAY PROCESSED VIDEO
     setPlayProcessedHandler(els.playProcessedButton, () => {
         console.log("[EVENT] Play processed video clicked");
-        showUnifiedChart(state, [0,1,2,3,4,5]);
-        startOverlayLoop();
+
+        if (!state.cached.ready || !state.cached.metrics) {
+            alert("Metrics are not ready yet. Please analyze the video first.");
+            return;
+        }
+
+        // 1) Move cached metrics into live backend state now
+        const m = state.cached.metrics;
+        state.backend.chartLabels = Array.isArray(m.chartLabels) ? m.chartLabels : [];
+        state.backend.headAngleData = Array.isArray(m.headAngleData) ? m.headAngleData : [];
+        state.backend.speedData = Array.isArray(m.speedData) ? m.speedData : [];
+        state.backend.accelerationData = Array.isArray(m.accelerationData) ? m.accelerationData : [];
+        state.backend.decelerationData = Array.isArray(m.decelerationData) ? m.decelerationData : [];
+        state.backend.strideData = Array.isArray(m.strideData) ? m.strideData : [];
+        state.backend.jumpData = Array.isArray(m.jumpData) ? m.jumpData : [];
+
+        state.backend.outerRing = m.outerRing || { Running: 0, Standing: 0, Crouching: 0 };
+        state.backend.innerRing = m.innerRing || { "Head Up": 0, "Head Down": 100 };
+        state.backend.athleticScores = m.athleticScores || state.backend.athleticScores;
+        state.backend.topSpeed = Number(m.topSpeed || 0);
+        state.backend.totalDistance = Number(m.totalDistance || 0);
+        state.backend.totalSteps = Number(m.totalSteps || 0);
+        state.backend.maxMetrics = m.maxMetrics || null;
+
+        // 2) Initialize the unified chart with labels only (series empty)
+        showUnifiedChart(state, [0, 1, 2, 3, 4, 5]); // builds chart with labels+data
+        // immediately clear series so it starts "empty"
+        state.currentChart.data.datasets.forEach(ds => ds.data = []);
+        state.currentChart.data.labels = state.backend.chartLabels || [];
+        state.currentChart.update('none');
+
+        // 3) Update doughnut to show posture/head rings at start = 0%
+        // (or, if you prefer, show final percentages immediately—comment next line out)
+        // updateDoughnutChartFromData(doughnutChart, state.backend); // <- KEEP OFF initially if you want zeroed rings
+
+        // 4) Begin overlay & playback
+        startOverlayLoop(); // this plays the video and begins Mediapipe draw loop
+        // (Mediapipe onResults draws every frame while video plays)  // :contentReference[oaicite:4]{index=4}
+
+        // 5) Progressive metric updates synced to video time
+        const labels = state.backend.chartLabels || [];
+        const L = labels.length;
+        let lastIdx = -1;
+
+        // run exactly on your aggregation cadence
+        const TICK_MS = 250;
+        const ticker = setInterval(() => {
+            if (!els.video || els.video.paused || els.video.ended) return;
+
+            const t = els.video.currentTime || 0;
+            // find index i such that labels[i] <= t < labels[i+1]
+            // labels are 0.25s spaced; this is a fast integer map:
+            let idx = Math.floor(t / 0.25);
+            if (idx >= L) idx = L - 1;
+            if (idx <= lastIdx) return; // nothing new to show
+
+            // update chart series up to idx
+            const ds = state.currentChart.data.datasets;
+            ds[0].data = state.backend.headAngleData.slice(0, idx + 1);
+            ds[1].data = state.backend.speedData.slice(0, idx + 1);
+            ds[2].data = state.backend.accelerationData.slice(0, idx + 1);
+            ds[3].data = state.backend.decelerationData.slice(0, idx + 1);
+            ds[4].data = state.backend.strideData.slice(0, idx + 1);
+            ds[5].data = state.backend.jumpData.slice(0, idx + 1);
+            state.currentChart.update('none');
+
+            // update sliders/top boxes progressively using uptoIndex
+            updateSlidersFromData(state.backend, CONFIG, idx);
+            updateTopMetricBoxes({
+                timeSecs: t,
+                totalDistanceYards: state.backend.totalDistance, // (distance is already a total)
+                steps: state.backend.totalSteps || 0
+            });
+
+            lastIdx = idx;
+        }, TICK_MS);
+
+        // stop the ticker when video ends or page unloads
+        els.video.addEventListener("ended", () => clearInterval(ticker), { once: true });
     });
 
-    // 9️⃣ CHART CLICK → SEEK VIDEO
+    //  CHART CLICK → SEEK VIDEO
     els.myChart2.addEventListener("click", (evt) => {
         console.log("[EVENT] Chart clicked for seeking");
         const chart = state.currentChart;
@@ -242,7 +338,7 @@ import {
         }
     });
 
-    // 🔟 VIDEO ENDED EVENT
+    // VIDEO ENDED EVENT
     els.video.addEventListener("ended", () => {
         console.log("[EVENT] Video ended");
         stopOverlayLoop();
@@ -254,29 +350,34 @@ import {
     }
 
     function applyBackendResultsToState(st, payload) {
-        console.log("[STATE] Applying backend results to state");
-        const lineSafe = (x) => Array.isArray(x) ? x : [];
-        st.backend.chartLabels = lineSafe(payload.chartLabels);
-        st.backend.headAngleData = lineSafe(payload.headAngleData);
-        st.backend.speedData = lineSafe(payload.speedData);
-        st.backend.accelerationData = lineSafe(payload.accelerationData);
-        st.backend.decelerationData = lineSafe(payload.decelerationData);
-        st.backend.strideData = lineSafe(payload.strideData);
-        st.backend.jumpData = lineSafe(payload.jumpData);
+        console.log("[STATE] Caching backend results (no UI updates yet)");
+        // just cache aggregated metrics blob as-is
+        st.cached.metrics = payload;
+        st.cached.ready = true;
 
-        st.backend.outerRing = payload.outerRing || { Running: 0, Standing: 0, Crouching: 0 };
-        st.backend.innerRing = payload.innerRing || { "Head Up": 0, "Head Down": 100 };
-        st.backend.athleticScores = payload.athleticScores || {
-            footworkScore: 0, speedScore: 0, accelerationScore: 0, headAngleScore: 0, postureScore: 0
+        // ensure visualizations remain reset/empty until Play
+        st.backend = {
+            chartLabels: [],
+            headAngleData: [],
+            speedData: [],
+            accelerationData: [],
+            decelerationData: [],
+            strideData: [],
+            jumpData: [],
+            outerRing: { Running: 0, Standing: 0, Crouching: 0 },
+            innerRing: { "Head Up": 0, "Head Down": 100 },
+            athleticScores: {
+                footworkScore: 0, speedScore: 0, accelerationScore: 0, headAngleScore: 0, postureScore: 0
+            },
+            topSpeed: 0,
+            totalDistance: 0,
+            totalSteps: 0,
+            maxMetrics: null
         };
 
-        st.backend.topSpeed = Number(payload.topSpeed || 0);
-        st.backend.totalDistance = Number(payload.totalDistance || 0);
-        if (typeof payload.totalSteps === "number") st.backend.totalSteps = payload.totalSteps;
-
-        console.log("[STATE] Updated backend metrics:", st.backend);
-        showUnifiedChart(st, [0, 1, 2, 3, 4, 5]);
+        // IMPORTANT: do NOT call showUnifiedChart, updateDoughnutChartFromData, or updateSlidersFromData here
     }
+
     async function callUploadVideo({ apiBase, userId, video }) {
         console.log("[NETWORK] Uploading video to /upload...");
         const form = new FormData();

@@ -373,20 +373,20 @@ p {
 .progressFill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
+    background: #c32222;
     transition: width 0.3s ease;
 }
 
 progress::-webkit-progress-bar {
-    background-color: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
+    background-color: #c32222;
 }
 
 progress::-webkit-progress-value {
-    background-color: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
+    background-color: #c32222;
 }
 
 progress::-moz-progress-bar {
-    background-color: linear-gradient(to right, #E9392C, #F3D455, #7ADE5A);
+    background-color: #c32222;
 }
 
 .card-back2 {
