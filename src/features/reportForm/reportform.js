@@ -1,3 +1,4 @@
+// reportform.js
 document.addEventListener("DOMContentLoaded", () => {
 
   /* =====================================================
@@ -6,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const openPreviewBtn = document.getElementById("openPreviewButton");
   const modal = document.getElementById("reportModal");
   const reportFrame = document.getElementById("reportFrame");
-  const shareModal = document.getElementById("shareModal");
 
 
   const fields = {
@@ -33,27 +33,27 @@ document.addEventListener("DOMContentLoaded", () => {
     reportFrame.addEventListener("load", () => {
       reportDoc = reportFrame.contentDocument || reportFrame.contentWindow.document;
       reportLoaded = true;
-
-      // Bind iframe buttons (share + close)
-      const shareButtonInIframe = reportDoc.getElementById("shareButton");
-      const closePreviewInIframe = reportDoc.getElementById("closePreview");
-
-      if (shareButtonInIframe) {
-        shareButtonInIframe.addEventListener("click", () => {
-          console.log('Clicked Share Report Button')
-          shareModal?.classList.remove("hidden");
-        });
-      }
-
-      if (closePreviewInIframe) {
-        closePreviewInIframe.addEventListener("click", () => {
-          modal.classList.add("hidden");
-        });
-      }
-
       updateReport();
       renderAchievements();
+
+      // ✅ Find the close button INSIDE the iframe (report.html)
+      const closePreviewBtn = reportDoc.getElementById("closePreview");
+
+      if (closePreviewBtn) {
+        closePreviewBtn.addEventListener("click", () => {
+          // ✅ Close the parent modal
+          modal.classList.add("hidden");
+
+          // ✅ Optional: clear the iframe so it unloads report.html
+          reportFrame.src = "";
+
+          // ✅ Reset tracking variables
+          reportLoaded = false;
+          reportDoc = null;
+        });
+      }
     });
+
   }
 
   // Update report fields live

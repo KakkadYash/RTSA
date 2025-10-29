@@ -1,3 +1,4 @@
+<!-- report.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -37,24 +38,7 @@
         <button id="closePreview" class="modal-button close-button click-animation hover-animation">✖</button>
       </div>
     </header>
-    
-  <!-- Modal for sharing the report -->
-  <div id="shareModal" class="share-modal hidden">
-    <div class="share-modal-content">
-      <!-- Share modal title -->
-      <div class="share-modal-header">
-        <div class="share-modal-title">Share Report</div>
-        <!-- Close share modal button -->
-        <button class="close-share-modal click-animation hover-animation" id="closeShareModal">✖</button>
-        <!-- Buttons for generating a share link and exporting as PDF -->
-      </div>
-      <div class="share-modal-buttons">
-        <button class="generate-link-button click-animation hover-animation" id="generateLink">Generate Link &
-          Copy</button>
-        <button class="export-pdf-button click-animation hover-animation" id="exportPDF">Export as PDF</button>
-      </div>
-    </div>
-  </div>
+
 
     <!-- Key performance metrics -->
     <section class="metrics metric-row">
@@ -129,6 +113,23 @@
       <p>Powered by Reaction Technologies.</p>
     </footer>
 
+  </div>
+  <!-- Modal for sharing the report -->
+  <div id="shareModal" class="share-modal hidden">
+    <div class="share-modal-content">
+      <!-- Share modal title -->
+      <div class="share-modal-header">
+        <div class="share-modal-title">Share Report</div>
+        <!-- Close share modal button -->
+        <button class="close-share-modal click-animation hover-animation" id="closeShareModal">✖</button>
+        <!-- Buttons for generating a share link and exporting as PDF -->
+      </div>
+      <div class="share-modal-buttons">
+        <button class="generate-link-button click-animation hover-animation" id="generateLink">Generate Link &
+          Copy</button>
+        <button class="export-pdf-button click-animation hover-animation" id="exportPDF">Export as PDF</button>
+      </div>
+    </div>
   </div>
   <script src="/src/features/report/report.js"></script>
 </body>
