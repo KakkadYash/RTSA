@@ -218,11 +218,13 @@ import {
             applyBackendResultsToState(state, fullData.metrics);
             console.log("[UI] Charts and sliders updated with backend data.");
 
-            els.video.style.display = "none";
+            // Show both: video (base) + canvas (overlay)
+            els.video.style.display = "block";
             els.canvas.style.display = "block";
             els.analyzeButton.style.display = "none";
             els.playProcessedButton.style.display = "block";
             drawOneFrameIfPaused();
+
 
         } catch (err) {
             console.error("[ERROR] Analyze failed:", err);
@@ -235,13 +237,8 @@ import {
     });
 
     //  PLAY PROCESSED VIDEO
-    setPlayProcessedHandler(els.playProcessedButton, () => {
+    setPlayProcessedHandler(els.playProcessedButton, async () => {
         console.log("[EVENT] Play processed video clicked");
-
-        if (!state.cached.ready || !state.cached.metrics) {
-            alert("Metrics are not ready yet. Please analyze the video first.");
-            return;
-        }
 
         // 1) Move cached metrics into live backend state now
         const m = state.cached.metrics;
@@ -268,13 +265,17 @@ import {
         state.currentChart.data.labels = state.backend.chartLabels || [];
         state.currentChart.update('none');
 
-        // 3) Update doughnut to show posture/head rings at start = 0%
-        // (or, if you prefer, show final percentages immediately—comment next line out)
-        // updateDoughnutChartFromData(doughnutChart, state.backend); // <- KEEP OFF initially if you want zeroed rings
+        // 4) Warm start pose so overlay is in sync WITH frame 0
+        try {
+            await pose.send({ image: els.video });
+        } catch (e) {
+            console.warn("Warm start skipped, pose not ready yet", e);
+        }
 
-        // 4) Begin overlay & playback
-        startOverlayLoop(); // this plays the video and begins Mediapipe draw loop
-        // (Mediapipe onResults draws every frame while video plays)  // :contentReference[oaicite:4]{index=4}
+        // Now begin overlay + video
+        startOverlayLoop();
+        els.video.play();
+
 
         // 5) Progressive metric updates synced to video time
         const labels = state.backend.chartLabels || [];
