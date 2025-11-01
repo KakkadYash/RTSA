@@ -1,5 +1,6 @@
 // analyticsCore.js
 // Handles Mediapipe Pose init and drawing overlay on the canvas in sync with video.
+let lastLandmarks = null;
 
 let pose = null;
 let videoEl = null;
@@ -49,10 +50,13 @@ export function stopOverlayLoop() {
 }
 
 export function drawOneFrameIfPaused() {
-  if (!videoEl || !canvasEl || !ctx2D) return;
+  if (!lastLandmarks) return;
   ctx2D.clearRect(0, 0, canvasEl.width, canvasEl.height);
-  ctx2D.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+  drawConnectors(ctx2D, lastLandmarks, POSE_CONNECTIONS, { color: "white", lineWidth: 1 });
+  drawLandmarks(ctx2D, lastLandmarks, { color: "red", fillColor: "green", radius: 2 });
 }
+
+
 
 let isProcessingFrame = false;
 
@@ -81,18 +85,36 @@ function onResults(results) {
     canvasEl.width = videoEl.videoWidth;
     canvasEl.height = videoEl.videoHeight;
   }
-  // Clear and draw current video frame
+  // Transparent overlay: only skeleton (no video frame)
   ctx2D.clearRect(0, 0, canvasEl.width, canvasEl.height);
-  ctx2D.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+  // ✅ MATCH REAL VIDEO DRAW REGION TO CANVAS (fix misalignment)
+  const videoW = videoEl.videoWidth;
+  const videoH = videoEl.videoHeight;
+  const canvasW = canvasEl.width;
+  const canvasH = canvasEl.height;
 
-  // Draw connectors + landmarks
+  // preserve aspect ratio inside canvas
+  const scale = Math.min(canvasW / videoW, canvasH / videoH);
+  const offsetX = (canvasW - videoW * scale) / 2;
+  const offsetY = (canvasH - videoH * scale) / 2;
+
+  ctx2D.save();
+  ctx2D.translate(offsetX, offsetY);
+  ctx2D.scale(scale, scale);
+
+
   drawConnectors(ctx2D, results.poseLandmarks, POSE_CONNECTIONS, {
     color: "white",
-    lineWidth: 2
+    lineWidth: 1
   });
   drawLandmarks(ctx2D, results.poseLandmarks, {
     color: "red",
     fillColor: "green",
-    radius: 3
+    radius: 2
   });
+
+  // remember for paused-draw
+  lastLandmarks = results.poseLandmarks;
+  ctx2D.restore();
+
 }
