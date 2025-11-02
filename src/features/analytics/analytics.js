@@ -187,7 +187,9 @@ import {
 
     // ANALYZE BUTTON
     setAnalyzeHandler(els.analyzeButton, async () => {
-        console.log("[EVENT] Analyze button clicked");
+
+        els.analyzeButton.disabled = true;
+
         try {
             if (!state.video) {
                 alert("Please upload a video file first.");
@@ -237,7 +239,10 @@ import {
             els.video.style.display = "block";
             els.canvas.style.display = "block";
             els.analyzeButton.style.display = "none";
-            els.playProcessedButton.style.display = "block";
+            // ✅ Only show play after results cached
+            if (state.cached.ready) {
+                els.playProcessedButton.style.display = "block";
+            }
             drawOneFrameIfPaused();
 
 
@@ -249,12 +254,28 @@ import {
             els.loadingOverlay.style.display = "none";
             console.log("[STATE] Analysis process finished.");
         }
+        els.analyzeButton.disabled = false;
+
         resetAnalyze(els.analyzeButton);
     });
 
     //  PLAY PROCESSED VIDEO
     setPlayProcessedHandler(els.playProcessedButton, async () => {
         console.log("[EVENT] Play processed video clicked");
+        // ✅ Block play if metrics not ready
+        // ✅ Stop UI + video if not ready
+        if (!state.cached.ready || !state.cached.metrics) {
+            alert("Analysis not finished — please wait.");
+
+            // Stop this click from doing anything else
+            els.video.pause();
+            e?.stopImmediatePropagation?.();
+            e?.preventDefault?.();
+
+            return;
+        }
+
+
         setPlaying(els.playProcessedButton);
 
         // 1) Move cached metrics into live backend state now
@@ -276,21 +297,20 @@ import {
         state.backend.maxMetrics = m.maxMetrics || null;
 
         // 2) Initialize the unified chart with labels only (series empty)
-        showUnifiedChart(state, [0, 1, 2, 3, 4, 5]); // builds chart with labels+data
+        // ✅ Destroy existing chart cleanly before building new one
+        const existingChart = Chart.getChart("myChart2");
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        showUnifiedChart(state, [0, 1, 2, 3, 4, 5]);
+
         // immediately clear series so it starts "empty"
         state.currentChart.data.datasets.forEach(ds => ds.data = []);
         state.currentChart.data.labels = state.backend.chartLabels || [];
         state.currentChart.update('none');
 
-        // 4) Warm start pose so overlay is in sync WITH frame 0
-        try {
-            await pose.send({ image: els.video });
-        } catch (e) {
-            console.warn("Warm start skipped, pose not ready yet", e);
-        }
-
         // Now begin overlay + video
-        startOverlayLoop();
         els.video.play();
 
 

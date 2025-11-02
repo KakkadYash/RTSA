@@ -48,8 +48,12 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-around;
-    height: 35vw;
+    height: 25vw;
     margin-bottom: 2vw;
+}
+
+.vid-chart-wrapper {
+    height: 100%;
 }
 
 .vid-chart {
@@ -65,7 +69,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: fill;
+    /* object-fit: fill; */
     /* match pixel matrix DO NOT preserve aspect */
     z-index: 1;
 }
@@ -111,7 +115,7 @@ video {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 80%;
+    height: 100%;
 }
 
 #myChart2 {
