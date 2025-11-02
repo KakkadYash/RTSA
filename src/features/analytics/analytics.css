@@ -562,3 +562,9 @@ progress::-moz-progress-bar {
     background: rgba(0, 0, 0, 0.5);
     border-radius: 6px;
 }
+
+.button-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+}

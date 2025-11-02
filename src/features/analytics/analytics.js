@@ -110,6 +110,11 @@ import {
         els.canvas,
         async () => {
             console.log("[EVENT] Upload metadata ready — preparing /upload request");
+            // ---- UI: Upload started ----
+            const uploadLabel = document.getElementById("uploadvideo");
+            uploadLabel.textContent = "UPLOADING...";
+            uploadLabel.classList.add("button-disabled");
+
             resetCharts(state, doughnutChart);
             resetMetricSlidersUI(CONFIG);
 
