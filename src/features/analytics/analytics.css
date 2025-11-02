@@ -52,6 +52,10 @@
     margin-bottom: 2vw;
 }
 
+.vid-chart-wrapper {
+    height: 100%;
+}
+
 .vid-chart {
     display: flex;
     flex-direction: row;
