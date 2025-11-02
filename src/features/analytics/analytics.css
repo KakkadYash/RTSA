@@ -48,7 +48,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-around;
-    height: 25vw;
+    height: 30vw;
     margin-bottom: 2vw;
 }
 
@@ -62,7 +62,7 @@
     align-items: center;
     height: 100%;
     position: relative;
-    width: 37vw;
+    width: 30vw;
 }
 
 #uploaded-video {
