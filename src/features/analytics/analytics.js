@@ -311,7 +311,6 @@ import {
         state.currentChart.update('none');
 
         // Now begin overlay + video
-        startOverlayLoop();
         els.video.play();
 
 
