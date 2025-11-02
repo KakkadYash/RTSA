@@ -23,8 +23,12 @@ import {
     wireUploadButton,
     wireCardsAndShowAll,
     setAnalyzeHandler,
-    setPlayProcessedHandler
+    setPlayProcessedHandler,
+    setUploadUploading, setUploadSuccess, resetUploadButton,
+    setAnalyzing, resetAnalyze,
+    setPlaying, resetPlayButton
 } from "./modules/uiHandlers.js";
+
 
 (function loadAnalytics() {
     console.log("[INIT] Analytics page loaded");
@@ -111,9 +115,10 @@ import {
         async () => {
             console.log("[EVENT] Upload metadata ready — preparing /upload request");
             // ---- UI: Upload started ----
+            // ✅ Upload UI
             const uploadLabel = document.getElementById("uploadvideo");
-            uploadLabel.textContent = "UPLOADING...";
-            uploadLabel.classList.add("button-disabled");
+            setUploadUploading(uploadLabel);
+
 
             resetCharts(state, doughnutChart);
             resetMetricSlidersUI(CONFIG);
@@ -132,12 +137,17 @@ import {
 
                 console.log("[SUCCESS] Video uploaded:", uploadResp);
                 els.analyzeButton.disabled = false;
+                els.analyzeButton.style.opacity = "1";
+                els.analyzeButton.style.pointerEvents = "auto";
+
                 localStorage.setItem("lastUploadedVideoId", uploadResp.videoId);
                 localStorage.setItem("lastUploadedVideoName", uploadResp.videoName);
+                setUploadSuccess(uploadLabel);
                 alert(`Video uploaded successfully: ${uploadResp.message}`);
             } catch (err) {
                 console.error("[ERROR] Video upload failed:", err);
                 alert("Video upload failed. Please try again.");
+                resetUploadButton(uploadLabel);
             }
         },
         (file) => {
@@ -183,7 +193,7 @@ import {
                 alert("Please upload a video file first.");
                 return;
             }
-
+            setAnalyzing(els.analyzeButton);
             els.analyzeButton.style.display = "none";
             els.loadingOverlay.style.display = "block";
 
@@ -239,11 +249,13 @@ import {
             els.loadingOverlay.style.display = "none";
             console.log("[STATE] Analysis process finished.");
         }
+        resetAnalyze(els.analyzeButton);
     });
 
     //  PLAY PROCESSED VIDEO
     setPlayProcessedHandler(els.playProcessedButton, async () => {
         console.log("[EVENT] Play processed video clicked");
+        setPlaying(els.playProcessedButton);
 
         // 1) Move cached metrics into live backend state now
         const m = state.cached.metrics;
@@ -348,7 +360,16 @@ import {
     els.video.addEventListener("ended", () => {
         console.log("[EVENT] Video ended");
         stopOverlayLoop();
+        els.playProcessedButton.style.display = "none";
+
+        // ✅ Reset UI
+        resetUploadButton(document.getElementById("uploadvideo"));
+        resetPlayButton(els.playProcessedButton);
+        els.analyzeButton.style.display = "block";
+        els.analyzeButton.style.opacity = "0.4";
+        els.analyzeButton.style.pointerEvents = "none";
     });
+
 
     // 🔹 Helper
     function lastKnownVideoTime(video) {

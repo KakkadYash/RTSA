@@ -1,3 +1,4 @@
+/* analytics.css */
 @import url("../../../src/shared/stylesheet.css");
 @import url("../../../src/shared/components.css");
 
@@ -567,4 +568,8 @@ progress::-moz-progress-bar {
     opacity: 0.4;
     pointer-events: none;
     cursor: default;
+}
+
+.button-success {
+    opacity: 0.7;
 }
