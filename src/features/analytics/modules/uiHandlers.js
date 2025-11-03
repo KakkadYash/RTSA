@@ -28,7 +28,7 @@ export function wireUploadButton(inputEl, videoEl, canvasEl, onMetadataReady, on
 }
 
 export function wireCardsAndShowAll(showMetricsBtn, { onShowAllMetrics, onShowTechnique, onShowSpeed, onShowFootwork }) {
-   // Card flip logic
+  // Card flip logic
   // Card flip logic
   document.querySelectorAll(".card").forEach((card, index, allCards) => {
     card.addEventListener("click", () => {
@@ -77,3 +77,42 @@ export function setPlayProcessedHandler(playBtn, handler) {
   };
   playBtn.addEventListener("click", once);
 }
+// --- Button state helpers ---
+
+export function setUploadUploading(el) {
+  el.textContent = "UPLOADING...";
+  el.classList.add("button-disabled");
+  el.classList.remove("button-success");
+}
+
+export function setUploadSuccess(el) {
+  el.textContent = "UPLOADED";
+  el.classList.remove("button-disabled");
+  el.classList.add("button-success");
+}
+
+export function resetUploadButton(el) {
+  el.textContent = "UPLOAD VIDEO";
+  el.classList.remove("button-disabled", "button-success");
+}
+
+export function setAnalyzing(el) {
+  el.textContent = "ANALYZING...";
+  el.classList.add("button-disabled");
+}
+
+export function resetAnalyze(el) {
+  el.textContent = "ANALYZE VIDEO";
+  el.classList.remove("button-disabled");
+}
+
+export function setPlaying(el) {
+  el.textContent = "PLAYING...";
+  el.classList.add("button-disabled");
+}
+
+export function resetPlayButton(el) {
+  el.textContent = "PLAY VIDEO";
+  el.classList.remove("button-disabled");
+}
+

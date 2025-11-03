@@ -58,6 +58,7 @@
     height: 100%;
     position: relative;
     width: 35vw;
+    justify-content: space-around;
 }
 
 #uploaded-video {
