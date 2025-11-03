@@ -114,6 +114,12 @@ import {
         els.canvas,
         async () => {
             console.log("[EVENT] Upload metadata ready — preparing /upload request");
+            // ---- UI: Upload started ----
+            // ✅ Upload UI
+            const uploadLabel = document.getElementById("uploadvideo");
+            setUploadUploading(uploadLabel);
+
+
             resetCharts(state, doughnutChart);
             resetMetricSlidersUI(CONFIG);
             const uploadLabel = document.getElementById("uploadvideo");
@@ -134,6 +140,9 @@ import {
 
                 console.log("[SUCCESS] Video uploaded:", uploadResp);
                 els.analyzeButton.disabled = false;
+                els.analyzeButton.style.opacity = "1";
+                els.analyzeButton.style.pointerEvents = "auto";
+
                 localStorage.setItem("lastUploadedVideoId", uploadResp.videoId);
                 localStorage.setItem("lastUploadedVideoName", uploadResp.videoName);
                 setUploadSuccess(uploadLabel);
@@ -144,6 +153,7 @@ import {
                 resetUploadButton(uploadLabel);
 
                 alert("Video upload failed. Please try again.");
+                resetUploadButton(uploadLabel);
             }
         },
         (file) => {
@@ -183,7 +193,9 @@ import {
 
     // ANALYZE BUTTON
     setAnalyzeHandler(els.analyzeButton, async () => {
-        console.log("[EVENT] Analyze button clicked");
+
+        els.analyzeButton.disabled = true;
+
         try {
             if (!state.video) {
                 alert("Please upload a video file first.");
@@ -230,11 +242,16 @@ import {
             applyBackendResultsToState(state, fullData.metrics);
             console.log("[UI] Charts and sliders updated with backend data.");
 
-            els.video.style.display = "none";
+            // Show both: video (base) + canvas (overlay)
+            els.video.style.display = "block";
             els.canvas.style.display = "block";
             els.analyzeButton.style.display = "none";
-            els.playProcessedButton.style.display = "block";
+            // ✅ Only show play after results cached
+            if (state.cached.ready) {
+                els.playProcessedButton.style.display = "block";
+            }
             drawOneFrameIfPaused();
+
 
         } catch (err) {
             console.error("[ERROR] Analyze failed:", err);
@@ -246,18 +263,25 @@ import {
 
             console.log("[STATE] Analysis process finished.");
         }
+        els.analyzeButton.disabled = false;
+
+        resetAnalyze(els.analyzeButton);
     });
 
     //  PLAY PROCESSED VIDEO
-    setPlayProcessedHandler(els.playProcessedButton, () => {
+    setPlayProcessedHandler(els.playProcessedButton, async () => {
         console.log("[EVENT] Play processed video clicked");
-
+        // ✅ Block play if metrics not ready
+        // ✅ Stop UI + video if not ready
         if (!state.cached.ready || !state.cached.metrics) {
             setPlaying(els.playProcessedButton);
 
             alert("Metrics are not ready yet. Please analyze the video first.");
             return;
         }
+
+
+        setPlaying(els.playProcessedButton);
 
         // 1) Move cached metrics into live backend state now
         const m = state.cached.metrics;
@@ -278,19 +302,22 @@ import {
         state.backend.maxMetrics = m.maxMetrics || null;
 
         // 2) Initialize the unified chart with labels only (series empty)
-        showUnifiedChart(state, [0, 1, 2, 3, 4, 5]); // builds chart with labels+data
+        // ✅ Destroy existing chart cleanly before building new one
+        const existingChart = Chart.getChart("myChart2");
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        showUnifiedChart(state, [0, 1, 2, 3, 4, 5]);
+
         // immediately clear series so it starts "empty"
         state.currentChart.data.datasets.forEach(ds => ds.data = []);
         state.currentChart.data.labels = state.backend.chartLabels || [];
         state.currentChart.update('none');
 
-        // 3) Update doughnut to show posture/head rings at start = 0%
-        // (or, if you prefer, show final percentages immediately—comment next line out)
-        // updateDoughnutChartFromData(doughnutChart, state.backend); // <- KEEP OFF initially if you want zeroed rings
+        // Now begin overlay + video
+        els.video.play();
 
-        // 4) Begin overlay & playback
-        startOverlayLoop(); // this plays the video and begins Mediapipe draw loop
-        // (Mediapipe onResults draws every frame while video plays)  // :contentReference[oaicite:4]{index=4}
 
         // 5) Progressive metric updates synced to video time
         const labels = state.backend.chartLabels || [];
@@ -360,7 +387,16 @@ import {
 
         console.log("[EVENT] Video ended");
         stopOverlayLoop();
+        els.playProcessedButton.style.display = "none";
+
+        // ✅ Reset UI
+        resetUploadButton(document.getElementById("uploadvideo"));
+        resetPlayButton(els.playProcessedButton);
+        els.analyzeButton.style.display = "block";
+        els.analyzeButton.style.opacity = "0.4";
+        els.analyzeButton.style.pointerEvents = "none";
     });
+
 
     // 🔹 Helper
     function lastKnownVideoTime(video) {

@@ -72,7 +72,7 @@ export function setAnalyzeHandler(analyzeBtn, handler) {
 
 export function setPlayProcessedHandler(playBtn, handler) {
   const once = (e) => {
-    handler();
+    handler(e);
     playBtn.removeEventListener("click", once);
   };
   playBtn.addEventListener("click", once);
