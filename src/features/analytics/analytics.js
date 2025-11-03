@@ -62,6 +62,8 @@ import {
         myChart2: document.getElementById("myChart2"),
     };
     const ctx2D = els.canvas.getContext("2d");
+    // Hide canvas at start
+    els.canvas.style.display = "none";
 
     // STATE
     const state = {
@@ -230,7 +232,7 @@ import {
             applyBackendResultsToState(state, fullData.metrics);
             console.log("[UI] Charts and sliders updated with backend data.");
 
-            els.video.style.display = "none";
+            // els.video.style.display = "none";
             els.canvas.style.display = "block";
             els.analyzeButton.style.display = "none";
             els.playProcessedButton.style.display = "block";

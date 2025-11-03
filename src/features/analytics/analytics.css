@@ -75,6 +75,8 @@ video {
     height: 22em;
     border-radius: 2%;
     border: 0.1em solid #000000;
+    display: none;
+    position: absolute;
 }
 
 #analyzingIndicator {
