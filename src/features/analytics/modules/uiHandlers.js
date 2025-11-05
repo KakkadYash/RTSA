@@ -21,9 +21,27 @@ export function wireUploadButton(inputEl, videoEl, canvasEl, onMetadataReady, on
       canvasEl.width = videoEl.videoWidth;
       canvasEl.height = videoEl.videoHeight;
 
+      // Detect orientation
+      const isVertical = videoEl.videoHeight > videoEl.videoWidth;
+
+      const canvasWrapper = document.getElementById("canvas-wrapper");
+
+      // Remove all orientation classes first
+      canvasWrapper.classList.remove("vertical-canvas-wrapper", "horizonatl-canvas-wrapper");
+      canvasEl.classList.remove("vertical-output_canvas", "horizonatl-output_canvas");
+
+      if (isVertical) {
+        canvasWrapper.classList.add("vertical-canvas-wrapper");
+        canvasEl.classList.add("vertical-output_canvas");
+      } else {
+        canvasWrapper.classList.add("horizonatl-canvas-wrapper");
+        canvasEl.classList.add("horizonatl-output_canvas");
+      }
+
       // Allow caller to reset UI state
       onMetadataReady?.();
     };
+
   });
 }
 
