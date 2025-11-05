@@ -71,11 +71,37 @@ video {
     border: 0.1em solid #000000;
 }
 
-#output_canvas {
-    height: 22em;
+.vertical-output_canvas {
+    height: 90%;
     border-radius: 2%;
     border: 0.1em solid #000000;
+    display: none;
+    /* position: absolute; */
+    width: 100%;
 }
+
+.horizonatl-output_canvas {
+    height: 100%;
+    border-radius: 2%;
+    border: 0.1em solid #000000;
+    display: none;
+    /* position: absolute; */
+    width: 100%;
+}
+
+.vertical-canvas-wrapper {
+    position: absolute;
+    height: 100%;
+    width: 40%;
+}
+
+.horizonatl-canvas-wrapper {
+    position: absolute;
+    height: 80%;
+    width: 100%;
+    bottom: 20%;
+}
+
 
 #analyzingIndicator {
     display: none;
@@ -85,9 +111,6 @@ video {
     padding: 1vw;
     border-radius: 1vw;
 }
-
-
-
 
 .chart-wrapper {
     background-color: transparent;
