@@ -1,0 +1,65 @@
+/* Backdrop */
+.rt-tour-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 9997;
+}
+
+/* Highlight ring */
+.rt-tour-highlight {
+    position: absolute;
+    outline: 3px solid #E90A01;
+    /* Reaction Red */
+    border-radius: 10px;
+    box-shadow: 0 0 0 6px rgba(233, 10, 1, 0.25);
+    z-index: 9999;
+    pointer-events: none;
+}
+
+/* Tooltip panel */
+.rt-tour-tooltip {
+    position: absolute;
+    max-width: 360px;
+    background: #0f0f10;
+    color: #fff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    line-height: 1.4;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* Buttons row */
+.rt-tour-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.rt-tour-btn {
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-weight: 600;
+}
+
+.rt-tour-btn-primary {
+    background: #E90A01;
+    color: #fff;
+}
+
+.rt-tour-btn-ghost {
+    background: transparent;
+    color: #fff;
+    outline: 1px solid #666;
+}
+
+@media (max-width: 640px) {
+    .rt-tour-tooltip {
+        max-width: 92vw;
+    }
+}

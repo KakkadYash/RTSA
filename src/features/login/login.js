@@ -78,7 +78,9 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       // Store userId and email in localStorage
       localStorage.setItem("userId", data.userId);
       localStorage.setItem("user_name", data.email);
-
+      if (response.first_time_login) {
+        localStorage.setItem("runTutorial", "yes");
+      }
       // Redirect to the profile page
       window.location.href = "../home/home.html";
     }
