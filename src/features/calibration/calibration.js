@@ -60,6 +60,33 @@ function initCalibrationFormHandler() {
       scanStatus.classList.remove("hidden");
     }
 
+    // --- Height conversion (ft+in -> cm) BEFORE creating FormData ---
+    const ftEl = document.getElementById("height_ft");
+    const inEl = document.getElementById("height_in");
+    const cmHidden = document.getElementById("height_cm");
+
+    // Validate dropdowns
+    if (!ftEl || !inEl || !cmHidden) {
+      console.error("[CALIBRATION] Height elements missing");
+    } else {
+      if (!ftEl.value || !inEl.value) {
+        alert("Please select your height in feet and inches.");
+        return; // stop submit
+      }
+      const feet = parseInt(ftEl.value, 10);
+      const inches = parseInt(inEl.value, 10);
+
+      // extra safety
+      if (feet < 4 || feet > 7 || inches < 0 || inches > 11) {
+        alert("Please enter a valid height (4–7 ft, 0–11 in).");
+        return;
+      }
+
+      const totalInches = feet * 12 + inches;
+      const cm = (totalInches * 2.54).toFixed(1);
+      cmHidden.value = cm; // this keeps your backend field name: height_cm
+    }
+    // --- end height conversion ---
 
     const formData = new FormData(form);
     const userId = localStorage.getItem("userId");
