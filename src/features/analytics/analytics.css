@@ -570,3 +570,23 @@ progress::-moz-progress-bar {
     background: rgba(0, 0, 0, 0.5);
     border-radius: 6px;
 }
+
+/* --- Unified Chart Legend Cleanup --- */
+#myChart2+div ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8em;
+}
+
+#myChart2+div li {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    font-family: 'Futura LtCn BT';
+    font-size: 1vw;
+    font-weight: bold;
+}

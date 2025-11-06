@@ -73,73 +73,6 @@ export function initDoughnutChart(canvasId, CONFIG) {
   });
 }
 
-export function initPentagonChart(canvasId) {
-  const ctx = document.getElementById(canvasId).getContext("2d");
-  return new Chart(ctx, {
-    type: "radar",
-    data: {
-      labels: ["Footwork", "Speed", "Acceleration", "Head Angle", "Posture"],
-      datasets: [{
-        label: "Athletic Scores",
-        data: [0, 0, 0, 0, 0],
-        backgroundColor: "rgba(230, 42, 42, 0.2)",
-        borderColor: "#1a2532ff",
-        borderWidth: 3
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: "top",
-          align: "end",
-          labels: {
-            font: { size: 22, weight: "bold" },
-            color: "rgb(0, 0, 0)"
-          }
-        }
-      },
-      scales: {
-        r: {
-          beginAtZero: true,
-          max: 100,
-          grid: { lineWidth: 3, color: "rgb(82, 80, 80)" },
-          ticks: {
-            font: { size: 12 },
-            color: "rgb(82, 80, 80)",
-            stepSize: 10
-          },
-          pointLabels: {
-            font: { size: 22 },
-            color: "rgb(0, 0, 0)"
-          }
-        }
-      }
-    }
-  });
-}
-
-export function showPentagonChart(state) {
-  const canvas = document.getElementById("myChart2");
-  const ctx = canvas.getContext("2d");
-  if (state.currentChart) state.currentChart.destroy();
-
-  state.currentChart = initPentagonChart("myChart2");
-  // Populate with current scores if present
-  const ds = state.currentChart.data.datasets[0];
-  const s = state.backend.athleticScores || {};
-  ds.data = [
-    s.footworkScore || 0,
-    s.speedScore || 0,
-    s.accelerationScore || 0,
-    s.headAngleScore || 0,
-    s.postureScore || 0,
-  ];
-  state.currentChart.update();
-  state.chartType = "radar";
-}
-
 export function showUnifiedChart(state, metricIndices = []) {
   const canvas = document.getElementById("myChart2");
   if (!canvas) return;
@@ -159,17 +92,40 @@ export function showUnifiedChart(state, metricIndices = []) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Now safely create a fresh Chart instance
+  // 🧠 Custom plugin to color each legend text per dataset
+  const legendColorPlugin = {
+    id: "legendColorPlugin",
+    afterDraw(chart) {
+      const legend = chart.legend;
+      if (!legend?.legendItems) return;
+
+      legend.legendItems.forEach((item, i) => {
+        // force text color based on index
+        const colorMap = [
+          "#FF8C00", // Head Angle
+          "#1F43E5", // Speed
+          "#7DD859", // Acceleration
+          "#E93632", // Deceleration
+          "#FFA500", // Stride Length
+          "#800080", // Jump Height
+        ];
+        item.fontColor = colorMap[i] || "#000";
+      });
+    },
+  };
+  Chart.register(legendColorPlugin);
+
   state.currentChart = new Chart(ctx, {
     type: "line",
     data: {
       labels: state.backend.chartLabels || [],
       datasets: [
-        { label: "Head Angle (°)",          data: state.backend.headAngleData || [],    borderColor: "#FF8C00", fill: false },
-        { label: "Speed (yards/sec)",       data: state.backend.speedData || [],        borderColor: "#1F43E5", fill: false },
-        { label: "Acceleration (yards/s²)", data: state.backend.accelerationData || [], borderColor: "#7DD859", fill: false },
-        { label: "Deceleration (yards/s²)", data: state.backend.decelerationData || [], borderColor: "#E93632", fill: false },
-        { label: "Stride Length (yards)",   data: state.backend.strideData || [],       borderColor: "#FFA500", fill: false },
-        { label: "Jump Height (yards)",     data: state.backend.jumpData || [],         borderColor: "#800080", fill: false },
+        { label: "Head Angle (°)", data: state.backend.headAngleData || [], borderColor: "#FF8C00", fill: false },
+        { label: "Speed (yd/s)", data: state.backend.speedData || [], borderColor: "#1F43E5", fill: false },
+        { label: "Acceleration (yd/s²)", data: state.backend.accelerationData || [], borderColor: "#7DD859", fill: false },
+        { label: "Deceleration (yd/s²)", data: state.backend.decelerationData || [], borderColor: "#E93632", fill: false },
+        { label: "Stride Length (yd)", data: state.backend.strideData || [], borderColor: "#FFA500", fill: false },
+        { label: "Jump Height (yd)", data: state.backend.jumpData || [], borderColor: "#800080", fill: false },
       ]
     },
     options: {
@@ -178,17 +134,28 @@ export function showUnifiedChart(state, metricIndices = []) {
       interaction: { mode: "nearest", intersect: true },
       elements: { point: { radius: 3, hitRadius: 10 }, line: { tension: 0.2 } },
       plugins: {
-        legend: { position: "top", labels: { usePointStyle: true } },
+        legend: {
+          position: "top",
+          labels: {
+            usePointStyle: false,
+            boxWidth: 0,
+            padding: 14,
+            font: { size: 13, weight: "bold" },
+            color: "#000", // base color (will be overridden by plugin)
+          },
+
+        },
         tooltip: {
           callbacks: {
-            title: (items) => {
+            title(items) {
               const i = items?.[0]?.dataIndex ?? 0;
               const t = state.currentChart?.data?.labels?.[i];
               return `t = ${Number(t || 0).toFixed(2)} s`;
-            }
-          }
-        }
+            },
+          },
+        },
       },
+
       scales: {
         x: { title: { display: true, text: "Time (s)" }, ticks: { autoSkip: true, maxTicksLimit: 10 } },
         y: { title: { display: true, text: "Value" } }
@@ -226,8 +193,8 @@ export function buildLegend(containerId, labels, colors) {
 
 export function updateDoughnutChartFromData(doughnutChart, backend) {
   // inner ring
-  const headUp  = Number(backend.innerRing?.["Head Up"] || 0);
-  const headDown= Number(backend.innerRing?.["Head Down"] || 0);
+  const headUp = Number(backend.innerRing?.["Head Up"] || 0);
+  const headDown = Number(backend.innerRing?.["Head Down"] || 0);
   doughnutChart.data.datasets[1].data = [headUp, headDown];
 
   // outer ring
@@ -249,8 +216,8 @@ export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
   const speedArr = slicer(backend.speedData);
   const accelArr = slicer(backend.accelerationData);
   const decelArr = slicer(backend.decelerationData);
-  const jumpArr  = slicer(backend.jumpData);
-  const strideArr= slicer(backend.strideData);
+  const jumpArr = slicer(backend.jumpData);
+  const strideArr = slicer(backend.strideData);
 
   const mm = backend.maxMetrics || {};
   const speed = Math.round( // prefer backend.topSpeed or mm.maxSpeed
@@ -269,8 +236,8 @@ export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
     )
   );
 
-  const jump  = round2(avgOrZero(jumpArr));
-  const stride= round2(avgOrZero(strideArr));
+  const jump = round2(avgOrZero(jumpArr));
+  const stride = round2(avgOrZero(strideArr));
 
   updateProgress("topSpeed", "topSpeedBar", speed, CONFIG.MAX_SPEED);
   updateProgress("peakAcceleration", "peakAccelerationBar", accel, CONFIG.MAX_ACCEL);
