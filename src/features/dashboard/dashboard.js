@@ -1,6 +1,7 @@
 function loadDashboard() {
   console.log("[DEBUG] loadDashboard() executed");
   const userId = localStorage.getItem("user_id");
+  const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/"
   if (!userId) return;
 
   const chartCanvas = document.getElementById("myChart");
@@ -60,7 +61,7 @@ function loadDashboard() {
 
   async function fetchUploadCount() {
     try {
-      const res = await fetch(`https://fastapi-app-843332298202.us-central1.run.app/get-total-uploads?userId=${userId}`);
+      const res = await fetch(`${API_BASE}get-total-uploads?userId=${userId}` );
       const data = await res.json();
       uploadCounter.textContent = data.total_uploads || "0";
     } catch (err) {
@@ -70,7 +71,7 @@ function loadDashboard() {
 
   async function fetchHistoryData() {
     try {
-      const res = await fetch(`https://fastapi-app-843332298202.us-central1.run.app/history?userId=${userId}`);
+      const res = await fetch(`${API_BASE}history?userId=${userId}`);
       const data = await res.json();
       const history = data.history;
       if (!Array.isArray(history)) return;

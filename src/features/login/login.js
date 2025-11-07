@@ -1,3 +1,4 @@
+const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/"
 // Open modal on forgot password click
 document.getElementById("forgotPasswordLink").addEventListener("click", function () {
   const modal = new bootstrap.Modal(document.getElementById("forgotPasswordModal"));
@@ -13,7 +14,7 @@ document.getElementById("forgotPasswordForm").addEventListener("submit", async f
   const email = document.getElementById("forgotEmail").value;
 
   try {
-    const response = await fetch("https://fastapi-app-843332298202.us-central1.run.app/forgot_password", {
+    const response = await fetch(`${API_BASE}forgot_password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -52,7 +53,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
   };
 
   try {
-    const response = await fetch("https://fastapi-app-843332298202.us-central1.run.app/login", {
+    const response = await fetch(`${API_BASE}login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
