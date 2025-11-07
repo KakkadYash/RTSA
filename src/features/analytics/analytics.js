@@ -36,7 +36,7 @@ import {
 
     // CONSTANTS
     const CONFIG = {
-        API_BASE: "https://fastapi-app-843332298202.us-central1.run.app",
+        API_BASE: "https://rtsa-backend-gpu-843332298202.us-central1.run.app/",
         OVERLAP_THRESHOLD: 0.5,
         HEAD_ANGLE_MIN: 40,
         HEAD_ANGLE_MAX: 120,
