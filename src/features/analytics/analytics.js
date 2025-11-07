@@ -27,7 +27,8 @@ import {
     setUploadUploading, setUploadSuccess, resetUploadButton,
     setAnalyzing, resetAnalyze,
     setPlaying, resetPlayButton,
-    setPlayButtonEnabled
+    setPlayButtonEnabled,
+    disableInteractiveButton, enableInteractiveButton
 } from "./modules/uiHandlers.js";
 
 
@@ -36,7 +37,7 @@ import {
 
     // CONSTANTS
     const CONFIG = {
-        API_BASE: "https://rtsa-backend-gpu-843332298202.us-central1.run.app/",
+        API_BASE: "https://rtsa-backend-gpu-843332298202.us-central1.run.app",
         OVERLAP_THRESHOLD: 0.5,
         HEAD_ANGLE_MIN: 40,
         HEAD_ANGLE_MAX: 120,
@@ -62,6 +63,57 @@ import {
         myChart: document.getElementById("myChart"),
         myChart2: document.getElementById("myChart2"),
     };
+
+    function setInitialUI() {
+        // Video + canvas
+        els.video.style.display = "block";
+        els.video.src = "";
+        els.canvas.style.display = "none";
+
+        // Buttons
+        const uploadLabel = document.getElementById("uploadvideo");
+        resetUploadButton(uploadLabel);
+
+        els.analyzeButton.style.display = "block";
+        resetAnalyze(els.analyzeButton);
+
+        els.playProcessedButton.style.display = "none";
+        resetPlayButton(els.playProcessedButton);
+        setPlayButtonEnabled(false);
+
+        // All Metrics button
+        enableInteractiveButton(els.showMetricsBtn);
+
+        // Hide analyzing overlay
+        els.loadingOverlay.style.display = "none";
+
+        // Reset stats & charts
+        resetCharts(state, doughnutChart);
+        resetMetricSlidersUI(CONFIG);
+
+        // Clear any “flipped” cards
+        document.querySelectorAll(".card").forEach(c => c.classList.remove("is-flipped"));
+    }
+
+    function fullReset() {
+        console.log("[STATE] Full reset");
+        if (state.ticker) {
+            clearInterval(state.ticker);
+            state.ticker = null;
+        }
+
+        state.video = null;
+        state.cached.metrics = null;
+        state.cached.ready = false;
+        state.overlayReady = false;
+
+        localStorage.removeItem("rtsa_metrics");
+        localStorage.removeItem("rtsa_hasVideo");
+        localStorage.removeItem("rtsa_lastVideoName");
+
+        setInitialUI();
+    }
+
     // ➋ On page load, Play must be disabled
     setPlayButtonEnabled(false);
 
@@ -107,13 +159,6 @@ import {
         maybeEnablePlayButton();
     });
 
-    // Listen for Mediapipe overlay finish event
-    window.addEventListener("overlayReady", () => {
-        console.log("[EVENT] Overlay ready received");
-        state.overlayReady = true;
-        maybeEnablePlayButton();
-    });
-
     if (state.currentChart) state.currentChart.destroy();
     if (Chart.getChart("myChart")) Chart.getChart("myChart").destroy();
     if (Chart.getChart("myChart2")) Chart.getChart("myChart2").destroy();
@@ -134,46 +179,38 @@ import {
         els.uploadButton,
         els.video,
         els.canvas,
-        async () => {
-            console.log("[EVENT] Upload metadata ready — preparing /upload request");
+        () => {
+            // onMetadataReady
+            console.log("[EVENT] Upload metadata ready");
+            // Reset UI/metrics for new run
+            if (state.ticker) {
+                clearInterval(state.ticker);
+                state.ticker = null;
+            }
+            state.cached.metrics = null;
+            state.cached.ready = false;
+            state.overlayReady = false;
+
             resetCharts(state, doughnutChart);
             resetMetricSlidersUI(CONFIG);
-            const uploadLabel = document.getElementById("uploadvideo");
-            setUploadUploading(uploadLabel);
-
 
             els.canvas.style.display = "none";
             els.playProcessedButton.style.display = "none";
             els.analyzeButton.style.display = "block";
-            els.analyzeButton.disabled = true;
             setPlayButtonEnabled(false);
 
-            try {
-                const uploadResp = await callUploadVideo({
-                    apiBase: CONFIG.API_BASE,
-                    userId: localStorage.getItem("userId"),
-                    video: state.video
-                });
+            // mark "uploaded" locally
+            localStorage.setItem("rtsa_lastVideoName", state.video?.name || "");
+            localStorage.setItem("rtsa_hasVideo", "1");
 
-                console.log("[SUCCESS] Video uploaded:", uploadResp);
-                els.analyzeButton.disabled = false;
-                localStorage.setItem("lastUploadedVideoId", uploadResp.videoId);
-                localStorage.setItem("lastUploadedVideoName", uploadResp.videoName);
-                setUploadSuccess(uploadLabel);
-
-                alert(`Video uploaded successfully: ${uploadResp.message}`);
-            } catch (err) {
-                console.error("[ERROR] Video upload failed:", err);
-                resetUploadButton(uploadLabel);
-
-                alert("Video upload failed. Please try again.");
-            }
+            alert("Video uploaded successfully"); // as per your spec
         },
         (file) => {
             console.log(`[EVENT] Selected file: ${file.name}`);
             state.video = file;
         }
     );
+
 
     // METRIC CARD BUTTONS
     wireCardsAndShowAll(els.showMetricsBtn, {
@@ -207,82 +244,92 @@ import {
     // ANALYZE BUTTON
     setAnalyzeHandler(els.analyzeButton, async () => {
         console.log("[EVENT] Analyze button clicked");
-        try {
-            if (!state.video) {
-                alert("Please upload a video file first.");
-                return;
-            }
-            setAnalyzing(els.analyzeButton);
-            setPlayButtonEnabled(false);
 
+        if (!state.video) {
+            alert("Upload a video first.");
+            return;
+        }
+
+        // 1) Lock UI: disable upload + ALL METRICS
+        const uploadLabel = document.getElementById("uploadvideo");
+        disableInteractiveButton(uploadLabel);
+        disableInteractiveButton(els.showMetricsBtn);
+        disableInteractiveButton(els.analyzeButton);
+
+        // 2) Confirm "video uploaded successfully" before starting analysis
+        alert("Video uploaded successfully");
+
+        try {
+            // Show analyzing
+            setAnalyzing(els.analyzeButton);
             els.analyzeButton.style.display = "none";
             els.loadingOverlay.style.display = "block";
+            setPlayButtonEnabled(false);
 
-            console.log("[NETWORK] Sending /analyze-video request...");
-            const lastVideoId = localStorage.getItem("lastUploadedVideoId");
-            if (!lastVideoId) {
-                alert("Please upload a video first.");
-                return;
-            }
-
+            // 3) Call /analyze-video with the file
             const analyzeJson = await callAnalyzeVideo({
                 apiBase: CONFIG.API_BASE,
                 userId: localStorage.getItem("userId"),
-                videoId: lastVideoId
+                video: state.video
             });
 
-            console.log("[NETWORK] /analyze-video response received");
-
-            const { analysisPath } = analyzeJson;
-            if (!analysisPath) {
-                console.warn("No analysisPath returned; using inline metrics only.");
-                applyBackendResultsToState(state, analyzeJson);
-                setPlayButtonEnabled(true);
-                return;
+            if (!analyzeJson || analyzeJson.status !== 200) {
+                throw new Error("Analyze did not return 200");
             }
 
-            const videoId = analysisPath.split("/").pop().replace(".json", "");
-            console.log(`[NETWORK] Fetching signed URL for videoId ${videoId}`);
+            // 4) Cache metrics locally (no UI yet)
+            applyBackendResultsToState(state, analyzeJson.metrics || analyzeJson);
+            localStorage.setItem("rtsa_metrics", JSON.stringify(analyzeJson.metrics || analyzeJson));
 
-            const resp = await fetch(`${CONFIG.API_BASE}/get-analysis/${videoId}`);
-            const { analysis_url } = await resp.json();
-            console.log(`[NETWORK] Signed URL fetched: ${analysis_url}`);
+            // 5) Only AFTER successful analysis, trigger /upload
+            const uploadResp = await callUploadVideo({
+                apiBase: CONFIG.API_BASE,
+                userId: localStorage.getItem("userId"),
+                video: state.video,
+                metrics: analyzeJson.metrics || analyzeJson
+            });
 
-            const metricsResp = await fetch(analysis_url);
-            const fullData = await metricsResp.json();
-            console.log("[DATA] Full metrics JSON loaded from GCS:", fullData);
+            console.log("[NETWORK] Upload after analysis completed:", uploadResp);
 
-            applyBackendResultsToState(state, fullData.metrics);
-            console.log("[UI] Charts and sliders updated with backend data.");
-            setPlayButtonEnabled(true);                 // ➎ ADD THIS (metrics are ready)
-
-            // els.video.style.display = "none";
-            els.canvas.style.display = "block";
-            els.analyzeButton.style.display = "none";
+            // 6) Show Play button (faded until we’re sure metrics cached)
+            els.loadingOverlay.style.display = "none";
             els.playProcessedButton.style.display = "block";
-            // drawOneFrameIfPaused();
+            setPlayButtonEnabled(false); // start disabled/faded
+
+            // metrics are already cached; so we can now enable
+            if (state.cached.ready) {
+                setPlayButtonEnabled(true);
+                enableInteractiveButton(els.playProcessedButton);
+            }
+            maybeEnablePlayButton();
 
         } catch (err) {
-            console.error("[ERROR] Analyze failed:", err);
-            alert("Video analysis failed. Please try again.");
-            els.analyzeButton.style.display = "block";
-        } finally {
-            els.loadingOverlay.style.display = "none";
-            resetAnalyze(els.analyzeButton);
+            console.error("[ERROR] Analyze or upload sequence failed:", err);
+            alert("Something went wrong, please upload another video.");
 
-            console.log("[STATE] Analysis process finished.");
+            // Full reset to initial state
+            fullReset();
+        } finally {
+            resetAnalyze(els.analyzeButton);
         }
     });
+
 
     //  PLAY PROCESSED VIDEO
     setPlayProcessedHandler(els.playProcessedButton, () => {
         console.log("[EVENT] Play processed video clicked");
 
         if (!state.cached.ready || !state.cached.metrics) {
-            resetPlayButton(els.playProcessedButton); // keep text "PLAY VIDEO"
-            alert("Metrics are not ready yet. Please analyze the video first.");
+            resetPlayButton(els.playProcessedButton);
+            alert("Metrics are not ready yet. Please run analysis again.");
             return;
         }
+
+        setPlaying(els.playProcessedButton);
+        els.canvas.style.display = "block";
+        els.video.play();
+        startOverlayLoop();
+
 
 
         // 1) Move cached metrics into live backend state now
@@ -357,7 +404,16 @@ import {
         }, TICK_MS);
 
         // stop the ticker when video ends or page unloads
-        els.video.addEventListener("ended", () => clearInterval(ticker), { once: true });
+        els.video.addEventListener("ended", () => {
+            console.log("[EVENT] Video ended, resetting state");
+            stopOverlayLoop();
+            if (state.ticker) {
+                clearInterval(state.ticker);
+                state.ticker = null;
+            }
+            fullReset(); // allow new upload without reload
+        }, { once: true });
+
     });
 
     //  CHART CLICK → SEEK VIDEO
@@ -442,46 +498,35 @@ import {
         // IMPORTANT: do NOT call showUnifiedChart, updateDoughnutChartFromData, or updateSlidersFromData here
     }
 
-    async function callUploadVideo({ apiBase, userId, video }) {
-        console.log("[NETWORK] Uploading video to /upload...");
+    async function callUploadVideo({ apiBase, userId, video, metrics }) {
+        console.log("[NETWORK] Uploading video to /upload AFTER analysis...");
+        const form = new FormData();
+        form.append("userId", userId || "");
+        form.append("video", video);
+        if (metrics) {
+            form.append("metrics", JSON.stringify(metrics));
+        }
+
+        const resp = await fetch(`${apiBase}/upload`, { method: "POST", body: form });
+        const data = await resp.json();
+        console.log("[NETWORK] /upload response:", resp.status, data);
+
+        if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
+        return data;
+    }
+
+    async function callAnalyzeVideo({ apiBase, userId, video }) {
+        console.log("[NETWORK] Triggering /analyze-video with raw file...");
         const form = new FormData();
         form.append("userId", userId || "");
         form.append("video", video);
 
-        try {
-            const resp = await fetch(`${apiBase}/upload`, { method: "POST", body: form });
-            console.log("[NETWORK] /upload Response Status:", resp.status);
-            const data = await resp.json();
-            console.log(`[NETWORK] /upload complete for videoId=${resp.videoId}`);
+        const resp = await fetch(`${apiBase}/analyze-video`, { method: "POST", body: form });
+        const data = await resp.json();
+        console.log("[NETWORK] /analyze-video response:", resp.status, data);
 
-            if (!resp.ok) throw new Error(`Upload failed: ${resp.status} ${JSON.stringify(data)}`);
-            return data; // expected: { videoId, message, status, videoPath, thumbnailPath }
-        } catch (error) {
-            console.error("[ERROR] Upload network call failed:", error);
-            throw error;
-        }
-    }
-
-    async function callAnalyzeVideo({ apiBase, userId, videoId }) {
-        console.log(`[NETWORK] Triggering analysis for videoId: ${videoId}`);
-
-        const form = new FormData();
-        form.append("userId", userId || "");
-        form.append("videoId", videoId);
-
-        try {
-            const resp = await fetch(`${apiBase}/analyze-video`, { method: "POST", body: form });
-            console.log("Analyze Response Status:", resp.status);
-            const data = await resp.json();
-            console.log(`[NETWORK] /analyze-video complete for videoId= `, JSON.stringify(data));
-
-
-            if (!resp.ok) throw new Error(`Analyze failed: ${resp.status} ${JSON.stringify(data)}`);
-            return data; // expected: { analysisPath, videoId, message, status }
-        } catch (error) {
-            console.error("[ERROR] Analyze network call failed:", error);
-            throw error;
-        }
+        if (!resp.ok) throw new Error(`Analyze failed: ${resp.status}`);
+        return data; // expected: { status:200, metrics:{...}, ... }
     }
 
     window.loadAnalytics = loadAnalytics;

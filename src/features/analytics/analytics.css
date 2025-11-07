@@ -166,11 +166,10 @@ video {
     background-color: #000000;
     border-radius: 1.6vw;
     color: #FFFFFF;
-    display: inline-block;
+    display: none;
     font-size: 2vw;
     cursor: pointer;
     border: #ff4343 solid 0.3vw;
-    display: none;
     height: 100%;
 }
 
@@ -593,6 +592,12 @@ progress::-moz-progress-bar {
 }
 
 #playProcessedButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.button-disabled {
     opacity: 0.5;
     cursor: not-allowed;
     pointer-events: none;

@@ -89,12 +89,12 @@ export function setAnalyzeHandler(analyzeBtn, handler) {
 }
 
 export function setPlayProcessedHandler(playBtn, handler) {
-  const once = (e) => {
+  playBtn.addEventListener("click", (e) => {
+    e.preventDefault();
     handler();
-    playBtn.removeEventListener("click", once);
-  };
-  playBtn.addEventListener("click", once);
+  });
 }
+
 // --- Button state helpers ---
 
 export function setUploadUploading(el) {
@@ -137,4 +137,18 @@ export function resetPlayButton(el) {
 export function setPlayButtonEnabled(isEnabled) {
   const playBtn = document.getElementById("playProcessedButton");
   if (playBtn) playBtn.disabled = !isEnabled;
+}
+
+export function disableInteractiveButton(el) {
+  if (!el) return;
+  el.classList.add("button-disabled");
+  el.classList.remove("hover-animation", "click-animation", "hover-box-shadow");
+  el.disabled = true;
+}
+
+export function enableInteractiveButton(el) {
+  if (!el) return;
+  el.classList.remove("button-disabled");
+  el.classList.add("hover-animation", "click-animation", "hover-box-shadow");
+  el.disabled = false;
 }
