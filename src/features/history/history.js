@@ -1,4 +1,5 @@
 function loadHistory() {
+  const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/"
   const userId = localStorage.getItem("user_id");
   if (!userId) return;
 
@@ -10,7 +11,7 @@ function loadHistory() {
 
   const fetchHistoryData = async () => {
     try {
-      const response = await fetch(`https://fastapi-app-843332298202.us-central1.run.app/history?userId=${userId}`);
+      const response = await fetch(`${API_BASE}history?userId=${userId}`);
       const historyData = await response.json();
 
       tableBody.innerHTML = '';

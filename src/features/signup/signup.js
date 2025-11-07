@@ -1,6 +1,6 @@
 document.getElementById("signUpForm").addEventListener("submit", async function (event) {
   event.preventDefault();
-
+  const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/"
   const first_name = document.getElementById('first_name').value.trim();
   const last_name = document.getElementById('last_name').value.trim();
   const email = document.getElementById('email').value.trim();
@@ -18,7 +18,7 @@ document.getElementById("signUpForm").addEventListener("submit", async function 
 
   try {
     console.log("[DEBUG] Sending signup request...");
-    const response = await fetch('https://fastapi-app-843332298202.us-central1.run.app/signup', {
+    const response = await fetch(`${API_BASE}signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

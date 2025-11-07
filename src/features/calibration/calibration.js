@@ -1,4 +1,4 @@
-const API_BASE = "https://fastapi-app-843332298202.us-central1.run.app";
+const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/";
 const modal = document.getElementById("popupModal");
 const container = document.getElementById("calibrationModalContainer");
 
