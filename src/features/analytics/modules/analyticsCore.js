@@ -95,4 +95,10 @@ function onResults(results) {
     fillColor: "green",
     radius: 3
   });
+  // ✅ Dispatch overlayReady event after first stick figure draw
+  if (!window.__RTSA_OVERLAY_READY__) {
+    window.__RTSA_OVERLAY_READY__ = true;
+    console.log("[EVENT] Stick figure drawn — dispatching overlayReady");
+    window.dispatchEvent(new Event("overlayReady"));
+  }
 }

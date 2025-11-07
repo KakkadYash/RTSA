@@ -26,7 +26,8 @@ import {
     setPlayProcessedHandler,
     setUploadUploading, setUploadSuccess, resetUploadButton,
     setAnalyzing, resetAnalyze,
-    setPlaying, resetPlayButton
+    setPlaying, resetPlayButton,
+    setPlayButtonEnabled
 } from "./modules/uiHandlers.js";
 
 
@@ -61,6 +62,9 @@ import {
         myChart: document.getElementById("myChart"),
         myChart2: document.getElementById("myChart2"),
     };
+    // ➋ On page load, Play must be disabled
+    setPlayButtonEnabled(false);
+
     const ctx2D = els.canvas.getContext("2d");
     // Hide canvas at start
     els.canvas.style.display = "none";
@@ -89,10 +93,26 @@ import {
             totalSteps: 0
         },
         cached: {
-            metrics: null, // holds full backend metrics until Play is clicked
+            metrics: null,
             ready: false
         },
     };
+    state.overlayReady = false;
+    state.cached.ready = false;
+
+    // ✅ Listen for Mediapipe overlay finish event
+    window.addEventListener("overlayReady", () => {
+        console.log("[EVENT] Overlay ready received");
+        state.overlayReady = true;
+        maybeEnablePlayButton();
+    });
+
+    // Listen for Mediapipe overlay finish event
+    window.addEventListener("overlayReady", () => {
+        console.log("[EVENT] Overlay ready received");
+        state.overlayReady = true;
+        maybeEnablePlayButton();
+    });
 
     if (state.currentChart) state.currentChart.destroy();
     if (Chart.getChart("myChart")) Chart.getChart("myChart").destroy();
@@ -126,6 +146,7 @@ import {
             els.playProcessedButton.style.display = "none";
             els.analyzeButton.style.display = "block";
             els.analyzeButton.disabled = true;
+            setPlayButtonEnabled(false);
 
             try {
                 const uploadResp = await callUploadVideo({
@@ -192,6 +213,7 @@ import {
                 return;
             }
             setAnalyzing(els.analyzeButton);
+            setPlayButtonEnabled(false);
 
             els.analyzeButton.style.display = "none";
             els.loadingOverlay.style.display = "block";
@@ -215,6 +237,7 @@ import {
             if (!analysisPath) {
                 console.warn("No analysisPath returned; using inline metrics only.");
                 applyBackendResultsToState(state, analyzeJson);
+                setPlayButtonEnabled(true);
                 return;
             }
 
@@ -231,12 +254,13 @@ import {
 
             applyBackendResultsToState(state, fullData.metrics);
             console.log("[UI] Charts and sliders updated with backend data.");
+            setPlayButtonEnabled(true);                 // ➎ ADD THIS (metrics are ready)
 
             // els.video.style.display = "none";
             els.canvas.style.display = "block";
             els.analyzeButton.style.display = "none";
             els.playProcessedButton.style.display = "block";
-            drawOneFrameIfPaused();
+            // drawOneFrameIfPaused();
 
         } catch (err) {
             console.error("[ERROR] Analyze failed:", err);
@@ -255,11 +279,11 @@ import {
         console.log("[EVENT] Play processed video clicked");
 
         if (!state.cached.ready || !state.cached.metrics) {
-            setPlaying(els.playProcessedButton);
-
+            resetPlayButton(els.playProcessedButton); // keep text "PLAY VIDEO"
             alert("Metrics are not ready yet. Please analyze the video first.");
             return;
         }
+
 
         // 1) Move cached metrics into live backend state now
         const m = state.cached.metrics;
@@ -363,6 +387,23 @@ import {
         console.log("[EVENT] Video ended");
         stopOverlayLoop();
     });
+    function maybeEnablePlayButton() {
+        const playBtn = document.getElementById("playProcessedButton");
+        if (!playBtn) return;
+
+        const metricsReady = state?.cached?.ready;
+        const overlayReady = state?.overlayReady;
+
+        if (metricsReady && overlayReady) {
+            setPlayButtonEnabled(true);
+            playBtn.style.display = "block";
+            playBtn.classList.add("enabled");
+            console.log("[UI] ✅ Metrics + Overlay ready — Play button enabled");
+        } else {
+            setPlayButtonEnabled(false);
+            console.log("[UI] Waiting for both metrics & overlay...");
+        }
+    }
 
     // 🔹 Helper
     function lastKnownVideoTime(video) {
@@ -374,6 +415,9 @@ import {
         // just cache aggregated metrics blob as-is
         st.cached.metrics = payload;
         st.cached.ready = true;
+        console.log("[STATE] Metrics ready — checking overlay readiness");
+        maybeEnablePlayButton();
+
 
         // ensure visualizations remain reset/empty until Play
         st.backend = {

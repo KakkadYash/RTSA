@@ -49,6 +49,7 @@
     justify-content: space-around;
     height: 25vw;
     margin-bottom: 2vw;
+    width: 100%;
 }
 
 .vid-chart {
@@ -74,7 +75,7 @@ video {
 .vertical-output_canvas {
     height: 90%;
     border-radius: 2%;
-    border: 0.1em solid #000000;
+    /* border: 0.1em solid #000000; */
     display: none;
     /* position: absolute; */
     width: 100%;
@@ -83,7 +84,7 @@ video {
 .horizonatl-output_canvas {
     height: 100%;
     border-radius: 2%;
-    border: 0.1em solid #000000;
+    /* border: 0.1em solid #000000; */
     display: none;
     /* position: absolute; */
     width: 100%;
@@ -589,4 +590,26 @@ progress::-moz-progress-bar {
     font-family: 'Futura LtCn BT';
     font-size: 1vw;
     font-weight: bold;
+}
+
+#playProcessedButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+#playProcessedButton.enabled {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

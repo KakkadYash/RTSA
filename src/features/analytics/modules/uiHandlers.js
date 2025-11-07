@@ -134,3 +134,7 @@ export function resetPlayButton(el) {
   el.classList.remove("button-disabled");
 }
 
+export function setPlayButtonEnabled(isEnabled) {
+  const playBtn = document.getElementById("playProcessedButton");
+  if (playBtn) playBtn.disabled = !isEnabled;
+}
