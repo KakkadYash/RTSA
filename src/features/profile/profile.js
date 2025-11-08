@@ -6,7 +6,7 @@ function loadProfile() {
     window.location.href = "../login/login.html";
     return;
   }
-  
+
   // ====== Fetch existing profile to populate UI ======
   (async () => {
     try {
@@ -33,6 +33,13 @@ function loadProfile() {
       document.getElementById("sports").value = Array.isArray(data.sports)
         ? data.sports.join(", ")
         : "";
+      // Set profile picture from backend if available
+      if (data.profilePicUrl) {
+        if (imagePreview) {
+          imagePreview.src = data.profilePicUrl;
+        }
+      }
+
 
       // Reflect checkbox states in dropdown
       const checkboxes = document.querySelectorAll("#sportsDropdown input[type='checkbox']");
@@ -48,6 +55,52 @@ function loadProfile() {
   const imagePreview = document.getElementById("img-preview");
   const form = document.getElementById("userProfileForm");
   const openModalBtn = document.getElementById("openModalBtn");
+  // === Click avatar to choose new profile photo ===
+  if (imagePreview && fileInput) {
+    imagePreview.addEventListener("click", () => {
+      fileInput.click();
+    });
+  }
+  // === Upload selected profile picture to backend ===
+  if (fileInput && imagePreview) {
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        alert("User ID missing. Please login again.");
+        window.location.href = "../login/login.html";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("userId", userId);
+      formData.append("profilePic", file);
+
+      try {
+        const res = await fetch(`${API_BASE}profile-pic`, {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.detail || "Failed to upload profile picture");
+        }
+
+        // Show new picture instantly
+        const objectUrl = URL.createObjectURL(file);
+        imagePreview.src = objectUrl;
+
+        alert("Profile picture updated successfully!");
+      } catch (err) {
+        console.error("Error uploading profile picture:", err);
+        alert("Could not upload profile picture. Please try again.");
+      }
+    });
+  }
+
 
   // ====== Helper: Load Calibration Modal HTML, CSS, JS ======
   async function loadCalibrationModal() {
