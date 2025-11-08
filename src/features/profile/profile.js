@@ -1,10 +1,48 @@
 function loadProfile() {
+  const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/";
   const userId = localStorage.getItem("userId");
   if (!userId) {
     alert("User ID not found. Redirecting to login.");
     window.location.href = "../login/login.html";
     return;
   }
+  
+  // ====== Fetch existing profile to populate UI ======
+  (async () => {
+    try {
+      const res = await fetch(`${API_BASE}profile?userId=${encodeURIComponent(userId)}`);
+      if (!res.ok) throw new Error("Failed to load profile");
+      const data = await res.json();
+
+      // Fill top info boxes
+      const nameInfo = document.getElementById("nameInfo");
+      const sportInfo = document.getElementById("sportInfo");
+      if (nameInfo) nameInfo.textContent = data.name || "—";
+      if (sportInfo) {
+        sportInfo.textContent =
+          Array.isArray(data.sports) && data.sports.length
+            ? data.sports.join(", ")
+            : "—";
+      }
+
+      // Fill form inputs
+      document.getElementById("name").value = data.name || "";
+      document.getElementById("email").value = data.email || "";
+      document.getElementById("age").value = data.age || "";
+      document.getElementById("state").value = data.state || "";
+      document.getElementById("sports").value = Array.isArray(data.sports)
+        ? data.sports.join(", ")
+        : "";
+
+      // Reflect checkbox states in dropdown
+      const checkboxes = document.querySelectorAll("#sportsDropdown input[type='checkbox']");
+      checkboxes.forEach(cb => {
+        cb.checked = Array.isArray(data.sports) && data.sports.includes(cb.value);
+      });
+    } catch (err) {
+      console.error("Error loading profile:", err);
+    }
+  })();
 
   const fileInput = document.getElementById("file-input");
   const imagePreview = document.getElementById("img-preview");
@@ -175,6 +213,77 @@ function loadProfile() {
       hiddenInput.value = selectedValues.join(", ");
     });
   });
+  // ====== Save Button Handler ======
+  const saveButton = document.getElementById("saveButton");
+  if (saveButton) {
+    saveButton.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        alert("User ID missing. Please login again.");
+        window.location.href = "../login/login.html";
+        return;
+      }
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const age = document.getElementById("age").value.trim();
+      const state = document.getElementById("state").value.trim();
+      const sportsInput = document.getElementById("sports").value;
+      const sports = sportsInput
+        ? sportsInput.split(",").map(s => s.trim()).filter(Boolean)
+        : [];
+
+      // Build payload with only provided fields
+      const payload = { userId };
+
+      if (name) payload.name = name;
+      if (email) payload.email = email;
+      if (age) payload.age = age;
+      if (state) payload.state = state;
+      if (sports.length) payload.sports = sports;
+
+      if (Object.keys(payload).length === 1) { // only userId present
+        alert("No changes to update.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}updateProfile`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.detail || "Failed to update profile");
+        }
+
+        const result = await response.json();
+        console.log(result.message, "Updated fields:", result.updated_fields);
+        alert("Profile updated successfully!");
+
+        // Update top info panel instantly (optional but nice UX)
+        if (payload.name) {
+          const nameInfo = document.getElementById("nameInfo");
+          if (nameInfo) nameInfo.textContent = payload.name;
+        }
+        if (payload.sports) {
+          const sportInfo = document.getElementById("sportInfo");
+          if (sportInfo) sportInfo.textContent = payload.sports.join(", ");
+        }
+
+        // Navigate to home page after update
+        window.location.href = "../home/home.html";
+      } catch (err) {
+        console.error("Error updating profile:", err);
+        alert("Something went wrong while updating your profile.");
+      }
+    });
+  }
+
 
 }
 window.loadProfile = loadProfile;
