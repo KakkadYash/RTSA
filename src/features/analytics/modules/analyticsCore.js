@@ -39,9 +39,15 @@ export function initPoseOverlay({ video, canvas, ctx2D: ctx }) {
 
 export function startOverlayLoop() {
   if (!videoEl) return;
-  if (videoEl.paused) videoEl.play();
   playing = true;
-  processFrameLoop();
+
+  if (videoEl.paused && !videoEl.ended) {
+    videoEl.play().catch((err) => {
+      console.warn("Video play failed:", err);
+    });
+  }
+
+  requestAnimationFrame(processFrameLoop);
 }
 
 export function stopOverlayLoop() {
@@ -57,9 +63,30 @@ export function drawOneFrameIfPaused() {
 let isProcessingFrame = false;
 
 export async function processFrameLoop() {
-  if (isProcessingFrame) return; // prevent overlap
-  isProcessingFrame = true;
+  // Stop if not in "playing" mode or missing pieces
+  if (!playing || !pose || !videoEl) return;
 
+  // Ensure we have a valid frame
+  if (
+    videoEl.readyState < HTMLMediaElement.HAVE_CURRENT_DATA ||
+    videoEl.paused ||
+    videoEl.ended
+  ) {
+    if (playing) {
+      requestAnimationFrame(processFrameLoop);
+    }
+    return;
+  }
+
+  if (isProcessingFrame) {
+    // Avoid overlapping pose.send calls
+    if (playing) {
+      requestAnimationFrame(processFrameLoop);
+    }
+    return;
+  }
+
+  isProcessingFrame = true;
   try {
     await pose.send({ image: videoEl });
   } catch (err) {
@@ -68,7 +95,9 @@ export async function processFrameLoop() {
     isProcessingFrame = false;
   }
 
-  requestAnimationFrame(processFrameLoop);
+  if (playing) {
+    requestAnimationFrame(processFrameLoop);
+  }
 }
 
 

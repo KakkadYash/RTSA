@@ -110,8 +110,10 @@ export function setUploadSuccess(el) {
 }
 
 export function resetUploadButton(el) {
+  if (!el) return;
   el.textContent = "UPLOAD VIDEO";
   el.classList.remove("button-disabled", "button-success");
+  el.disabled = false;
 }
 
 export function setAnalyzing(el) {
@@ -120,8 +122,10 @@ export function setAnalyzing(el) {
 }
 
 export function resetAnalyze(el) {
+  if (!el) return;
   el.textContent = "ANALYZE VIDEO";
   el.classList.remove("button-disabled");
+  el.disabled = false;
 }
 
 export function setPlaying(el) {
@@ -129,9 +133,12 @@ export function setPlaying(el) {
   el.classList.add("button-disabled");
 }
 
+
 export function resetPlayButton(el) {
+  if (!el) return;
   el.textContent = "PLAY VIDEO";
   el.classList.remove("button-disabled");
+  el.disabled = false;
 }
 
 export function setPlayButtonEnabled(isEnabled) {

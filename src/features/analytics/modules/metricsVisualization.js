@@ -262,16 +262,19 @@ export function updateTopMetricBoxes({ timeSecs, totalDistanceYards, steps }) {
 
 export function resetCharts(state, doughnutChart) {
   // doughnut
-  doughnutChart.data.datasets[0].data = [0, 0, 0];
-  doughnutChart.data.datasets[1].data = [0, 100];
-  doughnutChart.update();
+  if (doughnutChart) {
+    doughnutChart.data.datasets[0].data = [0, 0, 0];
+    doughnutChart.data.datasets[1].data = [0, 100];
+    doughnutChart.update();
+  }
 
-  if (state.currentChart) {
+  if (state.currentChart && state.currentChart.canvas && state.currentChart.ctx) {
     state.currentChart.data.labels = [];
     state.currentChart.data.datasets.forEach(ds => ds.data = []);
     state.currentChart.update();
   }
 }
+
 
 export function resetMetricSlidersUI(CONFIG) {
   updateProgress("topSpeed", "topSpeedBar", 0, CONFIG.MAX_SPEED);
