@@ -76,9 +76,12 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       alert("Login successful!");
       console.log("User ID from server:", data.userId);
 
-      // Store userId and email in localStorage
+      // ✅ Store userId under both camelCase & snake_case for compatibility
       localStorage.setItem("userId", data.userId);
-      localStorage.setItem("user_name", data.email);
+      localStorage.setItem("user_id", data.userId); // <- added line
+
+      // Optionally store name or email for profile usage
+      localStorage.setItem("user_name", data.email || `${data.first_name || ""} ${data.last_name || ""}`);
 
       // Redirect to the profile page
       window.location.href = "../home/home.html";
