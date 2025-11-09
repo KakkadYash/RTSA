@@ -335,12 +335,13 @@ import {
                     console.error("[BACKGROUND] Upload failed:", err);
                 });
 
-            // 6) Show Play button (faded until we’re sure metrics cached)
+            // 6) Show and enable Play button immediately after analysis
             els.loadingOverlay.style.display = "none";
             els.playProcessedButton.style.display = "block";
-            setPlayButtonEnabled(false); // start disabled/faded
+            els.playProcessedButton.classList.add("enabled"); // fade-in animation
+            setPlayButtonEnabled(true); // make it clickable immediately
+            console.log("[UI] ✅ /analyze-video complete — Play button enabled instantly");
 
-            maybeEnablePlayButton();
 
         } catch (err) {
             console.error("[ERROR] Analyze or upload sequence failed:", err);
@@ -448,14 +449,16 @@ import {
 
         // stop the ticker when video ends or page unloads
         els.video.addEventListener("ended", () => {
-            console.log("[EVENT] Video ended, resetting state");
+            console.log("[EVENT] Video ended (play handler) — letting global ended handler manage UI");
             stopOverlayLoop();
             if (state.ticker) {
                 clearInterval(state.ticker);
                 state.ticker = null;
             }
-            resetButtonsOnly();
+            // ❌ Do NOT call resetButtonsOnly() here.
+            // Global 'ended' listener will handle UI + Play button.
         }, { once: true });
+
 
     });
 
@@ -480,7 +483,8 @@ import {
     });
 
     els.video.addEventListener("ended", () => {
-        console.log("[EVENT] Video ended — disabling play button");
+        console.log("[EVENT] Video ended — keeping Play enabled for replay");
+
         stopOverlayLoop();
 
         if (state.ticker) {
@@ -488,21 +492,21 @@ import {
             state.ticker = null;
         }
 
-        // Hide canvas, show preview video again
+        // Show original video, hide overlay canvas
         els.canvas.style.display = "none";
         els.video.style.display = "block";
 
-        // Reset UI buttons except play
+        // Reset upload/analyze/show-metrics states
         resetButtonsOnly();
 
-        // ✅ Disable Play button after completion
-        setPlayButtonEnabled(false);
-        els.playProcessedButton.classList.remove("enabled");
-        els.playProcessedButton.textContent = "PLAY VIDEO";
-        els.playProcessedButton.disabled = true;
-        els.playProcessedButton.classList.add("button-disabled");
+        // ✅ Keep Play button visible & enabled as REPLAY
+        els.playProcessedButton.style.display = "block";
+        els.playProcessedButton.textContent = "REPLAY VIDEO";
+        els.playProcessedButton.classList.add("enabled");
+        els.playProcessedButton.disabled = false;
+        els.playProcessedButton.classList.remove("button-disabled");
 
-        console.log("[UI] Play button disabled after full process complete");
+        setPlayButtonEnabled(true);
     });
 
 
@@ -536,6 +540,16 @@ import {
         st.cached.ready = true;
         console.log("[STATE] Metrics ready — checking overlay readiness");
         maybeEnablePlayButton();
+        // --- Force Play button visible + animated (metrics already ready) ---
+        const playBtn = document.getElementById("playProcessedButton");
+        if (playBtn) {
+            playBtn.style.display = "block";
+            playBtn.classList.add("enabled"); // triggers fadeIn animation
+            playBtn.disabled = false;
+            playBtn.classList.remove("button-disabled");
+            console.log("[UI] ✅ Play button forced visible after metrics readiness");
+        }
+
 
 
         // ensure visualizations remain reset/empty until Play
