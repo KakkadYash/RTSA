@@ -34,7 +34,12 @@ import {
 
 (function loadAnalytics() {
     console.log("[INIT] Analytics page loaded");
-
+    // 🚫 Prevent double-initialization
+    if (window.__RTSA_ANALYTICS_INIT__) {
+        console.log("[INIT] Analytics already initialized, skipping.");
+        return;
+    }
+    window.__RTSA_ANALYTICS_INIT__ = true;
     // CONSTANTS
     const CONFIG = {
         API_BASE: "https://rtsa-backend-gpu-843332298202.us-central1.run.app",
@@ -607,4 +612,10 @@ import {
     }
 
     window.loadAnalytics = loadAnalytics;
+    // 👇 Cleanup hook for SPA navigation
+    window.addEventListener("beforeunloadAnalytics", () => {
+        console.log("[CLEANUP] Analytics tearing down...");
+        window.__RTSA_ANALYTICS_INIT__ = false;
+    });
+
 })();

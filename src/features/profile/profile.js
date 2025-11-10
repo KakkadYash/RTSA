@@ -6,13 +6,25 @@ function loadProfile() {
     window.location.href = "../login/login.html";
     return;
   }
-  
+
   // ====== Fetch existing profile to populate UI ======
   (async () => {
     try {
       const res = await fetch(`${API_BASE}profile?userId=${encodeURIComponent(userId)}`);
       if (!res.ok) throw new Error("Failed to load profile");
       const data = await res.json();
+
+      // ✅ Set profile picture if backend returns one
+      if (imagePreview) {
+        if (data.profilePicUrl) {
+          imagePreview.src = data.profilePicUrl;
+          // Optional: cache for other pages
+          localStorage.setItem("profilePicUrl", data.profilePicUrl);
+        } else {
+          // Fallback to default
+          imagePreview.src = "../../../public/assets/images/profilepic.png";
+        }
+      }
 
       // Fill top info boxes
       const nameInfo = document.getElementById("nameInfo");
@@ -48,6 +60,52 @@ function loadProfile() {
   const imagePreview = document.getElementById("img-preview");
   const form = document.getElementById("userProfileForm");
   const openModalBtn = document.getElementById("openModalBtn");
+  if (fileInput && imagePreview) {
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        alert("User ID missing. Please login again.");
+        window.location.href = "../login/login.html";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("userId", userId);
+      formData.append("profilePic", file);
+
+      try {
+        const res = await fetch(`${API_BASE}profile-pic`, {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.detail || "Failed to upload profile picture");
+        }
+
+        // Prefer backend URL; fallback to local preview
+        if (data.profilePicUrl) {
+          imagePreview.src = data.profilePicUrl;
+          localStorage.setItem("profilePicUrl", data.profilePicUrl);
+        } else {
+          const objectUrl = URL.createObjectURL(file);
+          imagePreview.src = objectUrl;
+        }
+
+        alert("Profile picture updated successfully!");
+      } catch (err) {
+        console.error("Error uploading profile picture:", err);
+        alert("Could not upload profile picture. Please try again.");
+      }
+    });
+
+    // Click on image opens file picker
+    imagePreview.addEventListener("click", () => fileInput.click());
+  }
 
   // ====== Helper: Load Calibration Modal HTML, CSS, JS ======
   async function loadCalibrationModal() {
