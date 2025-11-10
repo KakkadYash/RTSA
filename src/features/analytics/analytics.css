@@ -434,6 +434,12 @@ progress::-moz-progress-bar {
     align-items: center;
 }
 
+.legends-wrapper {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
 .inner-legend-wrapper {
     display: flex;
     width: 100%;
