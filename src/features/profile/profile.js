@@ -14,6 +14,18 @@ function loadProfile() {
       if (!res.ok) throw new Error("Failed to load profile");
       const data = await res.json();
 
+      // ✅ Set profile picture if backend returns one
+      if (imagePreview) {
+        if (data.profilePicUrl) {
+          imagePreview.src = data.profilePicUrl;
+          // Optional: cache for other pages
+          localStorage.setItem("profilePicUrl", data.profilePicUrl);
+        } else {
+          // Fallback to default
+          imagePreview.src = "../../../public/assets/images/profilepic.png";
+        }
+      }
+
       // Fill top info boxes
       const nameInfo = document.getElementById("nameInfo");
       const sportInfo = document.getElementById("sportInfo");
