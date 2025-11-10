@@ -139,20 +139,52 @@ export function showUnifiedChart(state, metricIndices = []) {
             boxWidth: 0,
             padding: 14,
             font: { size: 13, weight: "bold" },
-            color: "#000", // base color (will be overridden by plugin)
+            color: "#000", // base color (legendColorPlugin adjusts per item)
           },
+          onClick(e, legendItem, legend) {
+            const chart = legend.chart;
+            const datasetIndex = legendItem.datasetIndex;
 
-        },
-        tooltip: {
-          callbacks: {
-            title(items) {
-              const i = items?.[0]?.dataIndex ?? 0;
-              const t = state.currentChart?.data?.labels?.[i];
-              return `t = ${Number(t || 0).toFixed(2)} s`;
-            },
+            // How many are currently visible?
+            const visibleIndexes = chart.data.datasets
+              .map((ds, i) => ({ i, meta: chart.getDatasetMeta(i) }))
+              .filter(({ meta }) => meta && meta.hidden !== true)
+              .map(({ i }) => i);
+
+            const clickedMeta = chart.getDatasetMeta(datasetIndex);
+            const isClickedVisible = clickedMeta && clickedMeta.hidden !== true;
+            const allVisible = visibleIndexes.length === chart.data.datasets.length;
+            const singleVisible = visibleIndexes.length === 1 && visibleIndexes[0] === datasetIndex;
+
+            if (allVisible) {
+              // Case 1: all visible -> focus on clicked only
+              chart.data.datasets.forEach((ds, i) => {
+                const meta = chart.getDatasetMeta(i);
+                meta.hidden = i !== datasetIndex;
+              });
+            } else if (singleVisible && isClickedVisible) {
+              // Case 2: only this one visible -> reset to all
+              chart.data.datasets.forEach((ds, i) => {
+                const meta = chart.getDatasetMeta(i);
+                meta.hidden = false;
+              });
+            } else {
+              // Case 3: mixed state -> focus on clicked only
+              chart.data.datasets.forEach((ds, i) => {
+                const meta = chart.getDatasetMeta(i);
+                meta.hidden = i !== datasetIndex;
+              });
+            }
+
+            chart.update();
           },
+        },
+
+        tooltip: {
+          // ...
         },
       },
+
 
       scales: {
         x: { title: { display: true, text: "Time (s)" }, ticks: { autoSkip: true, maxTicksLimit: 10 } },
