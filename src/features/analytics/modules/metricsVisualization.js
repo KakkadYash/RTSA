@@ -1,77 +1,75 @@
 // metricsVisualization.js
 // All Chart.js logic, legends, sliders, and top metric boxes.
 
+// HTML-based double doughnut (outer posture ring + inner head ring)
 export function initDoughnutChart(canvasId, CONFIG) {
-  const ctx = document.getElementById(canvasId).getContext("2d");
+  const root = document.getElementById("doubleDonut");
+  if (!root) {
+    console.warn("[DOUGHNUT] #doubleDonut not found in DOM");
+    return null;
+  }
 
-  const centerLabelPlugin = {
-    id: "centerLabelPlugin",
-    afterDraw(chart) {
-      const { ctx, width, height } = chart;
-      ctx.save();
-      ctx.font = "bold 20px Arial";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      if (chart.canvas.id === "speedometerChart") {
-        const speedValue = chart.data.datasets[0].data[0] || 0;
-        ctx.fillText(`${Number(speedValue).toFixed(2)} yards/sec`, width / 2, height / 2);
-      } else if (chart.canvas.id === "headMovementChart") {
-        const idealPercentage = chart.data.datasets[0].data[0] || 0;
-        ctx.fillText(`${idealPercentage}% Ideal`, width / 2, height / 2);
-      }
-      ctx.restore();
-    }
-  };
-  Chart.register(centerLabelPlugin);
+  const outer = root.querySelector(".outer-ring");
+  const inner = root.querySelector(".inner-ring");
+  const center = document.getElementById("donutCenterLabel");
 
-  return new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: [...CONFIG.OUTER_LABELS, ...CONFIG.INNER_LABELS],
-      datasets: [
-        {
-          // OUTER ring
-          data: [0, 0, 0],
-          backgroundColor: [
-            "rgb(102, 169, 232)",  // Running
-            "rgb(82, 113, 255)",   // Standing
-            "rgb(0, 74, 100)"      // Crouching
-          ],
-          borderColor: ["rgb(0,0,0)", "rgb(0,0,0)", "rgb(0,0,0)"],
-          borderWidth: 2
-        },
-        {
-          // INNER ring
-          data: [0, 100],
-          backgroundColor: [
-            "rgb(122, 222, 90)",  // Head Up
-            "rgb(233, 57, 44)"    // Head Down
-          ],
-          borderColor: ["rgb(0,0,0)", "rgb(0,0,0)"],
-          borderWidth: 2
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: "40%",
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label(ctx) {
-              const lbl = ctx.datasetIndex === 0
-                ? CONFIG.OUTER_LABELS[ctx.dataIndex]
-                : CONFIG.INNER_LABELS[ctx.dataIndex];
-              return `${lbl}: ${Math.round(ctx.parsed)}%`;
-            }
-          }
-        }
-      }
-    }
-  });
+  if (!outer || !inner || !center) {
+    console.warn("[DOUGHNUT] Missing inner elements in #doubleDonut");
+    return null;
+  }
+
+  // Initialize as cleared
+  resetHtmlDoughnut({ outer, inner, center });
+
+  // Return a reference object instead of a Chart.js instance
+  return { outer, inner, center };
 }
+function resetHtmlDoughnut(refs) {
+  if (!refs) return;
+  refs.outer.style.background = "conic-gradient(#444 0deg, #444 360deg)";
+  refs.inner.style.background = "conic-gradient(#222 0deg, #222 360deg)";
+  refs.center.textContent = "--%";
+}
+
+export function updateDoughnutChartFromData(donutRefs, backend) {
+  if (!donutRefs || !backend) return;
+  const { outer, inner, center } = donutRefs;
+
+  // ----- OUTER RING: Running / Standing / Crouching -----
+  const r = Number(backend.outerRing?.Running || 0);
+  const s = Number(backend.outerRing?.Standing || 0);
+  const c = Number(backend.outerRing?.Crouching || 0);
+
+  const totalOuter = r + s + c || 1;
+  const rDeg = (r / totalOuter) * 360;
+  const sDeg = (s / totalOuter) * 360;
+  const cDeg = (c / totalOuter) * 360;
+
+  outer.style.background = `
+    conic-gradient(
+      rgb(102,169,232) 0deg ${rDeg}deg,
+      rgb(82,113,255) ${rDeg}deg ${rDeg + sDeg}deg,
+      rgb(0,74,100) ${rDeg + sDeg}deg 360deg
+    )
+  `;
+
+  // ----- INNER RING: Head Up / Head Down -----
+  const headUp = Number(backend.innerRing?.["Head Up"] || 0);
+  const headDown = Number(backend.innerRing?.["Head Down"] || 0);
+  const totalInner = headUp + headDown || 1;
+  const upDeg = (headUp / totalInner) * 360;
+
+  inner.style.background = `
+    conic-gradient(
+      rgb(122,222,90) 0deg ${upDeg}deg,
+      rgb(233,57,44) ${upDeg}deg 360deg
+    )
+  `;
+
+  // Center label -> Head Up %
+  center.textContent = `${Math.round(headUp)}%`;
+}
+
 
 export function showUnifiedChart(state, metricIndices = []) {
   const canvas = document.getElementById("myChart2");
@@ -191,21 +189,6 @@ export function buildLegend(containerId, labels, colors) {
   });
 }
 
-export function updateDoughnutChartFromData(doughnutChart, backend) {
-  // inner ring
-  const headUp = Number(backend.innerRing?.["Head Up"] || 0);
-  const headDown = Number(backend.innerRing?.["Head Down"] || 0);
-  doughnutChart.data.datasets[1].data = [headUp, headDown];
-
-  // outer ring
-  const r = Number(backend.outerRing?.Running || 0);
-  const s = Number(backend.outerRing?.Standing || 0);
-  const c = Number(backend.outerRing?.Crouching || 0);
-  doughnutChart.data.datasets[0].data = [r, s, c];
-
-  doughnutChart.update();
-}
-
 export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
   // slice arrays to "uptoIndex" (for progressive updates while playing)
   const slicer = (arr) => {
@@ -261,19 +244,19 @@ export function updateTopMetricBoxes({ timeSecs, totalDistanceYards, steps }) {
 }
 
 export function resetCharts(state, doughnutChart) {
-  // doughnut
+  // Reset HTML double donut
   if (doughnutChart) {
-    doughnutChart.data.datasets[0].data = [0, 0, 0];
-    doughnutChart.data.datasets[1].data = [0, 100];
-    doughnutChart.update();
+    resetHtmlDoughnut(doughnutChart);
   }
 
-  if (state.currentChart && state.currentChart.canvas && state.currentChart.ctx) {
+  // Reset unified line chart (Chart.js) safely
+  if (state.currentChart && state.currentChart.data) {
     state.currentChart.data.labels = [];
     state.currentChart.data.datasets.forEach(ds => ds.data = []);
     state.currentChart.update();
   }
 }
+
 
 
 export function resetMetricSlidersUI(CONFIG) {
