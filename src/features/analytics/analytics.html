@@ -84,16 +84,22 @@
               <div class="back-card-title">
                 <span>TECHNIQUE</span>
               </div>
-              <div class="outerlegendwrapper">
-                <div></div>
+            </div>
+            <div class="legends-wrapper">
+                <div id="innerLegend"></div>
                 <div id="outerLegend"></div>
+            </div>
+            <div class="donut-chart-wrapper">
+              <div class="double-donut" id="doubleDonut">
+                <!-- Outer ring (Running / Standing / Crouching) -->
+                <div class="outer-ring"></div>
+
+                <!-- Inner ring (Head Up / Head Down) -->
+                <div class="inner-ring"></div>
+
+                <!-- Center label (we use Head Up %) -->
+                <div class="center-label" id="donutCenterLabel">--%</div>
               </div>
-            </div>
-            <div>
-              <canvas id="myChart"></canvas>
-            </div>
-            <div class="inner-legend-wrapper">
-              <div id="innerLegend"></div>
             </div>
             <div class="description ai-video-wrap">
               <video class="ai-preview-video" preload="auto" autoplay muted loop playsinline>

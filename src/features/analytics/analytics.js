@@ -205,10 +205,24 @@ import {
 
     // CHARTS
     console.log("[INIT] Initializing charts...");
+
+    // HTML double donut (technique ring)
     const doughnutChart = initDoughnutChart("myChart", CONFIG);
-    showUnifiedChart(state, [0, 1, 2, 3, 4, 5]); // empty at first, becomes populated after analysis
-    buildLegend("outerLegend", CONFIG.OUTER_LABELS, doughnutChart.data.datasets[0].backgroundColor);
-    buildLegend("innerLegend", CONFIG.INNER_LABELS, doughnutChart.data.datasets[1].backgroundColor);
+
+    // Unified time-series chart (still Chart.js)
+    showUnifiedChart(state, [0, 1, 2, 3, 4, 5]);
+
+    // Legends: use your known colors directly
+    buildLegend("outerLegend", CONFIG.OUTER_LABELS, [
+        "rgb(102, 169, 232)",
+        "rgb(82, 113, 255)",
+        "rgb(0, 74, 100)"
+    ]);
+
+    buildLegend("innerLegend", CONFIG.INNER_LABELS, [
+        "rgb(122, 222, 90)",
+        "rgb(233, 57, 44)"
+    ]);
 
     // OVERLAY
     console.log("[INIT] Initializing Mediapipe overlay...");
@@ -394,6 +408,10 @@ import {
         state.backend.totalDistance = Number(m.totalDistance || 0);
         state.backend.totalSteps = Number(m.totalSteps || 0);
         state.backend.maxMetrics = m.maxMetrics || null;
+
+        // 3) Update the double donut now that backend has posture/head metrics
+        updateDoughnutChartFromData(doughnutChart, state.backend);
+
 
         // 2) Initialize the unified chart with labels only (series empty)
         // 🧹 Clean up any existing chart before creating a new one
