@@ -45,6 +45,13 @@ function loadProfile() {
       document.getElementById("sports").value = Array.isArray(data.sports)
         ? data.sports.join(", ")
         : "";
+      // Set profile picture from backend if available
+      if (data.profilePicUrl) {
+        if (imagePreview) {
+          imagePreview.src = data.profilePicUrl;
+        }
+      }
+
 
       // Reflect checkbox states in dropdown
       const checkboxes = document.querySelectorAll("#sportsDropdown input[type='checkbox']");
@@ -60,6 +67,13 @@ function loadProfile() {
   const imagePreview = document.getElementById("img-preview");
   const form = document.getElementById("userProfileForm");
   const openModalBtn = document.getElementById("openModalBtn");
+  // === Click avatar to choose new profile photo ===
+  if (imagePreview && fileInput) {
+    imagePreview.addEventListener("click", () => {
+      fileInput.click();
+    });
+  }
+  // === Upload selected profile picture to backend ===
   if (fileInput && imagePreview) {
     fileInput.addEventListener("change", async () => {
       const file = fileInput.files[0];
@@ -87,14 +101,9 @@ function loadProfile() {
           throw new Error(data.detail || "Failed to upload profile picture");
         }
 
-        // Prefer backend URL; fallback to local preview
-        if (data.profilePicUrl) {
-          imagePreview.src = data.profilePicUrl;
-          localStorage.setItem("profilePicUrl", data.profilePicUrl);
-        } else {
-          const objectUrl = URL.createObjectURL(file);
-          imagePreview.src = objectUrl;
-        }
+        // Show new picture instantly
+        const objectUrl = URL.createObjectURL(file);
+        imagePreview.src = objectUrl;
 
         alert("Profile picture updated successfully!");
       } catch (err) {
@@ -102,10 +111,8 @@ function loadProfile() {
         alert("Could not upload profile picture. Please try again.");
       }
     });
-
-    // Click on image opens file picker
-    imagePreview.addEventListener("click", () => fileInput.click());
   }
+
 
   // ====== Helper: Load Calibration Modal HTML, CSS, JS ======
   async function loadCalibrationModal() {
