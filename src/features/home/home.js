@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     drillCatalog: "loadDrillCatalog",
     // Add more if needed
   };
- 
+
   /**
    * Load HTML content into content area.
    */
@@ -71,8 +71,15 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   function removeElementById(id) {
     const el = document.getElementById(id);
-    if (el) el.remove();
+    if (el) {
+      // 🧹 Dispatch cleanup event before removing analytics
+      if (id === "dynamic-page-script") {
+        window.dispatchEvent(new Event("beforeunloadAnalytics"));
+      }
+      el.remove();
+    }
   }
+
 
   /**
    * Handle tab click: load resources and toggle active state.
