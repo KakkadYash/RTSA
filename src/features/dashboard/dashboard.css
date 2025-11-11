@@ -3,30 +3,30 @@
 
 
 #bg {
-  background-image: url(../../../public/assets/images/route.png), url(../../../public/assets/images/Logo-para-marca-personal-en-negro-y-rosa-15.png), url(../../../public/assets/images/Dashes.png);
+  background-image: url(../../../public/assets/images/route.png), url(../../../public/assets/images/Dashes.png);
   background-position: right top, right center, right bottom;
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-attachment: scroll, scroll, scroll;
-  background-size: 100px, auto 300px, 100px auto;
+  background-size: 50px, 65px auto;
   padding: 1vw;
-  height: 60vw;
+  height: 80vw;
 }
 
 main span {
-  padding-top: 20px;
-  padding-left: 20px;
+  padding-top: 10px;
+  padding-left: 10px;
   display: flex;
   line-height: 1;
-  font-size: 60px;
+  font-size: 30px;
   color: #fff;
   justify-content: flex-start;
   gap: 0.2em;
 }
 
 button#one-page-report {
-  width: 7em;
-  height: 3em;
-  font-size: 1.5em;
+  width: 6em;
+  height: 2em;
+  font-size: 1em;
 }
 
 .header-wrapper {
@@ -50,23 +50,23 @@ button#one-page-report {
 }
 
 .userData span {
-  padding-left: 20px;
+  padding-left: 10px;
   display: flex;
   line-height: 1;
-  font-size: 60px;
+  font-size: 35px;
   color: red;
 }
 
 #bg .line {
-  padding-left: 20px;
+  padding-left: 6px;
   height: auto;
-  width: 210px;
+  width: 150px;
 }
 
 main .line2 {
-  padding-left: 20px;
+  padding-left: 6px;
   height: auto;
-  width: 510px;
+  width: 165px;
 }
 
 .userData {
@@ -80,8 +80,8 @@ canvas {
   border: 2px solid #000000;
   background-color: #A7A7A7;
   border-radius: 1vw;
-  width: 61em;
-  height: 25em;
+  width: 30em;
+  height: 15em;
 }
 
 .avatar {
@@ -105,7 +105,7 @@ canvas {
   justify-content: flex-start;
   padding: 1vw 0 1vw 1vw;
   width: 100%;
-  height: 30vh;
+  height: 20vh;
   flex-wrap: wrap;
   align-items: flex-start;
   flex-direction: column;
@@ -118,7 +118,7 @@ canvas {
   height: 400px;
   /* ✅ fixed height */
   position: relative;
-  padding-left: 20px;
+  padding-left: 10px;
 }
 
 #prevChart {
@@ -130,7 +130,6 @@ canvas {
 }
 
 .chart-arrows {
-  margin-top: 1vw;
   height: 2vw;
   width: 100%;
   display: flex;
@@ -155,7 +154,7 @@ canvas {
 .small-box {
   background-color: #000000;
   color: #FFFFFF;
-  font-size: 4vw;
+  font-size: 2.5vw;
   border-radius: 1vw;
   display: flex;
   flex-direction: column;
@@ -180,7 +179,7 @@ canvas {
 
   .small-box {
     font-size: 30px;
-    width: 90vw;
+    width: 30vw;
     height: auto;
     padding: 15px;
     line-height: 40px;
@@ -232,7 +231,7 @@ canvas {
 
 @media (max-width: 1024px) {
   .small-box {
-    width: 80vw;
+    width: 20vw;
   }
 
   .avatar {
@@ -240,6 +239,6 @@ canvas {
   }
 
   .chart-container {
-    width: 95vw;
+    width: 56.5vw;
   }
 }
