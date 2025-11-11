@@ -76,7 +76,7 @@ export function showUnifiedChart(state, metricIndices = []) {
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
 
-  // ✅ Always destroy any existing chart before reusing canvas
+  // Always destroy any existing chart before reusing canvas
   if (state.currentChart) {
     try {
       state.currentChart.destroy();
@@ -90,7 +90,7 @@ export function showUnifiedChart(state, metricIndices = []) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Now safely create a fresh Chart instance
-  // 🧠 Custom plugin to color each legend text per dataset
+  // Custom plugin to color each legend text per dataset
   const legendColorPlugin = {
     id: "legendColorPlugin",
     afterDraw(chart) {
@@ -118,12 +118,12 @@ export function showUnifiedChart(state, metricIndices = []) {
     data: {
       labels: state.backend.chartLabels || [],
       datasets: [
-        { label: "Head Angle (°)", data: state.backend.headAngleData || [], borderColor: "#FF8C00", fill: false },
-        { label: "Speed (yd/s)", data: state.backend.speedData || [], borderColor: "#1F43E5", fill: false },
-        { label: "Acceleration (yd/s²)", data: state.backend.accelerationData || [], borderColor: "#7DD859", fill: false },
-        { label: "Deceleration (yd/s²)", data: state.backend.decelerationData || [], borderColor: "#E93632", fill: false },
-        { label: "Stride Length (yd)", data: state.backend.strideData || [], borderColor: "#FFA500", fill: false },
-        { label: "Jump Height (yd)", data: state.backend.jumpData || [], borderColor: "#800080", fill: false },
+        { label: "Head Angle (°)", data: state.backend.headAngleData || [], borderColor: "#FF8C00", fill: false, yAxisID: "y0" },
+        { label: "Speed (yd/s)", data: state.backend.speedData || [], borderColor: "#1F43E5", fill: false, yAxisID: "y1" },
+        { label: "Acceleration (yd/s²)", data: state.backend.accelerationData || [], borderColor: "#7DD859", fill: false, yAxisID: "y2" },
+        { label: "Deceleration (yd/s²)", data: state.backend.decelerationData || [], borderColor: "#E93632", fill: false, yAxisID: "y3" },
+        { label: "Step Length (yd)", data: state.backend.stepLengthData || [], borderColor: "#FFA500", fill: false, yAxisID: "y4" },
+        { label: "Jump Height (yd)", data: state.backend.jumpData || [], borderColor: "#800080", fill: false, yAxisID: "y5" },
       ]
     },
     options: {
@@ -177,6 +177,17 @@ export function showUnifiedChart(state, metricIndices = []) {
             }
 
             chart.update();
+
+            // 🧠 After toggling visibility, adjust which Y-axes show
+            Object.keys(chart.options.scales).forEach((axis) => {
+              if (axis.startsWith("y")) chart.options.scales[axis].display = false;
+            });
+
+            const visibleDatasets = chart.data.datasets.filter((ds, i) => !chart.getDatasetMeta(i).hidden);
+            if (visibleDatasets.length === 1) {
+              chart.options.scales[visibleDatasets[0].yAxisID].display = true;
+            }
+            chart.update();
           },
         },
 
@@ -185,11 +196,30 @@ export function showUnifiedChart(state, metricIndices = []) {
         },
       },
 
+      scales: (() => {
+        // dynamically create separate hidden y-axes for each dataset
+        const yAxes = {};
+        const colors = ["#FF8C00", "#1F43E5", "#7DD859", "#E93632", "#FFA500", "#800080"];
+        const keys = ["headAngleData", "speedData", "accelerationData", "decelerationData", "stepLengthData", "jumpData"];
+        keys.forEach((key, i) => {
+          yAxes[`y${i}`] = {
+            type: "linear",
+            display: false,       // hidden in combined mode
+            position: "left",
+            offset: true,         // avoids overlap → stacked visual
+            grid: { drawOnChartArea: false },
+            ticks: { color: colors[i] }
+          };
+        });
 
-      scales: {
-        x: { title: { display: true, text: "Time (s)" }, ticks: { autoSkip: true, maxTicksLimit: 10 } },
-        y: { title: { display: true, text: "Value" } }
-      }
+        return {
+          x: {
+            title: { display: true, text: "Time (s)" },
+            ticks: { autoSkip: true, maxTicksLimit: 10 }
+          },
+          ...yAxes
+        };
+      })()
     }
   });
 
@@ -232,7 +262,11 @@ export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
   const accelArr = slicer(backend.accelerationData);
   const decelArr = slicer(backend.decelerationData);
   const jumpArr = slicer(backend.jumpData);
-  const strideArr = slicer(backend.strideData);
+  // Prefer strideData array if available, else fallback to scalar stepFrequency
+  const strideArr = backend.strideData && backend.strideData.length
+    ? slicer(backend.strideData)
+    : [Number(backend.stepFrequency || 0)];
+
 
   const mm = backend.maxMetrics || {};
   const speed = Math.round( // prefer backend.topSpeed or mm.maxSpeed

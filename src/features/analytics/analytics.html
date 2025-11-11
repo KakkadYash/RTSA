@@ -86,8 +86,8 @@
               </div>
             </div>
             <div class="legends-wrapper">
-                <div id="innerLegend"></div>
-                <div id="outerLegend"></div>
+              <div id="innerLegend"></div>
+              <div id="outerLegend"></div>
             </div>
             <div class="donut-chart-wrapper">
               <div class="double-donut" id="doubleDonut">
@@ -189,25 +189,24 @@
               <div class="card-metrics-container">
                 <div class="slideContainer">
                   <div class="sliderHead">
+                    <label for="strideLength" class="tooltip-label">STEP FREQUENCY<span class="tooltip-text">The average
+                        number of steps/sec</span></label>
+                    <div id="averageStrideLength">0</div>
+                  </div>
+                  <div class="progressWrapper">
+                    <div class="progressFill" id="averageStrideLengthBar"></div>
+                  </div>
+                </div>
+                <div class="slideContainer">
+                  <div class="sliderHead">
                     <label for="jumpHeight" class="tooltip-label">MAX
-                      JUMP HEIGHT<span class="tooltip-text">The average height reached across all recorded jumps during
+                      JUMP HEIGHT<span class="tooltip-text">The maximum height reached across all recorded jumps during
                         the session. Measured
                         in yards (yd).</span></label>
                     <div id="averageJumpHeight">0</div>
                   </div>
                   <div class="progressWrapper">
                     <div class="progressFill" id="averageJumpHeightBar"></div>
-                  </div>
-                </div>
-                <div class="slideContainer">
-                  <div class="sliderHead">
-                    <label for="strideLength" class="tooltip-label">MAX
-                      STRIDE LENGTH<span class="tooltip-text">The average distance covered in each step while running or
-                        sprinting during the session. Measured in yards (yd).</span></label>
-                    <div id="averageStrideLength">0</div>
-                  </div>
-                  <div class="progressWrapper">
-                    <div class="progressFill" id="averageStrideLengthBar"></div>
                   </div>
                 </div>
               </div>
