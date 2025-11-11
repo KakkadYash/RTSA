@@ -4,163 +4,120 @@ function loadDashboard() {
   const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/"
   if (!userId) return;
 
-  const chartCanvas = document.getElementById("myChart");
   const uploadCounter = document.getElementById("uploadCounter");
-  const prevBtn = document.getElementById("prevChart");
-  const nextBtn = document.getElementById("nextChart");
-
-  if (!chartCanvas || !uploadCounter || !prevBtn || !nextBtn) {
+  const chartCanvas = document.getElementById("dashboardChart");
+  console.log("[DEBUG] chartCanvas:", chartCanvas, "uploadCounter:", uploadCounter);
+  if (!chartCanvas || !uploadCounter) {
     console.warn("Dashboard elements not ready");
     return;
   }
+  let dashboardChart = null;
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false, // <- keep
-    animation: false,           // <- optional
-  };
-
-  let chartInstance;
-  let currentMetricIndex = 0;
-
-  const metricLabels = ["Combined", "Ideal Head Angle %", "Top Speed (km/h)", "Average Athletic Score"];
-  const chartDataCache = { labels: [], headAngleData: [], topSpeedData: [], athleticScoreData: [] };
-
-  const average = arr => arr.length ? arr.reduce((a, b) => a + b, 0) : 0;
-
-  function renderChart(index) {
+  // ✅ Reusable Chart.js setup like analytics unified chart
+  function renderUnifiedChart(topSpeed, maxAccel, headUp) {
     const ctx = chartCanvas.getContext("2d");
-    if (chartInstance) chartInstance.destroy();
+    if (dashboardChart) dashboardChart.destroy();
 
-    const { labels, headAngleData, topSpeedData, athleticScoreData } = chartDataCache;
+    const labels = Array.from({ length: Math.max(topSpeed.length, maxAccel.length, headUp.length) }, (_, i) => `Video ${i + 1}`);
 
-    let datasets = [];
-    if (index === 0) {
-      datasets = [
-        { label: "Ideal Head Angle %", data: headAngleData, borderColor: "blue", fill: false },
-        { label: "Top Speed (km/h)", data: topSpeedData, borderColor: "red", fill: false },
-        { label: "Average Athletic Score", data: athleticScoreData, borderColor: "green", fill: false }
-      ];
-    } else {
-      const dataMap = [null, headAngleData, topSpeedData, athleticScoreData];
-      const colorMap = [null, "blue", "red", "green"];
-      datasets = [{
-        label: metricLabels[index],
-        data: dataMap[index],
-        borderColor: colorMap[index],
-        fill: false
-      }];
-    }
+    const datasets = [
+      { label: "Top Speed (yd/s)", data: topSpeed, borderColor: "#1F43E5", fill: false, yAxisID: "y0" },
+      { label: "Max Acceleration (yd/s²)", data: maxAccel, borderColor: "#7DD859", fill: false, yAxisID: "y1" },
+      { label: "Head Up %", data: headUp, borderColor: "#FF8C00", fill: false, yAxisID: "y2" },
+    ];
 
-    chartInstance = new Chart(ctx, {
+    const yAxes = {};
+    datasets.forEach((ds, i) => {
+      yAxes[`y${i}`] = {
+        type: "linear",
+        display: false,
+        position: "left",
+        offset: true,
+        grid: { drawOnChartArea: false },
+        ticks: { color: ds.borderColor },
+      };
+    });
+
+    dashboardChart = new Chart(ctx, {
       type: "line",
       data: { labels, datasets },
-      options: chartOptions
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "nearest", intersect: true },
+        elements: { point: { radius: 3 }, line: { tension: 0.25 } },
+        plugins: {
+          legend: {
+            position: "top",
+            labels: { font: { size: 13, weight: "bold" }, color: "#000" },
+            onClick: (e, legendItem, legend) => {
+              const chart = legend.chart;
+              const datasetIndex = legendItem.datasetIndex;
+              const meta = chart.getDatasetMeta(datasetIndex);
+              meta.hidden = meta.hidden === null ? !chart.data.datasets[datasetIndex].hidden : null;
+
+              // Hide all Y-axes
+              Object.keys(chart.options.scales).forEach(axis => {
+                if (axis.startsWith("y")) chart.options.scales[axis].display = false;
+              });
+
+              // Show Y-axis if only one dataset is visible
+              const visible = chart.data.datasets.filter((ds, i) => !chart.getDatasetMeta(i).hidden);
+              if (visible.length === 1) {
+                chart.options.scales[visible[0].yAxisID].display = true;
+              }
+
+              chart.update();
+            },
+          },
+        },
+        scales: {
+          x: { title: { display: true, text: "Video Index" } },
+          ...yAxes,
+        },
+      },
     });
   }
 
+
   async function fetchUploadCount() {
     try {
-      const res = await fetch(`${API_BASE}get-total-uploads?userId=${userId}` );
+      console.log("[NETWORK] Triggering /get-total-uploads for userId", userId);
+      const res = await fetch(`${API_BASE}get-total-uploads?userId=${userId}`);
       const data = await res.json();
+
       uploadCounter.textContent = data.total_uploads || "0";
+
+      const metrics = data.recent_analytics || {};
+      const topSpeed = metrics.topSpeed || [];
+      const maxAccel = metrics.maxAcceleration || [];
+      const headUp = metrics.headUpPercentage || [];
+
+      renderUnifiedChart(topSpeed, maxAccel, headUp);
     } catch (err) {
-      console.error("Upload count error:", err);
-    }
-  }
-
-  async function fetchHistoryData() {
-    try {
-      const res = await fetch(`${API_BASE}history?userId=${userId}`);
-      const data = await res.json();
-      const history = data.history;
-      if (!Array.isArray(history)) return;
-
-      history.sort((a, b) => new Date(a.upload_date) - new Date(b.upload_date));
-      const uploadDates = history.map(h => new Date(h.upload_date));
-      const firstDate = uploadDates[0];
-      const lastDate = uploadDates[uploadDates.length - 1];
-      const timeSpanDays = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24));
-
-      let labels = [], head = [], speed = [], score = [];
-
-      if (timeSpanDays <= 7) {
-        labels = uploadDates.map((_, i) => `Day ${i + 1}`);
-        head = history.map(h => parseFloat(h.ideal_head_angle_percentage) || 0);
-        speed = history.map(h => parseFloat(h.top_speed) || 0);
-        score = history.map(h => parseFloat(h.athletic_score) || 0);
-      } else if (timeSpanDays <= 28) {
-        const weekly = {};
-        history.forEach(h => {
-          const week = Math.ceil((new Date(h.upload_date) - firstDate) / (1000 * 60 * 60 * 24 * 7)) + 1;
-          const key = `Week ${week}`;
-          if (!weekly[key]) weekly[key] = { head: [], speed: [], score: [] };
-          weekly[key].head.push(parseFloat(h.ideal_head_angle_percentage) || 0);
-          weekly[key].speed.push(parseFloat(h.top_speed) || 0);
-          weekly[key].score.push(parseFloat(h.athletic_score) || 0);
-        });
-        labels = Object.keys(weekly);
-        head = labels.map(k => average(weekly[k].head));
-        speed = labels.map(k => average(weekly[k].speed));
-        score = labels.map(k => average(weekly[k].score));
-      } else {
-        const monthly = {};
-        history.forEach(h => {
-          const date = new Date(h.upload_date);
-          const month = (date.getFullYear() - firstDate.getFullYear()) * 12 + date.getMonth() - firstDate.getMonth() + 1;
-          const key = `Month ${month}`;
-          if (!monthly[key]) monthly[key] = { head: [], speed: [], score: [] };
-          monthly[key].head.push(parseFloat(h.ideal_head_angle_percentage) || 0);
-          monthly[key].speed.push(parseFloat(h.top_speed) || 0);
-          monthly[key].score.push(parseFloat(h.athletic_score) || 0);
-        });
-        labels = Object.keys(monthly);
-        head = labels.map(k => average(monthly[k].head));
-        speed = labels.map(k => average(monthly[k].speed));
-        score = labels.map(k => average(monthly[k].score));
-      }
-
-      chartDataCache.labels = labels;
-      chartDataCache.headAngleData = head;
-      chartDataCache.topSpeedData = speed;
-      chartDataCache.athleticScoreData = score;
-
-      renderChart(currentMetricIndex);
-    } catch (err) {
-      console.error("History fetch error:", err);
+      console.error("Dashboard data error:", err);
     }
   }
 
   // Run on load
-  fetchUploadCount();
-  fetchHistoryData();
-
-  // Arrows
-  prevBtn.addEventListener("click", () => {
-    currentMetricIndex = (currentMetricIndex - 1 + metricLabels.length) % metricLabels.length;
-    renderChart(currentMetricIndex);
-  });
-
-  nextBtn.addEventListener("click", () => {
-    currentMetricIndex = (currentMetricIndex + 1) % metricLabels.length;
-    renderChart(currentMetricIndex);
-  });
-}
-const reportBtn = document.getElementById("one-page-report");
-if (reportBtn) {
-  reportBtn.addEventListener("click", () => {
-    console.log('clicked one-page-report')
-    window.open("../../../src/features/reportForm/reportform.html", "_blank");
-  });
-} else {
-  console.warn("⚠️ One Page Report button not found.");
-}
-document.addEventListener("click", function (e) {
-  const reportBtn = e.target.closest("#one-page-report");
+  const reportBtn = document.getElementById("one-page-report");
   if (reportBtn) {
-    console.log("clicked one-page-report");
-    window.open("../../../src/features/reportForm/reportform.html", "_blank");
+    reportBtn.addEventListener("click", () => {
+      console.log('clicked one-page-report')
+      window.open("../../../src/features/reportForm/reportform.html", "_blank");
+    });
+  } else {
+    console.warn("⚠️ One Page Report button not found.");
   }
-});
+  document.addEventListener("click", function (e) {
+    const reportBtn = e.target.closest("#one-page-report");
+    if (reportBtn) {
+      console.log("clicked one-page-report");
+      window.open("../../../src/features/reportForm/reportform.html", "_blank");
+    }
+  });
+
+  fetchUploadCount();
+}
 // Required so home.js can access it globally
 window.loadDashboard = loadDashboard;
