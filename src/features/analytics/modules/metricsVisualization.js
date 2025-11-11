@@ -1,84 +1,82 @@
 // metricsVisualization.js
 // All Chart.js logic, legends, sliders, and top metric boxes.
 
+// HTML-based double doughnut (outer posture ring + inner head ring)
 export function initDoughnutChart(canvasId, CONFIG) {
-  const ctx = document.getElementById(canvasId).getContext("2d");
+  const root = document.getElementById("doubleDonut");
+  if (!root) {
+    console.warn("[DOUGHNUT] #doubleDonut not found in DOM");
+    return null;
+  }
 
-  const centerLabelPlugin = {
-    id: "centerLabelPlugin",
-    afterDraw(chart) {
-      const { ctx, width, height } = chart;
-      ctx.save();
-      ctx.font = "bold 20px Arial";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      if (chart.canvas.id === "speedometerChart") {
-        const speedValue = chart.data.datasets[0].data[0] || 0;
-        ctx.fillText(`${Number(speedValue).toFixed(2)} yards/sec`, width / 2, height / 2);
-      } else if (chart.canvas.id === "headMovementChart") {
-        const idealPercentage = chart.data.datasets[0].data[0] || 0;
-        ctx.fillText(`${idealPercentage}% Ideal`, width / 2, height / 2);
-      }
-      ctx.restore();
-    }
-  };
-  Chart.register(centerLabelPlugin);
+  const outer = root.querySelector(".outer-ring");
+  const inner = root.querySelector(".inner-ring");
+  const center = document.getElementById("donutCenterLabel");
 
-  return new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: [...CONFIG.OUTER_LABELS, ...CONFIG.INNER_LABELS],
-      datasets: [
-        {
-          // OUTER ring
-          data: [0, 0, 0],
-          backgroundColor: [
-            "rgb(102, 169, 232)",  // Running
-            "rgb(82, 113, 255)",   // Standing
-            "rgb(0, 74, 100)"      // Crouching
-          ],
-          borderColor: ["rgb(0,0,0)", "rgb(0,0,0)", "rgb(0,0,0)"],
-          borderWidth: 2
-        },
-        {
-          // INNER ring
-          data: [0, 100],
-          backgroundColor: [
-            "rgb(122, 222, 90)",  // Head Up
-            "rgb(233, 57, 44)"    // Head Down
-          ],
-          borderColor: ["rgb(0,0,0)", "rgb(0,0,0)"],
-          borderWidth: 2
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: "40%",
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label(ctx) {
-              const lbl = ctx.datasetIndex === 0
-                ? CONFIG.OUTER_LABELS[ctx.dataIndex]
-                : CONFIG.INNER_LABELS[ctx.dataIndex];
-              return `${lbl}: ${Math.round(ctx.parsed)}%`;
-            }
-          }
-        }
-      }
-    }
-  });
+  if (!outer || !inner || !center) {
+    console.warn("[DOUGHNUT] Missing inner elements in #doubleDonut");
+    return null;
+  }
+
+  // Initialize as cleared
+  resetHtmlDoughnut({ outer, inner, center });
+
+  // Return a reference object instead of a Chart.js instance
+  return { outer, inner, center };
 }
+function resetHtmlDoughnut(refs) {
+  if (!refs) return;
+  refs.outer.style.background = "conic-gradient(#444 0deg, #444 360deg)";
+  refs.inner.style.background = "conic-gradient(#222 0deg, #222 360deg)";
+  refs.center.textContent = "--%";
+}
+
+export function updateDoughnutChartFromData(donutRefs, backend) {
+  if (!donutRefs || !backend) return;
+  const { outer, inner, center } = donutRefs;
+
+  // ----- OUTER RING: Running / Standing / Crouching -----
+  const r = Number(backend.outerRing?.Running || 0);
+  const s = Number(backend.outerRing?.Standing || 0);
+  const c = Number(backend.outerRing?.Crouching || 0);
+
+  const totalOuter = r + s + c || 1;
+  const rDeg = (r / totalOuter) * 360;
+  const sDeg = (s / totalOuter) * 360;
+  const cDeg = (c / totalOuter) * 360;
+
+  outer.style.background = `
+    conic-gradient(
+      rgb(102,169,232) 0deg ${rDeg}deg,
+      rgb(82,113,255) ${rDeg}deg ${rDeg + sDeg}deg,
+      rgb(0,74,100) ${rDeg + sDeg}deg 360deg
+    )
+  `;
+
+  // ----- INNER RING: Head Up / Head Down -----
+  const headUp = Number(backend.innerRing?.["Head Up"] || 0);
+  const headDown = Number(backend.innerRing?.["Head Down"] || 0);
+  const totalInner = headUp + headDown || 1;
+  const upDeg = (headUp / totalInner) * 360;
+
+  inner.style.background = `
+    conic-gradient(
+      rgb(122,222,90) 0deg ${upDeg}deg,
+      rgb(233,57,44) ${upDeg}deg 360deg
+    )
+  `;
+
+  // Center label -> Head Up %
+  center.textContent = `${Math.round(headUp)}%`;
+}
+
 
 export function showUnifiedChart(state, metricIndices = []) {
   const canvas = document.getElementById("myChart2");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
 
-  // ✅ Always destroy any existing chart before reusing canvas
+  // Always destroy any existing chart before reusing canvas
   if (state.currentChart) {
     try {
       state.currentChart.destroy();
@@ -92,7 +90,7 @@ export function showUnifiedChart(state, metricIndices = []) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Now safely create a fresh Chart instance
-  // 🧠 Custom plugin to color each legend text per dataset
+  // Custom plugin to color each legend text per dataset
   const legendColorPlugin = {
     id: "legendColorPlugin",
     afterDraw(chart) {
@@ -120,12 +118,12 @@ export function showUnifiedChart(state, metricIndices = []) {
     data: {
       labels: state.backend.chartLabels || [],
       datasets: [
-        { label: "Head Angle (°)", data: state.backend.headAngleData || [], borderColor: "#FF8C00", fill: false },
-        { label: "Speed (yd/s)", data: state.backend.speedData || [], borderColor: "#1F43E5", fill: false },
-        { label: "Acceleration (yd/s²)", data: state.backend.accelerationData || [], borderColor: "#7DD859", fill: false },
-        { label: "Deceleration (yd/s²)", data: state.backend.decelerationData || [], borderColor: "#E93632", fill: false },
-        { label: "Stride Length (yd)", data: state.backend.strideData || [], borderColor: "#FFA500", fill: false },
-        { label: "Jump Height (yd)", data: state.backend.jumpData || [], borderColor: "#800080", fill: false },
+        { label: "Head Angle (°)", data: state.backend.headAngleData || [], borderColor: "#FF8C00", fill: false, yAxisID: "y0" },
+        { label: "Speed (yd/s)", data: state.backend.speedData || [], borderColor: "#1F43E5", fill: false, yAxisID: "y1" },
+        { label: "Acceleration (yd/s²)", data: state.backend.accelerationData || [], borderColor: "#7DD859", fill: false, yAxisID: "y2" },
+        { label: "Deceleration (yd/s²)", data: state.backend.decelerationData || [], borderColor: "#E93632", fill: false, yAxisID: "y3" },
+        { label: "Step Length (yd)", data: state.backend.stepLengthData || [], borderColor: "#FFA500", fill: false, yAxisID: "y4" },
+        { label: "Jump Height (yd)", data: state.backend.jumpData || [], borderColor: "#800080", fill: false, yAxisID: "y5" },
       ]
     },
     options: {
@@ -141,25 +139,87 @@ export function showUnifiedChart(state, metricIndices = []) {
             boxWidth: 0,
             padding: 14,
             font: { size: 13, weight: "bold" },
-            color: "#000", // base color (will be overridden by plugin)
+            color: "#000", // base color (legendColorPlugin adjusts per item)
           },
+          onClick(e, legendItem, legend) {
+            const chart = legend.chart;
+            const datasetIndex = legendItem.datasetIndex;
 
-        },
-        tooltip: {
-          callbacks: {
-            title(items) {
-              const i = items?.[0]?.dataIndex ?? 0;
-              const t = state.currentChart?.data?.labels?.[i];
-              return `t = ${Number(t || 0).toFixed(2)} s`;
-            },
+            // How many are currently visible?
+            const visibleIndexes = chart.data.datasets
+              .map((ds, i) => ({ i, meta: chart.getDatasetMeta(i) }))
+              .filter(({ meta }) => meta && meta.hidden !== true)
+              .map(({ i }) => i);
+
+            const clickedMeta = chart.getDatasetMeta(datasetIndex);
+            const isClickedVisible = clickedMeta && clickedMeta.hidden !== true;
+            const allVisible = visibleIndexes.length === chart.data.datasets.length;
+            const singleVisible = visibleIndexes.length === 1 && visibleIndexes[0] === datasetIndex;
+
+            if (allVisible) {
+              // Case 1: all visible -> focus on clicked only
+              chart.data.datasets.forEach((ds, i) => {
+                const meta = chart.getDatasetMeta(i);
+                meta.hidden = i !== datasetIndex;
+              });
+            } else if (singleVisible && isClickedVisible) {
+              // Case 2: only this one visible -> reset to all
+              chart.data.datasets.forEach((ds, i) => {
+                const meta = chart.getDatasetMeta(i);
+                meta.hidden = false;
+              });
+            } else {
+              // Case 3: mixed state -> focus on clicked only
+              chart.data.datasets.forEach((ds, i) => {
+                const meta = chart.getDatasetMeta(i);
+                meta.hidden = i !== datasetIndex;
+              });
+            }
+
+            chart.update();
+
+            // 🧠 After toggling visibility, adjust which Y-axes show
+            Object.keys(chart.options.scales).forEach((axis) => {
+              if (axis.startsWith("y")) chart.options.scales[axis].display = false;
+            });
+
+            const visibleDatasets = chart.data.datasets.filter((ds, i) => !chart.getDatasetMeta(i).hidden);
+            if (visibleDatasets.length === 1) {
+              chart.options.scales[visibleDatasets[0].yAxisID].display = true;
+            }
+            chart.update();
           },
+        },
+
+        tooltip: {
+          // ...
         },
       },
 
-      scales: {
-        x: { title: { display: true, text: "Time (s)" }, ticks: { autoSkip: true, maxTicksLimit: 10 } },
-        y: { title: { display: true, text: "Value" } }
-      }
+      scales: (() => {
+        // dynamically create separate hidden y-axes for each dataset
+        const yAxes = {};
+        const colors = ["#FF8C00", "#1F43E5", "#7DD859", "#E93632", "#FFA500", "#800080"];
+        const keys = ["headAngleData", "speedData", "accelerationData", "decelerationData", "stepLengthData", "jumpData"];
+        keys.forEach((key, i) => {
+          yAxes[`y${i}`] = {
+            type: "linear",
+            display: false,       // hidden in combined mode
+            position: "left",
+            offset: true,         // avoids overlap → stacked visual
+            grid: { drawOnChartArea: false },
+            ticks: { color: colors[i] }
+          };
+        });
+
+        return {
+          x: {
+            title: { display: true, text: "Time (s)" },
+            ticks: { autoSkip: true, maxTicksLimit: 10 }
+          },
+          ...yAxes
+        };
+      })()
     }
   });
 
@@ -191,21 +251,6 @@ export function buildLegend(containerId, labels, colors) {
   });
 }
 
-export function updateDoughnutChartFromData(doughnutChart, backend) {
-  // inner ring
-  const headUp = Number(backend.innerRing?.["Head Up"] || 0);
-  const headDown = Number(backend.innerRing?.["Head Down"] || 0);
-  doughnutChart.data.datasets[1].data = [headUp, headDown];
-
-  // outer ring
-  const r = Number(backend.outerRing?.Running || 0);
-  const s = Number(backend.outerRing?.Standing || 0);
-  const c = Number(backend.outerRing?.Crouching || 0);
-  doughnutChart.data.datasets[0].data = [r, s, c];
-
-  doughnutChart.update();
-}
-
 export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
   // slice arrays to "uptoIndex" (for progressive updates while playing)
   const slicer = (arr) => {
@@ -217,7 +262,11 @@ export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
   const accelArr = slicer(backend.accelerationData);
   const decelArr = slicer(backend.decelerationData);
   const jumpArr = slicer(backend.jumpData);
-  const strideArr = slicer(backend.strideData);
+  // Prefer strideData array if available, else fallback to scalar stepFrequency
+  const strideArr = backend.strideData && backend.strideData.length
+    ? slicer(backend.strideData)
+    : [Number(backend.stepFrequency || 0)];
+
 
   const mm = backend.maxMetrics || {};
   const speed = Math.round( // prefer backend.topSpeed or mm.maxSpeed
@@ -261,19 +310,19 @@ export function updateTopMetricBoxes({ timeSecs, totalDistanceYards, steps }) {
 }
 
 export function resetCharts(state, doughnutChart) {
-  // doughnut
+  // Reset HTML double donut
   if (doughnutChart) {
-    doughnutChart.data.datasets[0].data = [0, 0, 0];
-    doughnutChart.data.datasets[1].data = [0, 100];
-    doughnutChart.update();
+    resetHtmlDoughnut(doughnutChart);
   }
 
-  if (state.currentChart && state.currentChart.canvas && state.currentChart.ctx) {
+  // Reset unified line chart (Chart.js) safely
+  if (state.currentChart && state.currentChart.data) {
     state.currentChart.data.labels = [];
     state.currentChart.data.datasets.forEach(ds => ds.data = []);
     state.currentChart.update();
   }
 }
+
 
 
 export function resetMetricSlidersUI(CONFIG) {
