@@ -78,15 +78,11 @@ function loadHistory() {
 
   const fetchPage = async (pageNumber) => {
     try {
-      const cursor = pageTokens[pageNumber] || null;
-
       const url = new URL(API_BASE + "history");
       url.searchParams.set("userId", userId);
-      if (cursor) {
-        url.searchParams.set("lastUploadDate", cursor);
-      }
+      url.searchParams.set("page", pageNumber);
 
-      console.log(`[HISTORY] Fetching page ${pageNumber} with cursor:`, cursor);
+      console.log(`[HISTORY] Fetching page ${pageNumber}`);
 
       const response = await fetch(url.toString());
       if (!response.ok) {
@@ -95,25 +91,16 @@ function loadHistory() {
       }
 
       const data = await response.json();
-
       renderHistory(data.history || []);
 
-      // If backend returns nextPageToken, that means there IS another page
-      if (data.nextPageToken) {
-        pageTokens[pageNumber + 1] = data.nextPageToken;
-        lastResponseHasNext = true;
-      } else {
-        // No more pages beyond this
-        delete pageTokens[pageNumber + 1];
-        lastResponseHasNext = false;
-      }
-
-      currentPage = pageNumber;
+      lastResponseHasNext = data.nextPageAvailable;
+      currentPage = data.currentPage;
       updateControls();
     } catch (err) {
       console.error("[HISTORY] Error fetching page:", err);
     }
   };
+
 
   // Button handlers (lazy-load on click)
 
