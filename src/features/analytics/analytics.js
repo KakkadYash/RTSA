@@ -398,7 +398,7 @@ import {
         state.backend.speedData = Array.isArray(m.speedData) ? m.speedData : [];
         state.backend.accelerationData = Array.isArray(m.accelerationData) ? m.accelerationData : [];
         state.backend.decelerationData = Array.isArray(m.decelerationData) ? m.decelerationData : [];
-        state.backend.strideData = Array.isArray(m.strideData) ? m.strideData : [];
+        state.backend.stepLengthData = Array.isArray(m.stepWidth) ? m.stepWidth : [];
         state.backend.jumpData = Array.isArray(m.jumpData) ? m.jumpData : [];
 
         state.backend.outerRing = m.outerRing || { Running: 0, Standing: 0, Crouching: 0 };
@@ -407,6 +407,7 @@ import {
         state.backend.topSpeed = Number(m.topSpeed || 0);
         state.backend.totalDistance = Number(m.totalDistance || 0);
         state.backend.totalSteps = Number(m.totalSteps || 0);
+        state.backend.stepFrequency = Number(m.stepFrequency || 0);
         state.backend.maxMetrics = m.maxMetrics || null;
 
         // 3) Update the double donut now that backend has posture/head metrics
@@ -455,8 +456,8 @@ import {
             ds[1].data = state.backend.speedData.slice(0, idx + 1);
             ds[2].data = state.backend.accelerationData.slice(0, idx + 1);
             ds[3].data = state.backend.decelerationData.slice(0, idx + 1);
-            ds[4].data = state.backend.strideData.slice(0, idx + 1);
-            ds[5].data = state.backend.jumpData.slice(0, idx + 1);
+            ds[4].data = state.backend.stepLengthData.slice(0, idx + 1); ds[5].data = state.backend.jumpData.slice(0, idx + 1);
+            state.currentChart.update('none');
             state.currentChart.update('none');
 
             // update sliders/top boxes progressively using uptoIndex
