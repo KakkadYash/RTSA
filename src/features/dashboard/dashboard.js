@@ -1,16 +1,30 @@
 function loadDashboard() {
   console.log("[DEBUG] loadDashboard() executed");
-  const userId = localStorage.getItem("user_id");
-  const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/"
-  if (!userId) return;
+
+  // ✅ Log what key exists in localStorage
+  console.log("[DEBUG] LocalStorage keys:", Object.keys(localStorage));
+
+  // ✅ Fix to match backend login (most likely 'userId' not 'user_id')
+  const userId = localStorage.getItem("userId") || localStorage.getItem("user_id");
+  console.log("[DEBUG] userId from localStorage =", userId);
+
+  const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/";
+  if (!userId) {
+    console.warn("[WARN] No userId found — skipping API call");
+    return;
+  }
 
   const uploadCounter = document.getElementById("uploadCounter");
   const chartCanvas = document.getElementById("dashboardChart");
   console.log("[DEBUG] chartCanvas:", chartCanvas, "uploadCounter:", uploadCounter);
+
+  // ✅ Add DOM readiness check logging
   if (!chartCanvas || !uploadCounter) {
-    console.warn("Dashboard elements not ready");
+    console.warn("[WARN] Dashboard elements not ready — retrying in 200ms");
+    setTimeout(loadDashboard, 200);
     return;
   }
+
   let dashboardChart = null;
 
   // ✅ Reusable Chart.js setup like analytics unified chart
@@ -23,7 +37,7 @@ function loadDashboard() {
     const datasets = [
       { label: "Top Speed (yd/s)", data: topSpeed, borderColor: "#1F43E5", fill: false, yAxisID: "y0" },
       { label: "Max Acceleration (yd/s²)", data: maxAccel, borderColor: "#7DD859", fill: false, yAxisID: "y1" },
-      { label: "Head Up %", data: headUp, borderColor: "#FF8C00", fill: false, yAxisID: "y2" },
+      { label: "Head Up %", data: headUp, borderColor: "#ff6600ff", fill: false, yAxisID: "y2" },
     ];
 
     const yAxes = {};
@@ -72,7 +86,7 @@ function loadDashboard() {
           },
         },
         scales: {
-          x: { title: { display: true, text: "Video Index" } },
+          x: { title: { display: true, text: "Index" } },
           ...yAxes,
         },
       },
@@ -84,7 +98,15 @@ function loadDashboard() {
     try {
       console.log("[NETWORK] Triggering /get-total-uploads for userId", userId);
       const res = await fetch(`${API_BASE}get-total-uploads?userId=${userId}`);
+      console.log("[NETWORK] Response status:", res.status);
+
+      if (!res.ok) {
+        console.warn("[WARN] Non-OK response from API:", res.status);
+        return;
+      }
+
       const data = await res.json();
+      console.log("[DEBUG] API response payload:", data);
 
       uploadCounter.textContent = data.total_uploads || "0";
 
@@ -95,20 +117,25 @@ function loadDashboard() {
 
       renderUnifiedChart(topSpeed, maxAccel, headUp);
     } catch (err) {
-      console.error("Dashboard data error:", err);
+      console.error("[ERROR] Dashboard data fetch failed:", err);
     }
   }
 
-  // Run on load
+  // ✅ Always call fetchUploadCount last
+  console.log("[DEBUG] Calling fetchUploadCount() in 100ms...");
+  setTimeout(fetchUploadCount, 100);
+
+  // Report button setup (unchanged)
   const reportBtn = document.getElementById("one-page-report");
   if (reportBtn) {
     reportBtn.addEventListener("click", () => {
-      console.log('clicked one-page-report')
+      console.log("clicked one-page-report");
       window.open("../../../src/features/reportForm/reportform.html", "_blank");
     });
   } else {
     console.warn("⚠️ One Page Report button not found.");
   }
+
   document.addEventListener("click", function (e) {
     const reportBtn = e.target.closest("#one-page-report");
     if (reportBtn) {
@@ -116,8 +143,7 @@ function loadDashboard() {
       window.open("../../../src/features/reportForm/reportform.html", "_blank");
     }
   });
-
-  fetchUploadCount();
 }
+
 // Required so home.js can access it globally
 window.loadDashboard = loadDashboard;
