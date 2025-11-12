@@ -115,7 +115,7 @@ import {
         // Analyze button
         resetAnalyze(els.analyzeButton);
         enableInteractiveButton(els.analyzeButton);
-        els.analyzeButton.style.display = "block";
+        // els.analyzeButton.style.display = "block";
 
         // Play button
         resetPlayButton(els.playProcessedButton);
@@ -258,6 +258,12 @@ import {
             localStorage.setItem("rtsa_hasVideo", "1");
 
             alert("Video uploaded successfully"); // as per your spec
+            // ✅ Now show Analyze button only after upload success
+            els.analyzeButton.style.display = "block";
+            enableInteractiveButton(els.analyzeButton);
+            resetAnalyze(els.analyzeButton);
+            els.playProcessedButton.textContent = "PLAY VIDEO"; // reset text for next run
+
         },
         (file) => {
             console.log(`[EVENT] Selected file: ${file.name}`);
@@ -456,7 +462,8 @@ import {
             ds[1].data = state.backend.speedData.slice(0, idx + 1);
             ds[2].data = state.backend.accelerationData.slice(0, idx + 1);
             ds[3].data = state.backend.decelerationData.slice(0, idx + 1);
-            ds[4].data = state.backend.stepLengthData.slice(0, idx + 1); ds[5].data = state.backend.jumpData.slice(0, idx + 1);
+            ds[4].data = state.backend.stepLengthData.slice(0, idx + 1);
+            ds[5].data = state.backend.jumpData.slice(0, idx + 1);
             state.currentChart.update('none');
             state.currentChart.update('none');
 
@@ -474,7 +481,7 @@ import {
         // stop the ticker when video ends or page unloads
         els.video.addEventListener("ended", () => {
             console.log("[EVENT] Video ended (play handler) — letting global ended handler manage UI");
-            stopOverlayLoop();
+            // stopOverlayLoop();
             if (state.ticker) {
                 clearInterval(state.ticker);
                 state.ticker = null;
@@ -509,7 +516,7 @@ import {
     els.video.addEventListener("ended", () => {
         console.log("[EVENT] Video ended — keeping Play enabled for replay");
 
-        stopOverlayLoop();
+        // stopOverlayLoop();
 
         if (state.ticker) {
             clearInterval(state.ticker);
@@ -517,8 +524,8 @@ import {
         }
 
         // Show original video, hide overlay canvas
-        els.canvas.style.display = "none";
-        els.video.style.display = "block";
+        // els.canvas.style.display = "none";
+        // els.video.style.display = "block";
 
         // Reset upload/analyze/show-metrics states
         resetButtonsOnly();
@@ -545,6 +552,7 @@ import {
             setPlayButtonEnabled(true);
             playBtn.style.display = "block";
             playBtn.classList.add("enabled");
+            els.canvas.style.display = "block";
             console.log("[UI] ✅ Metrics + Overlay ready — Play button enabled");
         } else {
             setPlayButtonEnabled(false);
