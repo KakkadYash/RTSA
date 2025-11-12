@@ -462,7 +462,8 @@ import {
             ds[1].data = state.backend.speedData.slice(0, idx + 1);
             ds[2].data = state.backend.accelerationData.slice(0, idx + 1);
             ds[3].data = state.backend.decelerationData.slice(0, idx + 1);
-            ds[4].data = state.backend.stepLengthData.slice(0, idx + 1); ds[5].data = state.backend.jumpData.slice(0, idx + 1);
+            ds[4].data = state.backend.stepLengthData.slice(0, idx + 1);
+            ds[5].data = state.backend.jumpData.slice(0, idx + 1);
             state.currentChart.update('none');
             state.currentChart.update('none');
 
