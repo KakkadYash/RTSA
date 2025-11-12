@@ -523,8 +523,8 @@ import {
         }
 
         // Show original video, hide overlay canvas
-        els.canvas.style.display = "none";
-        els.video.style.display = "block";
+        // els.canvas.style.display = "none";
+        // els.video.style.display = "block";
 
         // Reset upload/analyze/show-metrics states
         resetButtonsOnly();
@@ -551,6 +551,7 @@ import {
             setPlayButtonEnabled(true);
             playBtn.style.display = "block";
             playBtn.classList.add("enabled");
+            els.canvas.style.display = "block";
             console.log("[UI] ✅ Metrics + Overlay ready — Play button enabled");
         } else {
             setPlayButtonEnabled(false);
