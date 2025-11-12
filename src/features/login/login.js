@@ -76,7 +76,27 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       alert("Login successful!");
       console.log("User ID from server:", data.userId);
 
-      // ✅ Store userId under both camelCase & snake_case for compatibility
+      // ✅ Create unified cache object
+      const userCache = {
+        userId: data.userId,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        height_input_m: data.height_input_m,
+        calibrated_height_m: data.calibrated_height_m,
+        profilePicUrl: data.profilePicUrl,
+        is_first_login: data.is_first_login,
+        timestamp: Date.now(),
+      };
+
+      // ✅ Store compact user cache
+      localStorage.setItem("userCache", JSON.stringify(userCache));
+
+      // (Optional: keep old single values too)
+      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("user_name", data.email);
+
+
+      // Store userId and email in localStorage
       localStorage.setItem("userId", data.userId);
       localStorage.setItem("user_id", data.userId); // <- added line
 

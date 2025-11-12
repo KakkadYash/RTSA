@@ -1,5 +1,14 @@
 function loadDashboard() {
   console.log("[DEBUG] loadDashboard() executed");
+  // ✅ Retrieve cached user info
+  const userCache = JSON.parse(localStorage.getItem("userCache") || "{}");
+  const nameInfo = document.getElementById("nameInfo");
+
+  if (userCache.first_name && nameInfo) {
+    nameInfo.textContent = userCache.first_name.toUpperCase(); // Example: "YASH"
+  } else {
+    console.warn("[WARN] No cached first_name found or #nameInfo missing");
+  }
 
   // ✅ Log what key exists in localStorage
   console.log("[DEBUG] LocalStorage keys:", Object.keys(localStorage));

@@ -70,7 +70,6 @@ export function updateDoughnutChartFromData(donutRefs, backend) {
   center.textContent = `${Math.round(headUp)}%`;
 }
 
-
 export function showUnifiedChart(state, metricIndices = []) {
   const canvas = document.getElementById("myChart2");
   if (!canvas) return;
@@ -86,66 +85,89 @@ export function showUnifiedChart(state, metricIndices = []) {
     state.currentChart = null;
   }
 
-  // Optional: clear canvas context manually
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Now safely create a fresh Chart instance
-  // Custom plugin to color each legend text per dataset
-  const legendColorPlugin = {
-    id: "legendColorPlugin",
+  const datasets = [
+    { label: "Head Angle (°)", key: "headAngleData", color: "#E93632", bg: "rgba(255,140,0,0.10)" },
+    { label: "Speed (yd/s)", key: "speedData", color: "#1F43E5", bg: "rgba(31,67,229,0.10)" },
+    { label: "Acceleration (yd/s²)", key: "accelerationData", color: "#7DD859", bg: "rgba(125,216,89,0.10)" },
+    { label: "Deceleration (yd/s²)", key: "decelerationData", color: "#E93632", bg: "rgba(233,54,50,0.10)" },
+    { label: "Step Length (yd)", key: "stepLengthData", color: "#FFA500", bg: "rgba(255,165,0,0.10)" },
+    { label: "Jump Height (yd)", key: "jumpData", color: "#800080", bg: "rgba(128,0,128,0.10)" },
+  ];
+
+  // Store originals for fade recovery
+  datasets.forEach((d) => (d.originalBorderColor = d.color));
+  // 🧠 Plugin: force legend colors + remove strike-through
+  const legendFixPlugin = {
+    id: "legendFixPlugin",
     afterDraw(chart) {
       const legend = chart.legend;
-      if (!legend?.legendItems) return;
+      if (!legend) return;
 
+      const ctx = chart.ctx;
       legend.legendItems.forEach((item, i) => {
-        // force text color based on index
-        const colorMap = [
-          "#FF8C00", // Head Angle
-          "#1F43E5", // Speed
-          "#7DD859", // Acceleration
-          "#E93632", // Deceleration
-          "#FFA500", // Stride Length
-          "#800080", // Jump Height
-        ];
-        item.fontColor = colorMap[i] || "#000";
+        // Find the matching dataset color
+        const ds = chart.data.datasets[item.datasetIndex];
+        const color = ds?.borderColor || "#000";
+
+        // Get legend text box geometry
+        const { text, textAlign, textBaseline, fontString, x, y } = item;
+        const font = Chart.helpers.toFont(fontString);
+        ctx.save();
+        ctx.font = font.string;
+        ctx.textAlign = textAlign || "left";
+        ctx.textBaseline = textBaseline || "middle";
+        ctx.fillStyle = color;        // ✅ dataset color text
+        ctx.strokeStyle = "transparent";
+        ctx.setLineDash([]);          // ✅ remove strike-through dash
+        ctx.fillText(item.text, item.textX, item.textY);
+        ctx.restore();
       });
     },
   };
-  Chart.register(legendColorPlugin);
+  Chart.register(legendFixPlugin);
 
   state.currentChart = new Chart(ctx, {
     type: "line",
     data: {
       labels: state.backend.chartLabels || [],
-      datasets: [
-        { label: "Head Angle (°)", data: state.backend.headAngleData || [], borderColor: "#FF8C00", fill: false, yAxisID: "y0" },
-        { label: "Speed (yd/s)", data: state.backend.speedData || [], borderColor: "#1F43E5", fill: false, yAxisID: "y1" },
-        { label: "Acceleration (yd/s²)", data: state.backend.accelerationData || [], borderColor: "#7DD859", fill: false, yAxisID: "y2" },
-        { label: "Deceleration (yd/s²)", data: state.backend.decelerationData || [], borderColor: "#E93632", fill: false, yAxisID: "y3" },
-        { label: "Step Length (yd)", data: state.backend.stepLengthData || [], borderColor: "#FFA500", fill: false, yAxisID: "y4" },
-        { label: "Jump Height (yd)", data: state.backend.jumpData || [], borderColor: "#800080", fill: false, yAxisID: "y5" },
-      ]
+      datasets: datasets.map((d, i) => ({
+        label: d.label,
+        data: state.backend[d.key] || [],
+        borderColor: d.color,
+        borderWidth: 1.5,
+        fill: true,
+        backgroundColor: d.bg,
+        yAxisID: `y${i}`,
+      })),
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: { duration: 500, easing: "easeOutQuart" },
       interaction: { mode: "nearest", intersect: true },
-      elements: { point: { radius: 3, hitRadius: 10 }, line: { tension: 0.2 } },
+      elements: {
+        point: { radius: 0.5, hitRadius: 8 },
+        line: { tension: 0.25, borderWidth: 1.5 },
+      },
       plugins: {
         legend: {
           position: "top",
           labels: {
             usePointStyle: false,
             boxWidth: 0,
-            padding: 14,
-            font: { size: 13, weight: "bold" },
-            color: "#000", // base color (legendColorPlugin adjusts per item)
+            padding: 8,
+            font: { size: 15, weight: "500" },
+            color: "#fff",
+            textStrokeWidth: 0,
+            textDecoration: "none",
           },
           onClick(e, legendItem, legend) {
             const chart = legend.chart;
             const datasetIndex = legendItem.datasetIndex;
 
-            // How many are currently visible?
+            // Determine visibility state
             const visibleIndexes = chart.data.datasets
               .map((ds, i) => ({ i, meta: chart.getDatasetMeta(i) }))
               .filter(({ meta }) => meta && meta.hidden !== true)
@@ -157,70 +179,56 @@ export function showUnifiedChart(state, metricIndices = []) {
             const singleVisible = visibleIndexes.length === 1 && visibleIndexes[0] === datasetIndex;
 
             if (allVisible) {
-              // Case 1: all visible -> focus on clicked only
-              chart.data.datasets.forEach((ds, i) => {
-                const meta = chart.getDatasetMeta(i);
-                meta.hidden = i !== datasetIndex;
-              });
+              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = i !== datasetIndex));
             } else if (singleVisible && isClickedVisible) {
-              // Case 2: only this one visible -> reset to all
-              chart.data.datasets.forEach((ds, i) => {
-                const meta = chart.getDatasetMeta(i);
-                meta.hidden = false;
-              });
+              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = false));
             } else {
-              // Case 3: mixed state -> focus on clicked only
-              chart.data.datasets.forEach((ds, i) => {
-                const meta = chart.getDatasetMeta(i);
-                meta.hidden = i !== datasetIndex;
-              });
+              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = i !== datasetIndex));
             }
 
-            chart.update();
+            // 🎨 Fade logic with color restoration (no black issue)
+            chart.data.datasets.forEach((ds, i) => {
+              const meta = chart.getDatasetMeta(i);
+              const isVisible = meta.hidden !== true;
+              const original = datasets[i];
+              ds.borderColor = original.color; // restore base color
+              ds.backgroundColor = isVisible
+                ? original.bg
+                : original.bg.replace(/,0\.10\)/, ",0.03)"); // faded alpha
+              ds.borderWidth = isVisible ? 2 : 1;
+            });
 
-            // 🧠 After toggling visibility, adjust which Y-axes show
+            // Manage Y-axis visibility
             Object.keys(chart.options.scales).forEach((axis) => {
               if (axis.startsWith("y")) chart.options.scales[axis].display = false;
             });
-
             const visibleDatasets = chart.data.datasets.filter((ds, i) => !chart.getDatasetMeta(i).hidden);
             if (visibleDatasets.length === 1) {
               chart.options.scales[visibleDatasets[0].yAxisID].display = true;
             }
+
             chart.update();
           },
         },
-
-        tooltip: {
-          // ...
-        },
       },
-
       scales: (() => {
-        // dynamically create separate hidden y-axes for each dataset
         const yAxes = {};
-        const colors = ["#FF8C00", "#1F43E5", "#7DD859", "#E93632", "#FFA500", "#800080"];
-        const keys = ["headAngleData", "speedData", "accelerationData", "decelerationData", "stepLengthData", "jumpData"];
-        keys.forEach((key, i) => {
+        datasets.forEach((d, i) => {
           yAxes[`y${i}`] = {
             type: "linear",
-            display: false,       // hidden in combined mode
+            display: false,
             position: "left",
-            offset: true,         // avoids overlap → stacked visual
+            offset: true,
             grid: { drawOnChartArea: false },
-            ticks: { color: colors[i] }
+            ticks: { color: d.color },
           };
         });
-
         return {
-          x: {
-            title: { display: true, text: "Time (s)" },
-            ticks: { autoSkip: true, maxTicksLimit: 10 }
-          },
-          ...yAxes
+          x: { title: { display: true, text: "Time (s)" }, ticks: { autoSkip: true, maxTicksLimit: 10 } },
+          ...yAxes,
         };
-      })()
-    }
+      })(),
+    },
   });
 
   state.chartType = "line";
@@ -229,7 +237,6 @@ export function showUnifiedChart(state, metricIndices = []) {
   });
   state.currentChart.update();
 }
-
 
 export function buildLegend(containerId, labels, colors) {
   const container = document.getElementById(containerId);
