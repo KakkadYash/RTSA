@@ -115,7 +115,7 @@ import {
         // Analyze button
         resetAnalyze(els.analyzeButton);
         enableInteractiveButton(els.analyzeButton);
-        els.analyzeButton.style.display = "block";
+        // els.analyzeButton.style.display = "block";
 
         // Play button
         resetPlayButton(els.playProcessedButton);
@@ -258,6 +258,12 @@ import {
             localStorage.setItem("rtsa_hasVideo", "1");
 
             alert("Video uploaded successfully"); // as per your spec
+            // ✅ Now show Analyze button only after upload success
+            els.analyzeButton.style.display = "block";
+            enableInteractiveButton(els.analyzeButton);
+            resetAnalyze(els.analyzeButton);
+            els.playProcessedButton.textContent = "PLAY VIDEO"; // reset text for next run
+
         },
         (file) => {
             console.log(`[EVENT] Selected file: ${file.name}`);
@@ -474,7 +480,7 @@ import {
         // stop the ticker when video ends or page unloads
         els.video.addEventListener("ended", () => {
             console.log("[EVENT] Video ended (play handler) — letting global ended handler manage UI");
-            stopOverlayLoop();
+            // stopOverlayLoop();
             if (state.ticker) {
                 clearInterval(state.ticker);
                 state.ticker = null;
@@ -509,7 +515,7 @@ import {
     els.video.addEventListener("ended", () => {
         console.log("[EVENT] Video ended — keeping Play enabled for replay");
 
-        stopOverlayLoop();
+        // stopOverlayLoop();
 
         if (state.ticker) {
             clearInterval(state.ticker);
