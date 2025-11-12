@@ -4,7 +4,7 @@
 
 #bg {
   background-image: url(../../../public/assets/images/route.png), url(../../../public/assets/images/Dashes.png);
-  background-position: right top, right center, right bottom;
+  background-position: right center, right bottom;
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-attachment: scroll, scroll, scroll;
   background-size: 50px, 65px auto;
@@ -38,7 +38,7 @@ button#one-page-report {
   align-items: baseline;
   justify-content: flex-start;
   gap: 0.5rem;
-  font-size: 2rem;
+  font-size: 2em;
 }
 
 .hello {
