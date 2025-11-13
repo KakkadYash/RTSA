@@ -320,60 +320,79 @@ export function buildUnifiedLegend(chart, datasets) {
   container.innerHTML = "";
 
   datasets.forEach((d, index) => {
+    // WRAPPER
     const item = document.createElement("div");
     item.classList.add("unified-legend-item");
 
+    // Color box
     const color = document.createElement("span");
     color.classList.add("unified-legend-color");
     color.style.backgroundColor = d.color;
 
+    // Label
     const label = document.createElement("span");
     label.classList.add("unified-legend-text");
     label.innerText = d.label;
 
+    // CHECKBOX
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.classList.add("legend-checkbox");
+
+    // Assemble
     item.appendChild(color);
     item.appendChild(label);
+    item.appendChild(checkbox);
+    container.appendChild(item);
 
-    // CLICK LOGIC = EXACT SAME AS YOUR CURRENT CHART LEGEND
-    item.addEventListener("click", () => {
-      const meta = chart.getDatasetMeta(index);
-
-      const visible = chart.data.datasets
-        .map((_, i) => !chart.getDatasetMeta(i).hidden)
-        .filter(v => v).length;
-
-      // Replicate your current logic
-      if (visible === datasets.length) {
+    // ---- SHARED TOGGLE FUNCTION ----
+    const applyToggle = () => {
+      if (checkbox.checked) {
+        // SHOW ONLY ONE METRIC
         chart.data.datasets.forEach((ds, i) => {
           chart.getDatasetMeta(i).hidden = i !== index;
         });
-      } else if (!meta.hidden && visible === 1) {
+
+        // Fade UI
+        [...container.children].forEach((el, i) => {
+          el.style.opacity = i === index ? "1" : "0.25";
+        });
+
+        // Show only correct y-axis
+        Object.keys(chart.options.scales).forEach(axis => {
+          if (axis.startsWith("y"))
+            chart.options.scales[axis].display = axis === `y${index}`;
+        });
+
+      } else {
+        // RESTORE ALL METRICS
         chart.data.datasets.forEach((ds, i) => {
           chart.getDatasetMeta(i).hidden = false;
         });
-      } else {
-        chart.data.datasets.forEach((ds, i) => {
-          chart.getDatasetMeta(i).hidden = i !== index;
+
+        [...container.children].forEach(el => el.style.opacity = "1");
+
+        Object.keys(chart.options.scales).forEach(axis => {
+          if (axis.startsWith("y"))
+            chart.options.scales[axis].display = false;
         });
       }
 
-      // Update y-axis visibility
-      Object.keys(chart.options.scales).forEach(axis => {
-        if (axis.startsWith("y")) chart.options.scales[axis].display = false;
-      });
-
-      const nowVisible = chart.data.datasets
-        .map((_, i) => !chart.getDatasetMeta(i).hidden);
-
-      const single = nowVisible.filter(v => v).length === 1;
-      if (single) {
-        const idx = nowVisible.indexOf(true);
-        chart.options.scales[`y${idx}`].display = true;
-      }
-
       chart.update();
-    });
+    };
 
-    container.appendChild(item);
+    // ---- ON CHECKBOX CLICK ----
+    checkbox.addEventListener("change", applyToggle);
+
+    // ---- ON LEGEND ROW CLICK (label or color or empty space) ----
+    item.addEventListener("click", (e) => {
+      // Prevent double-trigger if clicking checkbox directly
+      if (e.target === checkbox) return;
+
+      checkbox.checked = !checkbox.checked;
+      applyToggle();
+    });
   });
+
+
 }
