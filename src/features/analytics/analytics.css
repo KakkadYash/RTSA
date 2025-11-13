@@ -46,8 +46,10 @@
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-around;
-    min-height: 25vw;   /* safer baseline */
-    height: 25vw;       /* allow content to define height */
+    min-height: 25vw;
+    /* safer baseline */
+    height: 25vw;
+    /* allow content to define height */
     margin-bottom: 2vw;
     width: 100%;
     gap: 1em;
@@ -126,11 +128,12 @@ video {
     width: 50%;
     min-height: 25vw;
     box-sizing: border-box;
-    padding: 0 1em;
+    padding: 0 0 0 0.5em;
+    gap: 0.5em;
 }
 
 #myChart2 {
-    width: 28vw!important;
+    width: 28vw !important;
     height: 100% !important;
     display: block;
     background: linear-gradient(to bottom, #444444, #000000);
@@ -695,17 +698,18 @@ progress::-moz-progress-bar {
 .unified-legend-item {
     display: flex;
     align-items: center;
-    gap: 0.4vw;
-    padding: 0.4vw 0.8vw;
+    gap: 0.3em;
+    padding: 0.4em 0.4em;
     background: #202020;
     border: 1px solid #444;
-    border-radius: 0.6vw;
+    border-radius: 0.6em;
     cursor: pointer;
     font-family: Futura LtCn BT;
     color: white;
-    font-size: 1vw;
-    letter-spacing: 0.1vw;
     transition: 0.2s;
+    height: 3em;
+    width: 8em;
+    flex-direction: row;
 }
 
 .unified-legend-item:hover {
