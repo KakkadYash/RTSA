@@ -4,8 +4,10 @@
 <div id="bg">
   <div class="hello">
     <div class="header-wrapper">
-      <span>HEY,</span>
-      <div id=nameInfo></div>
+      <div class="greeting-wrapper">
+        <span>HEY,</span>
+        <div id=nameInfo></div>
+      </div>
       <button type="button" id="one-page-report" class="button hover-animation click-animation hover-box-shadow">One
         Page Report</button>
     </div>
@@ -18,8 +20,10 @@
         </div>
       </div>
     </div>
-    <span>PERFORMANCE METRICS OVER TIME</span>
-    <img src="../../../public/assets/images/single white line rt.png" alt="Line" class="line2">
+    <div class="chart-heading-wrapper">
+      <span>PERFORMANCE METRICS OVER TIME</span>
+      <img src="../../../public/assets/images/single white line rt.png" alt="Line" class="line2">
+    </div>
     <div class="chart-container">
       <canvas id="dashboardChart"></canvas>
     </div>

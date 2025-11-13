@@ -1,5 +1,14 @@
 function loadDashboard() {
   console.log("[DEBUG] loadDashboard() executed");
+  // ✅ Retrieve cached user info
+  const userCache = JSON.parse(localStorage.getItem("userCache") || "{}");
+  const nameInfo = document.getElementById("nameInfo");
+
+  if (userCache.first_name && nameInfo) {
+    nameInfo.textContent = userCache.first_name.toUpperCase(); // Example: "YASH"
+  } else {
+    console.warn("[WARN] No cached first_name found or #nameInfo missing");
+  }
 
   // ✅ Log what key exists in localStorage
   console.log("[DEBUG] LocalStorage keys:", Object.keys(localStorage));
@@ -64,25 +73,56 @@ function loadDashboard() {
           legend: {
             position: "top",
             labels: { font: { size: 13, weight: "bold" }, color: "#000" },
-            onClick: (e, legendItem, legend) => {
+            onClick(e, legendItem, legend) {
               const chart = legend.chart;
               const datasetIndex = legendItem.datasetIndex;
-              const meta = chart.getDatasetMeta(datasetIndex);
-              meta.hidden = meta.hidden === null ? !chart.data.datasets[datasetIndex].hidden : null;
 
-              // Hide all Y-axes
+              // Which datasets are currently visible?
+              const visibleIndexes = chart.data.datasets
+                .map((ds, i) => ({ i, meta: chart.getDatasetMeta(i) }))
+                .filter(({ meta }) => meta && meta.hidden !== true)
+                .map(({ i }) => i);
+
+              const clickedMeta = chart.getDatasetMeta(datasetIndex);
+              const isClickedVisible = clickedMeta && clickedMeta.hidden !== true;
+
+              const allVisible = visibleIndexes.length === chart.data.datasets.length;
+              const singleVisible = visibleIndexes.length === 1 && visibleIndexes[0] === datasetIndex;
+
+              if (allVisible) {
+                // First click → show only clicked dataset
+                chart.data.datasets.forEach((ds, i) => {
+                  chart.getDatasetMeta(i).hidden = i !== datasetIndex;
+                });
+              } else if (singleVisible && isClickedVisible) {
+                // Second click → restore all datasets
+                chart.data.datasets.forEach((ds, i) => {
+                  chart.getDatasetMeta(i).hidden = false;
+                });
+              } else {
+                // General case → solo mode
+                chart.data.datasets.forEach((ds, i) => {
+                  chart.getDatasetMeta(i).hidden = i !== datasetIndex;
+                });
+              }
+
+              // Manage Y-axis visibility exactly like analytics
               Object.keys(chart.options.scales).forEach(axis => {
                 if (axis.startsWith("y")) chart.options.scales[axis].display = false;
               });
 
-              // Show Y-axis if only one dataset is visible
-              const visible = chart.data.datasets.filter((ds, i) => !chart.getDatasetMeta(i).hidden);
-              if (visible.length === 1) {
-                chart.options.scales[visible[0].yAxisID].display = true;
+              const visibleDatasets = chart.data.datasets.filter((ds, i) => {
+                return !chart.getDatasetMeta(i).hidden;
+              });
+
+              if (visibleDatasets.length === 1) {
+                const singleAxis = visibleDatasets[0].yAxisID;
+                chart.options.scales[singleAxis].display = true;
               }
 
               chart.update();
             },
+
           },
         },
         scales: {
