@@ -153,63 +153,8 @@ export function showUnifiedChart(state, metricIndices = []) {
       },
       plugins: {
         legend: {
-          position: "top",
-          labels: {
-            usePointStyle: false,
-            boxWidth: 0,
-            padding: 8,
-            font: { size: 15, weight: "500" },
-            color: "#fff",
-            textStrokeWidth: 0,
-            textDecoration: "none",
-          },
-          onClick(e, legendItem, legend) {
-            const chart = legend.chart;
-            const datasetIndex = legendItem.datasetIndex;
-
-            // Determine visibility state
-            const visibleIndexes = chart.data.datasets
-              .map((ds, i) => ({ i, meta: chart.getDatasetMeta(i) }))
-              .filter(({ meta }) => meta && meta.hidden !== true)
-              .map(({ i }) => i);
-
-            const clickedMeta = chart.getDatasetMeta(datasetIndex);
-            const isClickedVisible = clickedMeta && clickedMeta.hidden !== true;
-            const allVisible = visibleIndexes.length === chart.data.datasets.length;
-            const singleVisible = visibleIndexes.length === 1 && visibleIndexes[0] === datasetIndex;
-
-            if (allVisible) {
-              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = i !== datasetIndex));
-            } else if (singleVisible && isClickedVisible) {
-              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = false));
-            } else {
-              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = i !== datasetIndex));
-            }
-
-            // 🎨 Fade logic with color restoration (no black issue)
-            chart.data.datasets.forEach((ds, i) => {
-              const meta = chart.getDatasetMeta(i);
-              const isVisible = meta.hidden !== true;
-              const original = datasets[i];
-              ds.borderColor = original.color; // restore base color
-              ds.backgroundColor = isVisible
-                ? original.bg
-                : original.bg.replace(/,0\.10\)/, ",0.03)"); // faded alpha
-              ds.borderWidth = isVisible ? 2 : 1;
-            });
-
-            // Manage Y-axis visibility
-            Object.keys(chart.options.scales).forEach((axis) => {
-              if (axis.startsWith("y")) chart.options.scales[axis].display = false;
-            });
-            const visibleDatasets = chart.data.datasets.filter((ds, i) => !chart.getDatasetMeta(i).hidden);
-            if (visibleDatasets.length === 1) {
-              chart.options.scales[visibleDatasets[0].yAxisID].display = true;
-            }
-
-            chart.update();
-          },
-        },
+          display: false
+        }
       },
       scales: (() => {
         const yAxes = {};
@@ -230,6 +175,8 @@ export function showUnifiedChart(state, metricIndices = []) {
       })(),
     },
   });
+  // 🔥 Build Custom HTML Legend for Unified Chart
+  buildUnifiedLegend(state.currentChart, datasets);
 
   state.chartType = "line";
   state.currentChart.data.datasets.forEach((ds, idx) => {
@@ -366,3 +313,67 @@ const minOrZero = (arr) => {
 };
 const round1 = (n) => Math.round((Number(n) || 0) * 10) / 10;
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+export function buildUnifiedLegend(chart, datasets) {
+  const container = document.getElementById("unifiedLegend");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  datasets.forEach((d, index) => {
+    const item = document.createElement("div");
+    item.classList.add("unified-legend-item");
+
+    const color = document.createElement("span");
+    color.classList.add("unified-legend-color");
+    color.style.backgroundColor = d.color;
+
+    const label = document.createElement("span");
+    label.classList.add("unified-legend-text");
+    label.innerText = d.label;
+
+    item.appendChild(color);
+    item.appendChild(label);
+
+    // CLICK LOGIC = EXACT SAME AS YOUR CURRENT CHART LEGEND
+    item.addEventListener("click", () => {
+      const meta = chart.getDatasetMeta(index);
+
+      const visible = chart.data.datasets
+        .map((_, i) => !chart.getDatasetMeta(i).hidden)
+        .filter(v => v).length;
+
+      // Replicate your current logic
+      if (visible === datasets.length) {
+        chart.data.datasets.forEach((ds, i) => {
+          chart.getDatasetMeta(i).hidden = i !== index;
+        });
+      } else if (!meta.hidden && visible === 1) {
+        chart.data.datasets.forEach((ds, i) => {
+          chart.getDatasetMeta(i).hidden = false;
+        });
+      } else {
+        chart.data.datasets.forEach((ds, i) => {
+          chart.getDatasetMeta(i).hidden = i !== index;
+        });
+      }
+
+      // Update y-axis visibility
+      Object.keys(chart.options.scales).forEach(axis => {
+        if (axis.startsWith("y")) chart.options.scales[axis].display = false;
+      });
+
+      const nowVisible = chart.data.datasets
+        .map((_, i) => !chart.getDatasetMeta(i).hidden);
+
+      const single = nowVisible.filter(v => v).length === 1;
+      if (single) {
+        const idx = nowVisible.indexOf(true);
+        chart.options.scales[`y${idx}`].display = true;
+      }
+
+      chart.update();
+    });
+
+    container.appendChild(item);
+  });
+}

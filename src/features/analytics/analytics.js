@@ -300,7 +300,6 @@ import {
         },
     });
 
-
     // ANALYZE BUTTON
     setAnalyzeHandler(els.analyzeButton, async () => {
         console.log("[EVENT] Analyze button clicked");
