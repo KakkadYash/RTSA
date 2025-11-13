@@ -153,63 +153,8 @@ export function showUnifiedChart(state, metricIndices = []) {
       },
       plugins: {
         legend: {
-          position: "top",
-          labels: {
-            usePointStyle: false,
-            boxWidth: 0,
-            padding: 8,
-            font: { size: 15, weight: "500" },
-            color: "#fff",
-            textStrokeWidth: 0,
-            textDecoration: "none",
-          },
-          onClick(e, legendItem, legend) {
-            const chart = legend.chart;
-            const datasetIndex = legendItem.datasetIndex;
-
-            // Determine visibility state
-            const visibleIndexes = chart.data.datasets
-              .map((ds, i) => ({ i, meta: chart.getDatasetMeta(i) }))
-              .filter(({ meta }) => meta && meta.hidden !== true)
-              .map(({ i }) => i);
-
-            const clickedMeta = chart.getDatasetMeta(datasetIndex);
-            const isClickedVisible = clickedMeta && clickedMeta.hidden !== true;
-            const allVisible = visibleIndexes.length === chart.data.datasets.length;
-            const singleVisible = visibleIndexes.length === 1 && visibleIndexes[0] === datasetIndex;
-
-            if (allVisible) {
-              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = i !== datasetIndex));
-            } else if (singleVisible && isClickedVisible) {
-              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = false));
-            } else {
-              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = i !== datasetIndex));
-            }
-
-            // 🎨 Fade logic with color restoration (no black issue)
-            chart.data.datasets.forEach((ds, i) => {
-              const meta = chart.getDatasetMeta(i);
-              const isVisible = meta.hidden !== true;
-              const original = datasets[i];
-              ds.borderColor = original.color; // restore base color
-              ds.backgroundColor = isVisible
-                ? original.bg
-                : original.bg.replace(/,0\.10\)/, ",0.03)"); // faded alpha
-              ds.borderWidth = isVisible ? 2 : 1;
-            });
-
-            // Manage Y-axis visibility
-            Object.keys(chart.options.scales).forEach((axis) => {
-              if (axis.startsWith("y")) chart.options.scales[axis].display = false;
-            });
-            const visibleDatasets = chart.data.datasets.filter((ds, i) => !chart.getDatasetMeta(i).hidden);
-            if (visibleDatasets.length === 1) {
-              chart.options.scales[visibleDatasets[0].yAxisID].display = true;
-            }
-
-            chart.update();
-          },
-        },
+          display: false
+        }
       },
       scales: (() => {
         const yAxes = {};
@@ -230,6 +175,8 @@ export function showUnifiedChart(state, metricIndices = []) {
       })(),
     },
   });
+  // 🔥 Build Custom HTML Legend for Unified Chart
+  buildUnifiedLegend(state.currentChart, datasets);
 
   state.chartType = "line";
   state.currentChart.data.datasets.forEach((ds, idx) => {
@@ -366,3 +313,86 @@ const minOrZero = (arr) => {
 };
 const round1 = (n) => Math.round((Number(n) || 0) * 10) / 10;
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+export function buildUnifiedLegend(chart, datasets) {
+  const container = document.getElementById("unifiedLegend");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  datasets.forEach((d, index) => {
+    // WRAPPER
+    const item = document.createElement("div");
+    item.classList.add("unified-legend-item");
+
+    // Color box
+    const color = document.createElement("span");
+    color.classList.add("unified-legend-color");
+    color.style.backgroundColor = d.color;
+
+    // Label
+    const label = document.createElement("span");
+    label.classList.add("unified-legend-text");
+    label.innerText = d.label;
+
+    // CHECKBOX
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.classList.add("legend-checkbox");
+
+    // Assemble
+    item.appendChild(color);
+    item.appendChild(label);
+    item.appendChild(checkbox);
+    container.appendChild(item);
+
+    // ---- SHARED TOGGLE FUNCTION ----
+    const applyToggle = () => {
+      if (checkbox.checked) {
+        // SHOW ONLY ONE METRIC
+        chart.data.datasets.forEach((ds, i) => {
+          chart.getDatasetMeta(i).hidden = i !== index;
+        });
+
+        // Fade UI
+        [...container.children].forEach((el, i) => {
+          el.style.opacity = i === index ? "1" : "0.25";
+        });
+
+        // Show only correct y-axis
+        Object.keys(chart.options.scales).forEach(axis => {
+          if (axis.startsWith("y"))
+            chart.options.scales[axis].display = axis === `y${index}`;
+        });
+
+      } else {
+        // RESTORE ALL METRICS
+        chart.data.datasets.forEach((ds, i) => {
+          chart.getDatasetMeta(i).hidden = false;
+        });
+
+        [...container.children].forEach(el => el.style.opacity = "1");
+
+        Object.keys(chart.options.scales).forEach(axis => {
+          if (axis.startsWith("y"))
+            chart.options.scales[axis].display = false;
+        });
+      }
+
+      chart.update();
+    };
+
+    // ---- ON CHECKBOX CLICK ----
+    checkbox.addEventListener("change", applyToggle);
+
+    // ---- ON LEGEND ROW CLICK (label or color or empty space) ----
+    item.addEventListener("click", (e) => {
+      // Prevent double-trigger if clicking checkbox directly
+      if (e.target === checkbox) return;
+
+      checkbox.checked = !checkbox.checked;
+      applyToggle();
+    });
+  });
+
+
+}
