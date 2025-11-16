@@ -1,3 +1,5 @@
+//tutorial.js 
+
 import steps from "./walkthroughSteps.js";
 
 let state = {
@@ -5,17 +7,24 @@ let state = {
   nodes: { backdrop: null, ring: null, tip: null }
 };
 
+let controller = null;   // ← ADD THIS EXACTLY HERE
+
 export function startTutorial() {
   // Build overlay nodes once
   buildScaffold();
-  // Attach controls
-  window.addEventListener("resize", placeStep, { passive: true });
-  window.addEventListener("keydown", onKey);
+
+  // Modern: use AbortController for cleanup
+  controller = new AbortController();
+  const { signal } = controller;
+
+  window.addEventListener("resize", placeStep, { passive: true, signal });
+  window.addEventListener("keydown", onKey, { signal });
 
   // Begin on first valid step
-  state.idx = -1;
-  next(true);
+  state.idx = 0;
+  placeStep(true);
 }
+
 
 /* ---------- Controls ---------- */
 function onKey(e) {
@@ -42,31 +51,98 @@ function prev() {
 
 function finish() {
   teardown();
-  // OPTIONAL: tell backend the tutorial is completed
-  // fetch(`${API_BASE}/users/tutorial-completed`, { method: "POST", headers:{Authorization:`Bearer ${token}`}});
+
+  try {
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      fetch(`${window.API_BASE}/users/tutorial-completed`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Id": userId
+        }
+      });
+    }
+  } catch (err) {
+    console.warn("[TUTORIAL] Could not update completion:", err);
+  }
 }
+
 
 /* ---------- DOM helpers ---------- */
 function buildScaffold() {
-  // Backdrop
+  // Parent container for backdrop + ring
+  const container = el("div", "rt-tour-container");
+
+  // Backdrop (mask)
   const backdrop = el("div", "rt-tour-backdrop");
   backdrop.addEventListener("click", () => next());
-  document.body.appendChild(backdrop);
+  container.appendChild(backdrop);
 
   // Highlight ring
   const ring = el("div", "rt-tour-highlight");
-  document.body.appendChild(ring);
+  container.appendChild(ring);
 
-  // Tooltip
-  const tip = el("div", "rt-tour-tooltip");
-  tip.innerHTML = `
-    <div class="rt-tour-text"></div>
-    <div class="rt-tour-actions">
-      <button class="rt-tour-btn rt-tour-btn-ghost" data-act="skip">Skip</button>
-      <button class="rt-tour-btn rt-tour-btn-ghost" data-act="prev">Back</button>
-      <button class="rt-tour-btn rt-tour-btn-primary" data-act="next">Next</button>
-    </div>
-  `;
+  // Add container to DOM
+  document.body.appendChild(container);
+
+
+  // Tooltip (modern: via <template>)
+  let tip;
+  const tpl = document.getElementById("rt-tour-tooltip-template");
+  if (tpl && 'content' in tpl) {
+    tip = tpl.content.firstElementChild.cloneNode(true);
+  } else {
+    // Fallback (in case template is missing)
+    tip = el("div", "rt-tour-tooltip");
+    tip.innerHTML = `
+  <div class="rt-tour-text"></div>
+  <div class="rt-tour-actions">
+
+    <button
+      class="
+        rt-tour-btn
+        rt-tour-btn-ghost
+        button
+        hover-animation
+        click-animation
+        btn-scale
+        transition-fast
+      "
+      data-act="skip"
+    >Skip</button>
+
+    <button
+      class="
+        rt-tour-btn
+        rt-tour-btn-ghost
+        button
+        hover-animation
+        click-animation
+        btn-scale
+        transition-fast
+      "
+      data-act="prev"
+    >Back</button>
+
+    <button
+      class="
+        rt-tour-btn
+        rt-tour-btn-primary
+        button
+        hover-animation
+        click-animation
+        btn-scale
+        transition-fast
+      "
+      data-act="next"
+    >Next</button>
+
+  </div>
+`;
+
+  }
+
   tip.addEventListener("click", (e) => {
     const act = e.target?.dataset?.act;
     if (act === "skip") finish();
@@ -75,52 +151,189 @@ function buildScaffold() {
   });
   document.body.appendChild(tip);
 
-  state.nodes = { backdrop, ring, tip };
+  // Allow initial layout, then fade in (modern, smooth)
+  requestAnimationFrame(() => {
+    tip.classList.add("rt-tour-tooltip--visible");
+  });
+
+  state.nodes = { container, backdrop, ring, tip };
 }
 
 function teardown() {
-  window.removeEventListener("resize", placeStep);
-  window.removeEventListener("keydown", onKey);
+  if (controller) {
+    controller.abort();   // removes both listeners
+    controller = null;
+  }
   Object.values(state.nodes).forEach(n => n?.remove());
-  state.nodes = { backdrop: null, ring: null, tip: null };
+  state.nodes = { container: null, backdrop: null, ring: null, tip: null };
+
 }
 
 /* ---------- Layout ---------- */
 function placeStep(firstRun = false) {
   const step = steps[state.idx];
+  // For full-screen welcome/intro steps, disable spotlight
+  if (["welcome", "intro-message"].includes(step.id)) {
+    if (state.nodes.backdrop) {
+      state.nodes.backdrop.style.maskImage = "none";
+      state.nodes.backdrop.style.webkitMaskImage = "none";
+      state.nodes.backdrop.style.background = "rgba(0, 0, 0, 0.85)";
+      state.nodes.backdrop.style.backdropFilter = "blur(3px)";
+    }
+  } else {
+    // Use CSS-defined rectangular mask for guided steps
+    if (state.nodes.backdrop) {
+      state.nodes.backdrop.style.maskImage = "";
+      state.nodes.backdrop.style.webkitMaskImage = "";
+    }
+  }
+
   if (!step) return;
   const target = query(step.selector);
   if (!target) return next(); // selector missing → skip
 
+  // 🔒 Scroll lock ONLY for specific steps
+  const lockSteps = ["welcome", "intro-message"];
+  if (lockSteps.includes(step.id)) {
+    document.body.classList.add("rt-scroll-lock");
+  } else {
+    document.body.classList.remove("rt-scroll-lock");
+  }
+  // Always show backdrop during guided steps
+  if (state.nodes.backdrop) {
+    state.nodes.backdrop.style.display = "block";
+    requestAnimationFrame(() => (state.nodes.backdrop.style.opacity = "1"));
+  }
+
+
+
+
+  // ------------------------------------------------------
+  // CUSTOM TOOLTIP POSITIONING (ONLY FOR PROFILE STEP)
+  // ------------------------------------------------------
+  if (step.customLayout) {
+    const target = query(step.selector);
+    if (!target) return;
+
+    const rect = target.getBoundingClientRect();
+    const ring = state.nodes.ring;
+    const tip = state.nodes.tip;
+
+    // Hide text completely
+    const txt = tip.querySelector(".rt-tour-text");
+    if (txt) txt.style.display = "none";
+
+    // Tooltip layout for profile section
+    tip.style.top = "128.5px";
+    tip.style.left = "30%";
+    tip.style.position = "fixed";
+    tip.style.bottom = "5%";
+    tip.style.background = "transparent";
+    tip.style.boxShadow = "none";
+    tip.style.display = "flex";
+    tip.style.width = "100%";
+    tip.style.flexDirection = "column";
+    tip.style.justifyContent = "flex-end";
+
+    // Restore button row
+    const actions = tip.querySelector(".rt-tour-actions");
+    actions.style.display = "flex";
+    actions.style.gap = "8px";
+    actions.style.width = "100%";
+    actions.style.justifyContent = "space-evenly";
+
+    // ✅ Position highlight ring properly
+    ring.style.position = "absolute";
+    ring.style.left = `${rect.left - 8 + window.scrollX}px`;
+    ring.style.top = `${rect.top - 8 + window.scrollY}px`;
+    ring.style.width = `${rect.width + 16}px`;
+    ring.style.height = `${rect.height + 16}px`;
+    ring.style.borderRadius = "8px";
+    ring.style.outline = "3px solid #FFD700"; // golden
+    ring.style.boxShadow = "0 0 25px 6px rgba(255,215,0,0.5)";
+    ring.style.zIndex = "10001";
+    ring.style.display = "block";
+
+    // ✅ Re-enable backdrop with spotlight around the aside menu
+    if (state.nodes.backdrop) {
+      const padding = 12; // adjust for more/less space around the ring
+
+      const width = rect.width + padding * 2;
+      const height = rect.height + padding * 2;
+
+      const centerX = rect.left + window.scrollX + rect.width / 2;
+      const centerY = rect.top + window.scrollY + rect.height / 2;
+
+      const backdrop = state.nodes.backdrop;
+      backdrop.style.display = "block";
+      backdrop.style.opacity = "1";
+
+      backdrop.style.setProperty("--spot-left", `${centerX}px`);
+      backdrop.style.setProperty("--spot-top", `${centerY}px`);
+      backdrop.style.setProperty("--spot-width", `${width}px`);
+      backdrop.style.setProperty("--spot-height", `${height}px`);
+    }
+
+
+
+    return; // stop normal layout
+
+  }
+
+
   const rect = target.getBoundingClientRect();
+
+  // 🎯 Centered elliptical spotlight around target
+  if (state.nodes.backdrop) {
+    const padding = 16; // increase slightly for breathing room
+    const width = rect.width + padding * 2;
+    const height = rect.height + padding * 2;
+
+    const left = rect.left + window.scrollX - padding;
+    const top = rect.top + window.scrollY - padding;
+
+    const backdrop = state.nodes.backdrop;
+    backdrop.style.setProperty("--spot-left", `${left + width / 2}px`);
+    backdrop.style.setProperty("--spot-top", `${top + height / 2}px`);
+    backdrop.style.setProperty("--spot-width", `${width / 1.8}px`);
+    backdrop.style.setProperty("--spot-height", `${height / 1.8}px`);
+
+  }
+
+
+
   const ring = state.nodes.ring;
   ring.style.left = `${rect.left - 6 + window.scrollX}px`;
-  ring.style.top  = `${rect.top  - 6 + window.scrollY}px`;
-  ring.style.width  = `${rect.width  + 12}px`;
+  ring.style.top = `${rect.top - 6 + window.scrollY}px`;
+  ring.style.width = `${rect.width + 12}px`;
   ring.style.height = `${rect.height + 12}px`;
 
   const tip = state.nodes.tip;
   tip.querySelector(".rt-tour-text").textContent = step.text;
 
-  // Position tooltip
-  const gap = 10;
-  let top = rect.top + window.scrollY;
-  let left = rect.left + window.scrollX;
-  switch ((step.placement || "bottom").toLowerCase()) {
-    case "top":    top -= (tip.offsetHeight || 120) + gap; break;
-    case "right":  left += rect.width + gap; break;
-    case "left":   left -= (tip.offsetWidth || 320) + gap; break;
-    default:       top += rect.height + gap; break; // bottom / center
+  if (!step.disableAutoPosition) {
+    // Position tooltip (default behavior)
+    const gap = 10;
+    let top = rect.top + window.scrollY;
+    let left = rect.left + window.scrollX;
+
+    switch ((step.placement || "bottom").toLowerCase()) {
+      case "top": top -= (tip.offsetHeight || 120) + gap; break;
+      case "right": left += rect.width + gap; break;
+      case "left": left -= (tip.offsetWidth || 320) + gap; break;
+      default: top += rect.height + gap; break;
+    }
+
+    if (step.placement === "center") {
+      const w = tip.offsetWidth || 320;
+      const h = tip.offsetHeight || 120;
+      top = window.scrollY + (window.innerHeight - h) / 2;
+      left = window.scrollX + (window.innerWidth - w) / 2;
+    }
+
+    tip.style.top = `${Math.max(window.scrollY + 12, top)}px`;
+    tip.style.left = `${Math.max(window.scrollX + 12, left)}px`;
   }
-  // Center placement support
-  if (step.placement === "center") {
-    const w = tip.offsetWidth  || 320;
-    const h = tip.offsetHeight || 120;
-    top  = window.scrollY + (window.innerHeight - h)/2;
-    left = window.scrollX + (window.innerWidth  - w)/2;
-  }
-  tip.style.top = `${Math.max(window.scrollY + 12, top)}px`;
-  tip.style.left = `${Math.max(window.scrollX + 12, left)}px`;
 
   // Button text for last step
   const nextBtn = tip.querySelector('[data-act="next"]');

@@ -1,19 +1,37 @@
-/* Backdrop */
-.rt-tour-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(2px);
-    z-index: 9997;
+/* tutorial.css */
+
+@import url(../../../src/shared/components.css);
+@import url(../../../src/shared/stylesheet.css);
+
+:root {
+    --rt-color-primary: #FFD700;
+    --rt-color-bg: #0f0f10;
+    --rt-color-text: #ffffff;
+
+    --rt-radius-lg: 12px;
+    --rt-radius-md: 10px;
+
+    --rt-backdrop-opacity: 0.45;
+    --rt-backdrop-blur: 2px;
+
+    --rt-tooltip-max-width: 40%;
+    --rt-tooltip-font-size: 1.5em;
+
+    --rt-transition-fast: 0.25s ease;
+
+    /* NEW: spotlight default size + position */
+    --spot-width: 320px;
+    --spot-height: 240px;
+    --spot-left: 50%;
+    --spot-top: 50%;
 }
 
 /* Highlight ring */
 .rt-tour-highlight {
     position: absolute;
-    outline: 3px solid #E90A01;
-    /* Reaction Red */
-    border-radius: 10px;
-    box-shadow: 0 0 0 6px rgba(233, 10, 1, 0.25);
+    outline: 3px solid var(--rt-color-primary);
+    border-radius: var(--rt-radius-md);
+    box-shadow: 0 0 15px 3px rgba(255, 215, 0, 0.45);
     z-index: 9999;
     pointer-events: none;
 }
@@ -21,22 +39,39 @@
 /* Tooltip panel */
 .rt-tour-tooltip {
     position: absolute;
-    max-width: 360px;
-    background: #0f0f10;
-    color: #fff;
-    border-radius: 12px;
+    max-width: var(--rt-tooltip-max-width);
+    background: var(--rt-color-bg);
+    color: var(--rt-color-text);
+    border-radius: var(--rt-radius-lg);
     padding: 14px 16px;
-    line-height: 1.4;
-    font-size: 14px;
+    font-size: var(--rt-tooltip-font-size);
     z-index: 10000;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    /* modern feel: fade + scale */
+    opacity: 0;
+    transform: scale(0.96);
+    transition:
+        opacity var(--rt-transition-fast),
+        transform var(--rt-transition-fast);
+}
+
+/* visible state */
+.rt-tour-tooltip--visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.rt-tour-text {
+    font-family: 'Futura LtCn BT';
+    margin: 1em;
 }
 
 /* Buttons row */
 .rt-tour-actions {
     display: flex;
     gap: 8px;
-    margin-top: 12px;
+    width: 100%;
+    justify-content: space-evenly;
 }
 
 .rt-tour-btn {
@@ -45,6 +80,7 @@
     border-radius: 10px;
     padding: 8px 12px;
     font-weight: 600;
+    transition: box-shadow 0.6s ease, transform 0.3s ease;
 }
 
 .rt-tour-btn-primary {
@@ -53,13 +89,56 @@
 }
 
 .rt-tour-btn-ghost {
-    background: transparent;
     color: #fff;
     outline: 1px solid #666;
+    background-color: #0f0f10;
 }
 
 @media (max-width: 640px) {
     .rt-tour-tooltip {
         max-width: 92vw;
     }
+}
+
+/* Disable page scrolling while tutorial is active */
+.rt-scroll-lock {
+    overflow: hidden;
+    height: 100vh;
+}
+
+
+/* Backdrop — darken everything except highlighted area */
+.rt-tour-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(3px);
+    z-index: 9997;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+
+    /* ✅ ELLIPTICAL SPOTLIGHT (cross-browser) */
+    /* Standard syntax */
+    mask-image: radial-gradient(ellipse var(--spot-width) var(--spot-height) at var(--spot-left) var(--spot-top),
+            transparent 0%,
+            transparent 50%,
+            black 70%);
+    mask-composite: exclude;
+
+    /* WebKit fallback */
+    -webkit-mask-image: radial-gradient(ellipse var(--spot-width) var(--spot-height) at var(--spot-left) var(--spot-top),
+            transparent 0%,
+            transparent 50%,
+            black 70%);
+    -webkit-mask-composite: destination-out;
+}
+
+
+/* Parent container wrapping backdrop + ring */
+.rt-tour-container {
+    position: fixed;
+    inset: 0;
+    z-index: 9997;
+    pointer-events: none;
+    transition: all 0.4s ease;
 }

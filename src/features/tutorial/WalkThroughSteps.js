@@ -1,29 +1,66 @@
-// Order matters; each step points to an element in your UI.
-// If a selector isn't found, the step is auto-skipped.
+// WalkThroughSteps.js
+
 export default [
-  { id: "welcome", selector: "header .title, .header .title, h1.title", placement: "bottom",
-    text: "Welcome to Reaction Analytics! Let’s take a 30-second tour." },
+  {
+    id: "welcome",
+    selector: "body",
+    placement: "center",
+    text: `Welcome to Reaction Technologies — where innovation meets athletic excellence.
+You’re now officially part of a community leading a new era in sports performance, redefining how athletes train, measure progress, and stay safer on the field.
+Let’s push the boundaries of what’s possible and elevate your game.`
+  },
+  {
+    id: "intro-message",
+    selector: "body",
+    placement: "center",
+    text: `This short tutorial will guide you through the core features, help you upload your first video, 
+and show you how to harness real-time, data-driven insights designed for serious growth. 
+We’re thrilled to have you with us — together, we’re shaping the future of sports technology.`
+  },
 
-  { id: "upload", selector: "#upload-video-btn, #btnUploadVideo, button[data-role='upload']",
+  {
+    id: "upload",
+    selector: "#upload-video-btn, #btnUploadVideo, button[data-role='upload']",
     placement: "right",
-    text: "Upload your practice video here to start automated analysis." },
+    text: `Start your journey by uploading a practice video.
+Our system instantly processes movement, posture, speed, acceleration, and more — transforming raw footage into actionable, elite-level insights.`
+  },
 
-  { id: "analytics", selector: "#nav-analytics, a[href*='analytics'], #analytics-card",
+  {
+    id: "analytics",
+    selector: "#nav-analytics, a[href*='analytics'], #analytics-card",
     placement: "bottom",
-    text: "Open Analytics to view head angle, speed, acceleration, and more." },
+    text: `This is the Analytics Hub — your command center for performance.
+Dive into head-angle precision, acceleration curves, footwork quality, athletic score breakdowns, and step-by-step improvement insights — all powered by real-time AI analysis.`
+  },
 
-  { id: "history", selector: "#nav-history, a[href*='history']",
+  {
+    id: "history",
+    selector: "#nav-history, a[href*='history']",
     placement: "bottom",
-    text: "History stores all your past uploads and reports." },
+    text: `Your History section stores every uploaded session.
+Track progress over time, revisit past analytics, compare performances, and see how your training is evolving rep by rep.`
+  },
 
-  { id: "profile", selector: "#nav-profile, a[href*='profile']",
-    placement: "left",
-    text: "Keep your athlete profile updated for more accurate metrics." },
+  {
+    id: "profile-highlight",
+    selector: "#profile",     // ← Your aside menu profile container ID
+    customLayout: true,
+  },
 
-  { id: "drills", selector: "#nav-drills, a[href*='drillCatalog']",
+
+  {
+    id: "drills",
+    selector: "#nav-drills, a[href*='drillCatalog']",
     placement: "top",
-    text: "Explore drill catalog for targeted improvements." },
+    text: `Explore our curated Drill Catalog — packed with technique-driven challenges designed to sharpen footwork, posture, reaction time, and overall athletic output.
+Train smarter with purpose-built routines aligned to your analytics.`
+  },
 
-  { id: "done", selector: "body", placement: "center",
-    text: "You’re all set! You can re-open this tutorial anytime from the Help menu." }
+  {
+    id: "done",
+    selector: ".tutorial-complete-marker",
+    placement: "center",
+    text: `You're all set.`
+  }
 ];
