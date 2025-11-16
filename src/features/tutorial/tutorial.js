@@ -208,10 +208,9 @@ function placeStep(firstRun = false) {
 
 
 
+  // CUSTOM SPOTLIGHT LOGIC — for all aside menu items
   // ------------------------------------------------------
-  // CUSTOM TOOLTIP POSITIONING (ONLY FOR PROFILE STEP)
-  // ------------------------------------------------------
-  if (step.customLayout) {
+  if (["profile-highlight", "analytics", "history", "drills", "dashboard"].includes(step.id)) {
     const target = query(step.selector);
     if (!target) return;
 
@@ -219,14 +218,14 @@ function placeStep(firstRun = false) {
     const ring = state.nodes.ring;
     const tip = state.nodes.tip;
 
-    // Hide text completely
+    // Hide text completely during aside highlights
     const txt = tip.querySelector(".rt-tour-text");
     if (txt) txt.style.display = "none";
 
-    // Tooltip layout for profile section
+    // Tooltip layout (buttons only at bottom)
+    tip.style.position = "fixed";
     tip.style.top = "128.5px";
     tip.style.left = "30%";
-    tip.style.position = "fixed";
     tip.style.bottom = "5%";
     tip.style.background = "transparent";
     tip.style.boxShadow = "none";
@@ -235,29 +234,28 @@ function placeStep(firstRun = false) {
     tip.style.flexDirection = "column";
     tip.style.justifyContent = "flex-end";
 
-    // Restore button row
+    // Buttons row styling
     const actions = tip.querySelector(".rt-tour-actions");
     actions.style.display = "flex";
     actions.style.gap = "8px";
     actions.style.width = "100%";
     actions.style.justifyContent = "space-evenly";
 
-    // ✅ Position highlight ring properly
+    // ✅ Position golden ring
     ring.style.position = "absolute";
     ring.style.left = `${rect.left - 8 + window.scrollX}px`;
     ring.style.top = `${rect.top - 8 + window.scrollY}px`;
     ring.style.width = `${rect.width + 16}px`;
     ring.style.height = `${rect.height + 16}px`;
     ring.style.borderRadius = "8px";
-    ring.style.outline = "3px solid #FFD700"; // golden
+    ring.style.outline = "3px solid #FFD700";
     ring.style.boxShadow = "0 0 25px 6px rgba(255,215,0,0.5)";
     ring.style.zIndex = "10001";
     ring.style.display = "block";
 
-    // ✅ Re-enable backdrop with spotlight around the aside menu
+    // ✅ Spotlight mask positioning
     if (state.nodes.backdrop) {
-      const padding = 12; // adjust for more/less space around the ring
-
+      const padding = 12;
       const width = rect.width + padding * 2;
       const height = rect.height + padding * 2;
 
@@ -274,11 +272,9 @@ function placeStep(firstRun = false) {
       backdrop.style.setProperty("--spot-height", `${height}px`);
     }
 
-
-
-    return; // stop normal layout
-
+    return; // skip default layout
   }
+
 
 
   const rect = target.getBoundingClientRect();
