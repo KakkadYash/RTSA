@@ -78,7 +78,6 @@ function buildScaffold() {
   const backdrop = el("div", "rt-tour-backdrop");
   backdrop.addEventListener("click", () => next());
   container.appendChild(backdrop);
-
   // Highlight ring
   const ring = el("div", "rt-tour-highlight");
   container.appendChild(ring);
@@ -177,8 +176,6 @@ function placeStep(firstRun = false) {
     if (state.nodes.backdrop) {
       state.nodes.backdrop.style.maskImage = "none";
       state.nodes.backdrop.style.webkitMaskImage = "none";
-      state.nodes.backdrop.style.background = "rgba(0, 0, 0, 0.85)";
-      state.nodes.backdrop.style.backdropFilter = "blur(3px)";
     }
   } else {
     // Use CSS-defined rectangular mask for guided steps
@@ -242,15 +239,10 @@ function placeStep(firstRun = false) {
     actions.style.justifyContent = "space-evenly";
 
     // ✅ Position golden ring
-    ring.style.position = "absolute";
     ring.style.left = `${rect.left - 8 + window.scrollX}px`;
     ring.style.top = `${rect.top - 8 + window.scrollY}px`;
     ring.style.width = `${rect.width + 16}px`;
     ring.style.height = `${rect.height + 16}px`;
-    ring.style.borderRadius = "8px";
-    ring.style.outline = "3px solid #FFD700";
-    ring.style.boxShadow = "0 0 25px 6px rgba(255,215,0,0.5)";
-    ring.style.zIndex = "10001";
     ring.style.display = "block";
 
     // ✅ Spotlight mask positioning
@@ -259,17 +251,16 @@ function placeStep(firstRun = false) {
       const width = rect.width + padding * 2;
       const height = rect.height + padding * 2;
 
-      const centerX = rect.left + window.scrollX + rect.width / 2;
-      const centerY = rect.top + window.scrollY + rect.height / 2;
+      const left = rect.left + window.scrollX - padding;
+      const top = rect.top + window.scrollY - padding;
 
       const backdrop = state.nodes.backdrop;
-      backdrop.style.display = "block";
-      backdrop.style.opacity = "1";
 
-      backdrop.style.setProperty("--spot-left", `${centerX}px`);
-      backdrop.style.setProperty("--spot-top", `${centerY}px`);
+      backdrop.style.setProperty("--spot-left", `${left}px`);
+      backdrop.style.setProperty("--spot-top", `${top}px`);
       backdrop.style.setProperty("--spot-width", `${width}px`);
       backdrop.style.setProperty("--spot-height", `${height}px`);
+
     }
 
     return; // skip default layout
@@ -280,21 +271,22 @@ function placeStep(firstRun = false) {
   const rect = target.getBoundingClientRect();
 
   // 🎯 Centered elliptical spotlight around target
-  if (state.nodes.backdrop) {
-    const padding = 16; // increase slightly for breathing room
-    const width = rect.width + padding * 2;
-    const height = rect.height + padding * 2;
+  // if (state.nodes.backdrop) {
+  //   const padding = 12;
 
-    const left = rect.left + window.scrollX - padding;
-    const top = rect.top + window.scrollY - padding;
+  //   const left = rect.left + window.scrollX - padding;
+  //   const top = rect.top + window.scrollY - padding;
+  //   const width = rect.width + padding * 2;
+  //   const height = rect.height + padding * 2;
 
-    const backdrop = state.nodes.backdrop;
-    backdrop.style.setProperty("--spot-left", `${left + width / 2}px`);
-    backdrop.style.setProperty("--spot-top", `${top + height / 2}px`);
-    backdrop.style.setProperty("--spot-width", `${width / 1.8}px`);
-    backdrop.style.setProperty("--spot-height", `${height / 1.8}px`);
+  //   const backdrop = state.nodes.backdrop;
 
-  }
+  //   backdrop.style.setProperty("--spot-left", `${left}px`);
+  //   backdrop.style.setProperty("--spot-top", `${top}px`);
+  //   backdrop.style.setProperty("--spot-width", `${width}px`);
+  //   backdrop.style.setProperty("--spot-height", `${height}px`);
+  // }
+
 
 
 

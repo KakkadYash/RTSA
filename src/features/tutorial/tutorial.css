@@ -107,31 +107,48 @@
 }
 
 
-/* Backdrop — darken everything except highlighted area */
+/* -------------------------------------------------
+   RECTANGULAR SPOTLIGHT WINDOW (correct method)
+---------------------------------------------------*/
+/* -------------------------------------------------
+   RECTANGULAR SPOTLIGHT WINDOW (cut-out)
+---------------------------------------------------*/
 .rt-tour-backdrop {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(3px);
-    z-index: 9997;
-    pointer-events: none;
-    transition: opacity 0.6s ease;
+    z-index: 9996;
+    pointer-events: auto;
+    transition: opacity 0.4s ease;
 
-    /* ✅ ELLIPTICAL SPOTLIGHT (cross-browser) */
-    /* Standard syntax */
-    mask-image: radial-gradient(ellipse var(--spot-width) var(--spot-height) at var(--spot-left) var(--spot-top),
-            transparent 0%,
-            transparent 50%,
-            black 70%);
+    /* ---- MASK HOLE ---- */
+
+    mask-image:
+        linear-gradient(#000 0 0),
+        linear-gradient(#000 0 0),
+        linear-gradient(#000 0 0),
+        linear-gradient(#000 0 0);
+
+    mask-size: 18% var(--spot-top), var(--spot-left) 0%, calc(100% - (var(--spot-left) + var(--spot-width))) 100%, 18% calc(100% - (var(--spot-top) + var(--spot-height)));
+
+    mask-position:
+        /* TOP */
+        0 0,
+
+        /* LEFT */
+        0 0,
+
+        /* RIGHT */
+        calc(var(--spot-left) + var(--spot-width)) 0,
+
+        /* BOTTOM — FULL WIDTH */
+        0 calc(var(--spot-top) + var(--spot-height));
+    -webkit-mask-size: 18% var(--spot-top), var(--spot-left) 0%, calc(100% - (var(--spot-left) + var(--spot-width))) 100%, 18% calc(100% - (var(--spot-top) + var(--spot-height)));
+    mask-repeat: no-repeat;
     mask-composite: exclude;
-
-    /* WebKit fallback */
-    -webkit-mask-image: radial-gradient(ellipse var(--spot-width) var(--spot-height) at var(--spot-left) var(--spot-top),
-            transparent 0%,
-            transparent 50%,
-            black 70%);
-    -webkit-mask-composite: destination-out;
 }
+
+
 
 
 /* Parent container wrapping backdrop + ring */
