@@ -2,12 +2,13 @@
  * Page Loader Module
  * Handles navigation, dynamic resource loading, and tab switching.
  */
+// home.js
 
 document.addEventListener("DOMContentLoaded", () => {
   const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
   const tabs = document.querySelectorAll(".nav-link");
-   // --- TEMPORARY: always trigger tutorial ---
+  // --- TEMPORARY: always trigger tutorial ---
   localStorage.setItem("runTutorial", "yes");
   (async () => {
     const runTutorial = localStorage.getItem("runTutorial");
@@ -70,9 +71,13 @@ document.addEventListener("DOMContentLoaded", () => {
     jsEl.onload = () => {
       const funcName = pageFunctionMap[page];
       if (funcName && typeof window[funcName] === "function") {
-        // Defer execution to next browser paint to ensure injected DOM exists
         requestAnimationFrame(() => {
           window[funcName]();
+
+          // ✅ NEW: Signal that profile page is fully loaded
+          if (page === "profile") {
+            document.dispatchEvent(new Event("profile-loaded"));
+          }
         });
       }
     };

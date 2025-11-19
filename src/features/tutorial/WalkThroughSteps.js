@@ -1,75 +1,57 @@
 // WalkThroughSteps.js
-
+import profileSteps from "./tutorial_steps/profile.js";
 export default [
+
+  /* ------------------ INTRO ------------------ */
+
   {
     id: "welcome",
     selector: "body",
     placement: "center",
-    text: `Welcome to Reaction Technologies — where innovation meets athletic excellence.
-You’re now officially part of a community leading a new era in sports performance, redefining how athletes train, measure progress, and stay safer on the field.
-Let’s push the boundaries of what’s possible and elevate your game.`
+    text: `
+      Welcome to Reaction Technologies — where innovation meets athletic excellence.
+      You’re now officially part of a community leading a new era in sports performance.
+      Let’s push the boundaries of what’s possible and elevate your game.
+    `
   },
+
   {
     id: "intro-message",
     selector: "body",
     placement: "center",
-    text: `This short tutorial will guide you through the core features, help you upload your first video, 
-and show you how to harness real-time, data-driven insights designed for serious growth. 
-We’re thrilled to have you with us — together, we’re shaping the future of sports technology.`
+    text: `
+      This short tutorial will guide you through the platform and show you how to use
+      real-time AI analytics to grow faster, train smarter, and perform safer.
+    `
   },
 
-  // ---- Sidebar Order Begins ----
+  /* ------------------ SIDEBAR HIGHLIGHTS ------------------ */
+  /* ONLY PROFILE + ANALYTICS */
 
   {
     id: "profile-highlight",
-    selector: "#profile",     // ← Your aside menu profile container ID
-    customLayout: true,
+    selector: "#profile",
+    placement: "right",
+    text: `This is your Profile section — update your personal and athletic details here to improve measurement accuracy.`
   },
-
+  ...profileSteps,
   {
-    id: "dashboard",
-    selector: "#dashboard",
-    placement: "bottom",
-    text: `Your Dashboard gives you a snapshot of your performance progress, total uploads, and athletic growth trends at a glance.`
-  },
-
-  {
-    id: "analytics",
+    id: "analytics-highlight",
     selector: "#analytics",
-    placement: "bottom",
-    text: `This is the Analytics Hub — your command center for performance.
-    Dive into head-angle precision, acceleration curves, footwork quality, athletic score breakdowns, and step-by-step improvement insights — all powered by real-time AI analysis.`
+    placement: "right",
+    text: `
+      Welcome to the Analytics Hub — your performance command center.
+      Dive into head-angle precision, acceleration curves, footwork quality,
+      jump metrics, and more.
+    `
   },
 
-  {
-    id: "history",
-    selector: "#history",
-    placement: "bottom",
-    text: `Your History section stores every uploaded session.
-    Track progress over time, revisit past analytics, compare performances, and see how your training is evolving rep by rep.`
-  },
-
-  {
-    id: "drills",
-    selector: "#drillcatalog",
-    placement: "top",
-    text: `Explore our curated Drill Catalog — packed with technique-driven challenges designed to sharpen footwork, posture, reaction time, and overall athletic output.
-    Train smarter with purpose-built routines aligned to your analytics.`
-  },
+  /* ------------------ COMPLETION ------------------ */
 
   {
     id: "done",
-    selector: ".tutorial-complete-marker",
+    selector: "body",
     placement: "center",
-    text: `You're all set.`
-  },
-
-  {
-    id: "upload",
-    selector: "#upload-video-btn, #btnUploadVideo, button[data-role='upload']",
-    placement: "right",
-    text: `Start your journey by uploading a practice video.
-    Our system instantly processes movement, posture, speed, acceleration, and more — transforming raw footage into actionable, elite-level insights.`
-  },
-
+    text: `You're all set! Start exploring and improving your game.`
+  }
 ];
