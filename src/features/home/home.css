@@ -10,7 +10,12 @@
 body {
     font-family: SCHABO Condensed;
     background-color: #383838;
-    display: flex;
+    display: grid;
+    grid-template-columns: 15% 1fr;
+}
+
+img {
+    width: 100%;
 }
 
 aside {
@@ -18,7 +23,6 @@ aside {
     padding: 0.5vw;
     background-color: #e62a2a;
     height: 100vh;
-    width: 20vw;
     top: 0;
 }
 
@@ -39,7 +43,7 @@ aside a {
 
 aside ul {
     list-style: none;
-    padding: 0 0 0 1em;
+    padding: 0;
 }
 
 aside a.active,
@@ -48,7 +52,7 @@ aside a:focus-visible {
     color: #FFFFFF;
 }
 
-aside a:hover span{
+aside a:hover span {
     text-shadow: 0.1em 0.1em 0.1em black;
 }
 
@@ -64,29 +68,23 @@ aside a span {
 .links {
     display: flex;
     flex-direction: column;
-    padding: 0 2em 0 0;
 }
 
 .arrow {
     width: 20%;
 }
 
-.line {
-    height: auto;
-    width: 100%;
-}
-
 li {
     margin: 0.5vh 0vw 0.5vh 0vw;
 }
 
-#logoutButton{
+#logoutButton {
     display: inline-block;
 }
 
 .logOut:hover span {
     color: #FFFFFF;
-    text-shadow: 0.1em 0.1em  0.1em black;
+    text-shadow: 0.1em 0.1em 0.1em black;
 }
 
 .logOut {
@@ -106,12 +104,11 @@ li {
 }
 
 main {
-    display: flex;
+    display: grid;
     flex-direction: column;
     justify-content: flex-start;
     overflow: hidden;
-    width: 80vw;
-    overflow: auto;
+    grid-template-columns: 1fr;
 }
 
 .header {

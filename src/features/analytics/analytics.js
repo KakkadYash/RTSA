@@ -290,7 +290,7 @@ import {
             console.log("[EVENT] Show speed/accel/decel");
             const existing = Chart.getChart("myChart2");
             if (existing) existing.destroy();
-            showUnifiedChart(state, [1, 2, 3]);
+            showUnifiedChart(state, [1, 2]);
         },
         onShowFootwork: () => {
             console.log("[EVENT] Show stride/jump");
@@ -460,9 +460,9 @@ import {
             ds[0].data = state.backend.headAngleData.slice(0, idx + 1);
             ds[1].data = state.backend.speedData.slice(0, idx + 1);
             ds[2].data = state.backend.accelerationData.slice(0, idx + 1);
-            ds[3].data = state.backend.decelerationData.slice(0, idx + 1);
-            ds[4].data = state.backend.stepLengthData.slice(0, idx + 1);
-            ds[5].data = state.backend.jumpData.slice(0, idx + 1);
+            // ds[3].data = state.backend.decelerationData.slice(0, idx + 1);
+            ds[3].data = state.backend.stepLengthData.slice(0, idx + 1);
+            ds[4].data = state.backend.jumpData.slice(0, idx + 1);
             state.currentChart.update('none');
             state.currentChart.update('none');
 

@@ -8,7 +8,7 @@
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-attachment: scroll, scroll, scroll;
   background-size: 50px, 65px auto;
-  padding: 1vw;
+  margin: 0 0 1em 0;
 }
 
 main span {
@@ -44,7 +44,6 @@ button#one-page-report {
 .hello {
   display: flex;
   flex-direction: column;
-  padding-left: 20px;
 }
 
 #nameInfo {
@@ -54,7 +53,6 @@ button#one-page-report {
 }
 
 .userData span {
-  padding-left: 10px;
   display: flex;
   line-height: 1;
   font-size: 35px;
@@ -74,10 +72,9 @@ main .line2 {
 }
 
 .userData {
-  padding-left: 20px;
   display: flex;
   flex-direction: column;
-  /* gap: 20px; */
+  padding: 0 1em 0 1em;
 }
 
 canvas {
@@ -107,9 +104,9 @@ canvas {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  padding: 1vw 0 1vw 1vw;
+  /* padding: 1vw 0 1vw 1vw; */
   width: 100%;
-  height: 7em;
+  height: 5em;
   /* flex-wrap: wrap; */
   /* align-items: flex-start; */
   /* flex-direction: column; */
@@ -122,7 +119,6 @@ canvas {
   height: 400px;
   /* ✅ fixed height */
   position: relative;
-  padding-left: 10px;
 }
 
 #prevChart {

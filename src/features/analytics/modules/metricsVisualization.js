@@ -88,12 +88,12 @@ export function showUnifiedChart(state, metricIndices = []) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const datasets = [
-    { label: "Head Angle (°)", key: "headAngleData", color: "#E93632", bg: "rgba(255,140,0,0.10)" },
-    { label: "Speed (yd/s)", key: "speedData", color: "#1F43E5", bg: "rgba(31,67,229,0.10)" },
-    { label: "Acceleration (yd/s²)", key: "accelerationData", color: "#7DD859", bg: "rgba(125,216,89,0.10)" },
-    { label: "Deceleration (yd/s²)", key: "decelerationData", color: "#E93632", bg: "rgba(233,54,50,0.10)" },
-    { label: "Step Length (yd)", key: "stepLengthData", color: "#FFA500", bg: "rgba(255,165,0,0.10)" },
-    { label: "Jump Height (yd)", key: "jumpData", color: "#800080", bg: "rgba(128,0,128,0.10)" },
+    { label: "Head Angle", key: "headAngleData", color: "#E93632", bg: "rgba(255,140,0,0.10)" },
+    { label: "Speed", key: "speedData", color: "#1F43E5", bg: "rgba(31,67,229,0.10)" },
+    { label: "Acceleration", key: "accelerationData", color: "#7DD859", bg: "rgba(125,216,89,0.10)" },
+    // { label: "Deceleration", key: "decelerationData", color: "#E93632", bg: "rgba(233,54,50,0.10)" },
+    { label: "Step Length", key: "stepLengthData", color: "#FFA500", bg: "rgba(255,165,0,0.10)" },
+    { label: "Jump Height", key: "jumpData", color: "#800080", bg: "rgba(128,0,128,0.10)" },
   ];
 
   // Store originals for fade recovery
