@@ -61,7 +61,7 @@
     align-items: center;
     height: 100%;
     position: relative;
-    width: 35em;
+    width: 50%;
     justify-content: space-around;
     border-radius: 1em;
     background:linear-gradient(to bottom, #444444, #000000);
@@ -127,7 +127,7 @@ video {
     justify-content: flex-start;
     align-items: center;
     height: 100%;
-    width: 40em;
+    width: 50%;
     min-height: 25vw;
     box-sizing: border-box;
     padding: 0 0 0 0.5em;
