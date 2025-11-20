@@ -170,6 +170,14 @@ function teardown() {
 /* ---------- Layout ---------- */
 function placeStep(firstRun = false) {
   const step = steps[state.idx];
+  // 🔧 Dynamically sync aside width into CSS variable
+  const aside = document.querySelector(".aside");
+  if (aside) {
+    document.documentElement.style.setProperty(
+      "--aside-width",
+      `${aside.offsetWidth}px`
+    );
+  }
   // ⭐ SPECIAL CASE: Wait until profile DOM is loaded
   if (step.id === "profile-open-modal" || step.id === "profile-open-modal-btn") {
 

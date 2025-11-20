@@ -121,31 +121,65 @@
     pointer-events: auto;
     transition: opacity 0.4s ease;
 
-    /* ---- MASK HOLE ---- */
+    /* ---------------------------------------------
+   3-MASK SPOTLIGHT (ASIDE-SAFE)
+   Standard + WebKit versions
+---------------------------------------------- */
 
     mask-image:
         linear-gradient(#000 0 0),
+        /* TOP MASK */
+        linear-gradient(#000 0 0),
+        /* RIGHT MASK */
+        linear-gradient(#000 0 0);
+    /* BOTTOM MASK */
+
+    -webkit-mask-image:
         linear-gradient(#000 0 0),
         linear-gradient(#000 0 0),
         linear-gradient(#000 0 0);
 
-    mask-size: 18% var(--spot-top), var(--spot-left) 0%, calc(100% - (var(--spot-left) + var(--spot-width))) 100%, 18% calc(100% - (var(--spot-top) + var(--spot-height)));
+    /* ---------- MASK SIZES ---------- */
+
+    mask-size:
+        /* TOP: width = aside, height = above spotlight */
+        var(--aside-width) var(--spot-top),
+
+        /* RIGHT: width = page - aside width, height = full page */
+        calc(100% - var(--aside-width)) 100%,
+
+        /* BOTTOM: width = aside, height = below spotlight */
+        var(--aside-width) calc(100% - (var(--spot-top) + var(--spot-height)));
+
+    -webkit-mask-size:
+        var(--aside-width) var(--spot-top),
+        calc(100% - var(--aside-width)) 100%,
+        var(--aside-width) calc(100% - (var(--spot-top) + var(--spot-height)));
+
+    /* ---------- MASK POSITIONS ---------- */
 
     mask-position:
-        /* TOP */
+        /* TOP MASK → upper-left corner */
         0 0,
 
-        /* LEFT */
-        0 0,
+        /* RIGHT MASK → begins to the right of the aside */
+        var(--aside-width) 0,
 
-        /* RIGHT */
-        calc(var(--spot-left) + var(--spot-width)) 0,
-
-        /* BOTTOM — FULL WIDTH */
+        /* BOTTOM MASK → begins under spotlight */
         0 calc(var(--spot-top) + var(--spot-height));
-    -webkit-mask-size: 18% var(--spot-top), var(--spot-left) 0%, calc(100% - (var(--spot-left) + var(--spot-width))) 100%, 18% calc(100% - (var(--spot-top) + var(--spot-height)));
+
+    -webkit-mask-position:
+        0 0,
+        var(--aside-width) 0,
+        0 calc(var(--spot-top) + var(--spot-height));
+
     mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+
+    /* Spotlight cut-out mode */
     mask-composite: exclude;
+    -webkit-mask-composite: xor;
+
 }
 
 
@@ -171,4 +205,3 @@
 .rt-spot-active {
     pointer-events: auto !important;
 }
-
