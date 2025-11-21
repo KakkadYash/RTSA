@@ -134,7 +134,12 @@ export function showUnifiedChart(state, metricIndices = []) {
       labels: state.backend.chartLabels || [],
       datasets: datasets.map((d, i) => ({
         label: d.label,
-        data: state.backend[d.key] || [],
+        // 👉 Apply rounding per metric
+        data: (state.backend[d.key] || []).map((v) =>
+          d.key === "jumpData" || d.key === "stepLengthData"
+            ? round2(v)      // Jump Height + Step Length → 2 decimals
+            : roundWhole(v)  // Everything else → whole number
+        ),
         borderColor: d.color,
         borderWidth: 1.5,
         fill: true,
@@ -142,6 +147,7 @@ export function showUnifiedChart(state, metricIndices = []) {
         yAxisID: `y${i}`,
       })),
     },
+
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -153,9 +159,29 @@ export function showUnifiedChart(state, metricIndices = []) {
       },
       plugins: {
         legend: {
-          display: false
-        }
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const dsMeta = datasets[ctx.datasetIndex];
+              const label = dsMeta?.label || ctx.dataset.label || "";
+              const key = dsMeta?.key;
+              const rawValue = ctx.parsed.y;
+
+              let formatted;
+              if (key === "jumpData" || key === "stepLengthData") {
+                formatted = round2(rawValue);     // Jump / Step Length → 2 decimals
+              } else {
+                formatted = roundWhole(rawValue); // Others → whole number
+              }
+
+              return `${label}: ${formatted}`;
+            },
+          },
+        },
       },
+
       scales: (() => {
         const yAxes = {};
         datasets.forEach((d, i) => {
@@ -223,24 +249,28 @@ export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
 
 
   const mm = backend.maxMetrics || {};
-  const speed = Math.round( // prefer backend.topSpeed or mm.maxSpeed
+
+  // 👉 Whole-number rounding for speed / accel / decel
+  const speed = roundWhole(
     Number.isFinite(backend.topSpeed) && backend.topSpeed > 0
       ? backend.topSpeed
       : (Number.isFinite(mm.maxSpeed) ? mm.maxSpeed : maxOrZero(speedArr))
   );
 
-  const accel = Math.round(
+  const accel = roundWhole(
     Number.isFinite(mm.maxAcceleration) ? mm.maxAcceleration : maxOrZero(accelArr)
   );
 
-  const decel = Math.round(
+  const decel = roundWhole(
     Math.abs(
       Number.isFinite(mm.maxDeceleration) ? mm.maxDeceleration : minOrZero(decelArr)
     )
   );
 
+  // 👉 Jump height & step frequency: keep 2 decimals
   const jump = round2(avgOrZero(jumpArr));
   const stride = round2(avgOrZero(strideArr));
+
 
   updateProgress("topSpeed", "topSpeedBar", speed, CONFIG.MAX_SPEED);
   updateProgress("peakAcceleration", "peakAccelerationBar", accel, CONFIG.MAX_ACCEL);
@@ -315,6 +345,17 @@ const minOrZero = (arr) => {
 };
 const round1 = (n) => Math.round((Number(n) || 0) * 10) / 10;
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+
+// Round to whole number with custom rule:
+// - decimals < 0.5  → floor
+// - decimals >= 0.5 → ceil
+const roundWhole = (n) => {
+  const num = Number(n) || 0;
+  const base = Math.floor(num);
+  const decimal = num - base;
+  if (decimal < 0.5) return base;
+  return base + 1;
+};
 export function buildUnifiedLegend(chart, datasets) {
   const container = document.getElementById("unifiedLegend");
   if (!container) return;
