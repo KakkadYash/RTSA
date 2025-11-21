@@ -64,7 +64,7 @@
     width: 50%;
     justify-content: space-around;
     border-radius: 1em;
-    background:linear-gradient(to bottom, #444444, #000000);
+    background: linear-gradient(to bottom, #444444, #000000);
 }
 
 #uploaded-video {
@@ -122,7 +122,7 @@ video {
     background: linear-gradient(to bottom, #444444, #000000);
     /* background-color: rgba(0, 0, 0, 1); */
     border-radius: 1em;
-    display: flex;
+    display: grid;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
@@ -130,19 +130,21 @@ video {
     width: 50%;
     min-height: 25vw;
     box-sizing: border-box;
-    padding: 0 0 0 0.5em;
-    gap: 0.5em;
+    padding: 0 0.5em 0 0.5em;
+    /* gap: 0.5em; */
     /* border: 1px solid rgba(255, 255, 255, 1); */
+    grid-auto-flow: column;
+    grid-template-columns: 1fr;
 }
 
 #myChart2 {
-    width: 32em !important;
+    width: 100% !important;
     height: 100% !important;
     display: block;
     /* background-color: rgba(0, 0, 0, 0.5); */
     border-radius: 0.6rem;
     box-sizing: border-box;
-    /* aspect-ratio: 16/9; */
+    /* aspect-ratio: 16 / 9; */
 }
 
 #videoForm {

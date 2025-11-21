@@ -9,7 +9,8 @@ import {
     updateSlidersFromData,
     resetCharts,
     resetMetricSlidersUI,
-    updateTopMetricBoxes
+    updateTopMetricBoxes,
+    updateAverageSpeedBox
 } from "./modules/metricsVisualization.js";
 
 import {
@@ -176,9 +177,6 @@ import {
             jumpData: [],
             outerRing: { Running: 0, Standing: 0, Crouching: 0 },
             innerRing: { "Head Up": 0, "Head Down": 100 },
-            athleticScores: {
-                footworkScore: 0, speedScore: 0, accelerationScore: 0, headAngleScore: 0, postureScore: 0
-            },
             topSpeed: 0,
             totalDistance: 0,
             totalSteps: 0
@@ -473,6 +471,8 @@ import {
                 totalDistanceYards: state.backend.totalDistance, // (distance is already a total)
                 steps: state.backend.totalSteps || 0
             });
+            const avgSpeed = state.backend.totalDistance / (t || 1);
+            updateAverageSpeedBox(avgSpeed);
 
             lastIdx = idx;
         }, TICK_MS);
@@ -594,9 +594,6 @@ import {
             jumpData: [],
             outerRing: { Running: 0, Standing: 0, Crouching: 0 },
             innerRing: { "Head Up": 0, "Head Down": 100 },
-            athleticScores: {
-                footworkScore: 0, speedScore: 0, accelerationScore: 0, headAngleScore: 0, postureScore: 0
-            },
             topSpeed: 0,
             totalDistance: 0,
             totalSteps: 0,

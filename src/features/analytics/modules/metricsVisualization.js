@@ -253,7 +253,6 @@ export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
   const avgScore = avgOrZero([
     scores.footworkScore, scores.speedScore, scores.accelerationScore, scores.headAngleScore, scores.postureScore
   ]);
-  document.getElementById("athleticScoreValue").textContent = `${round1(avgScore)}%`;
 }
 
 
@@ -261,6 +260,10 @@ export function updateTopMetricBoxes({ timeSecs, totalDistanceYards, steps }) {
   document.getElementById("drillTimeValue").textContent = `${Number(timeSecs || 0).toFixed(1)} SECS`;
   document.getElementById("distanceValue").textContent = `${Number(totalDistanceYards || 0).toFixed(1)} YARDS`;
   document.getElementById("stepsValue").textContent = `${Number(steps || 0)}`;
+}
+export function updateAverageSpeedBox(avgSpeed) {
+  document.getElementById("averageSpeedValue").textContent =
+    `${Number(avgSpeed || 0).toFixed(2)} YD/S`;
 }
 
 export function resetCharts(state, doughnutChart) {
@@ -285,7 +288,6 @@ export function resetMetricSlidersUI(CONFIG) {
   updateProgress("peakDeceleration", "peakDecelerationBar", 0, CONFIG.MAX_DECEL);
   updateProgress("averageJumpHeight", "averageJumpHeightBar", 0, CONFIG.MAX_JUMP);
   updateProgress("averageStrideLength", "averageStrideLengthBar", 0, CONFIG.MAX_STRIDE);
-  document.getElementById("athleticScoreValue").textContent = `0%`;
   document.getElementById("drillTimeValue").textContent = `0 SECS`;
   document.getElementById("distanceValue").textContent = `0 YARDS`;
   document.getElementById("stepsValue").textContent = `0`;
