@@ -435,6 +435,25 @@ import {
         state.currentChart.data.datasets.forEach(ds => ds.data = []);
         state.currentChart.data.labels = state.backend.chartLabels || [];
         state.currentChart.update('none');
+        // ---- Rounding helpers (mirror metricsVisualization.js rules) ----
+        const roundWhole = (n) => {
+            const num = Number(n) || 0;
+            const base = Math.floor(num);
+            const decimal = num - base;
+            if (decimal < 0.5) return base;
+            return base + 1;
+        };
+
+        const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+
+        // Slice up to index and round depending on metric key
+        const sliceAndRound = (arr, key, uptoIdx) => {
+            const raw = (arr || []).slice(0, uptoIdx + 1);
+            if (key === "jumpData" || key === "stepLengthData") {
+                return raw.map(round2);
+            }
+            return raw.map(roundWhole);
+        };
 
         // 5) Progressive metric updates synced to video time
         const labels = state.backend.chartLabels || [];
@@ -453,16 +472,19 @@ import {
             if (idx >= L) idx = L - 1;
             if (idx <= lastIdx) return; // nothing new to show
 
-            // update chart series up to idx
+            // update chart series up to idx (rounded)
             const ds = state.currentChart.data.datasets;
-            ds[0].data = state.backend.headAngleData.slice(0, idx + 1);
-            ds[1].data = state.backend.speedData.slice(0, idx + 1);
-            ds[2].data = state.backend.accelerationData.slice(0, idx + 1);
-            // ds[3].data = state.backend.decelerationData.slice(0, idx + 1);
-            ds[3].data = state.backend.stepLengthData.slice(0, idx + 1);
-            ds[4].data = state.backend.jumpData.slice(0, idx + 1);
-            state.currentChart.update('none');
-            state.currentChart.update('none');
+
+            ds[0].data = sliceAndRound(state.backend.headAngleData, "headAngleData", idx);
+            ds[1].data = sliceAndRound(state.backend.speedData, "speedData", idx);
+            ds[2].data = sliceAndRound(state.backend.accelerationData, "accelerationData", idx);
+            // ds[3].data = sliceAndRound(state.backend.decelerationData, "decelerationData", idx);
+            ds[3].data = sliceAndRound(state.backend.stepLengthData, "stepLengthData", idx);
+            ds[4].data = sliceAndRound(state.backend.jumpData, "jumpData", idx);
+
+            state.currentChart.update("none");
+            state.currentChart.update("none");
+
 
             // update sliders/top boxes progressively using uptoIndex
             updateSlidersFromData(state.backend, CONFIG, idx);
