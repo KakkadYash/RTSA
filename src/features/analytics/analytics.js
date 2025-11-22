@@ -294,7 +294,7 @@ import {
             console.log("[EVENT] Show stride/jump");
             const existing = Chart.getChart("myChart2");
             if (existing) existing.destroy();
-            showUnifiedChart(state, [4, 5]);
+            showUnifiedChart(state, [3, 4]);
         },
     });
 
