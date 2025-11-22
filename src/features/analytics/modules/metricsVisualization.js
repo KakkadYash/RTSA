@@ -321,6 +321,7 @@ export function resetMetricSlidersUI(CONFIG) {
   document.getElementById("drillTimeValue").textContent = `0 SECS`;
   document.getElementById("distanceValue").textContent = `0 YARDS`;
   document.getElementById("stepsValue").textContent = `0`;
+  document.getElementById("averageSpeedValue").textContent = `0 YD/S`;
 }
 
 // ---- helpers
