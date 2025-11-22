@@ -9,6 +9,7 @@
   background-attachment: scroll, scroll, scroll;
   background-size: 50px, 65px auto;
   margin: 0 0 1em 0;
+  padding: 1em;
 }
 
 main span {
@@ -44,6 +45,7 @@ button#one-page-report {
 .hello {
   display: flex;
   flex-direction: column;
+  margin: 1em 0 0 0;
 }
 
 #nameInfo {
@@ -55,8 +57,9 @@ button#one-page-report {
 .userData span {
   display: flex;
   line-height: 1;
-  font-size: 35px;
-  color: red;
+  font-size: 2em;
+  color: white;
+  padding: 0;
 }
 
 #bg .line {
@@ -75,10 +78,11 @@ main .line2 {
   display: flex;
   flex-direction: column;
   padding: 0 1em 0 1em;
+  height: 100%;
+  justify-content: space-evenly;
 }
 
 canvas {
-  border: 2px solid #000000;
   background-color: #A7A7A7;
   border-radius: 1vw;
   width: 30em;
@@ -247,4 +251,51 @@ canvas {
   .chart-container {
     width: 56.5vw;
   }
+}
+
+.chart-wrapper {
+  background: linear-gradient(to bottom, #444444, #000000);
+  border-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0.5em;
+  width: 100%;
+  margin: 0 0 4em 0;
+}
+
+.unified-legend {
+  display: flex;
+  gap: 0.4em;
+  width: 100%;
+  padding: 0.4em 0;
+  justify-content: space-evenly;
+}
+
+input.legend-checkbox {
+  display: none;
+}
+
+.unified-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  color: white;
+  font-family: "Futura LtCn BT";
+  font-size: 1vw;
+}
+
+.unified-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+#dashboardChart {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0.6rem;
+  background-color: transparent;
+  overflow: hidden;
 }
