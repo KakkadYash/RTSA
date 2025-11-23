@@ -11,6 +11,21 @@ let controller = null;   // ← ADD THIS EXACTLY HERE
 export function startTutorial() {
   // Build overlay nodes once
   buildScaffold();
+  // ✅ Jump directly to openModalBtn spotlight when PROFILE tab is clicked
+  // ✅ Force jump to profile tutorial whenever PROFILE tab is clicked
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("#profile");
+    if (!link) return;
+
+    // ✅ allow page navigation to happen
+    document.body.classList.remove("rt-disable-all");
+
+    // ✅ move tutorial index to the first profile step
+    const targetStepIndex = steps.findIndex(s => s.id === "profile-open-modal");
+    if (targetStepIndex === -1) return;
+
+    state.idx = targetStepIndex;
+  });
 
   // Modern: use AbortController for cleanup
   controller = new AbortController();
@@ -243,7 +258,7 @@ function placeStep(firstRun = false) {
 
   // CUSTOM SPOTLIGHT LOGIC — for all aside menu items
   // ------------------------------------------------------
-  if (["profile-highlight", "analytics-highlight"].includes(step.id)) {
+  if (["profile-highlight", "profile-open-modal", "analytics-highlight"].includes(step.id)) {
     // 1) Special case: waiting for profile DOM (openModalBtn)
     if (step.id === "profile-open-modal") {
       const maybeBtn = document.querySelector("#openModalBtn");
