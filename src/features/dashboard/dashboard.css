@@ -93,7 +93,7 @@ canvas {
   border-radius: 1vw;
   background-color: #000000;
   height: 100%;
-  width: 12vw;
+  width: clamp(120px, 18vw, 240px);
   margin-right: 3vw;
   display: flex;
   align-items: center;
@@ -105,25 +105,23 @@ canvas {
 }
 
 .uploads {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  /* padding: 1vw 0 1vw 1vw; */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
   width: 100%;
-  height: 5em;
-  /* flex-wrap: wrap; */
-  /* align-items: flex-start; */
-  /* flex-direction: column; */
-  align-items: center;
-  align-content: flex-start;
+  align-items: stretch;
+  margin-bottom: 1.5rem;
 }
 
+
 .chart-container {
-  width: 1000px;
+  width: 100%;
+  max-width: 950px;
   height: 400px;
-  /* ✅ fixed height */
   position: relative;
+  margin: 0 auto;
 }
+
 
 #prevChart {
   background-image: url(../../../public/assets/images/left-navigation-button.png);
@@ -165,8 +163,9 @@ canvas {
   align-items: start;
   justify-content: center;
   /* padding: 1vw; */
-  width: 7em;
-  height: 100%;
+  width: 100%;
+  min-height: 90px;
+  font-size: clamp(18px, 2vw, 26px);
   border: 1px solid #FFFFFF;
 }
 
@@ -177,6 +176,14 @@ canvas {
 }
 
 @media (max-width: 768px) {
+  .uploads {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-container {
+    width: 100%;
+    height: 70vw;
+  }
 
   main span,
   .userData span {
@@ -253,28 +260,39 @@ canvas {
   }
 }
 
-.chart-wrapper {
-  background: linear-gradient(to bottom, #444444, #000000);
-  border-radius: 1em;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 0.5em;
-  width: 100%;
-  margin: 0 0 4em 0;
-}
+@media (max-width: 1300px) {
+  .chart-container {
+    max-width: 85vw;
+    height: 45vw;
+  }
 
-.unified-legend {
-  display: flex;
-  gap: 0.4em;
-  width: 100%;
-  padding: 0.4em 0;
-  justify-content: space-evenly;
-}
+  .greeting-wrapper {
+    font-size: clamp(20px, 2vw, 32px);
+  }
 
-input.legend-checkbox {
-  display: none;
+  .chart-wrapper {
+    background: linear-gradient(to bottom, #444444, #000000);
+    border-radius: 1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.5em;
+    width: 100%;
+    margin: 0 0 4em 0;
+  }
+
+  .unified-legend {
+    display: flex;
+    gap: 0.4em;
+    width: 100%;
+    padding: 0.4em 0;
+    justify-content: space-evenly;
+  }
+
+  input.legend-checkbox {
+    display: none;
+  }
 }
 
 .unified-legend-item {
