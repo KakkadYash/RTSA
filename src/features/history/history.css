@@ -29,7 +29,7 @@ div.library a {
   display: flex;
   flex-direction: column;
   align-items: start;
-  width: 350px;
+  width: 100%;
 }
 
 .sort {
@@ -40,42 +40,49 @@ div.library a {
 }
 
 #history-table-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  width: 100vh;
-  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  width: 100%;
+  padding: 30px 20px;
 }
 
+
+/* 
 .drill-row {
   display: flex;
   justify-content: space-between;
   flex-wrap: nowrap;
   gap: 16px;
-}
+} */
 
 video,
 canvas {
-  width: 25vw;
-  /* Relative width based on the viewport */
-  height: 25vw;
-  /* Maintain aspect ratio */
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   border-radius: 10%;
   background-color: #000000;
   border: 1px solid #FFFF;
+  /* height: 80%; */
 }
+
 
 .drill {
   display: flex;
   flex-direction: column;
-  align-items: start;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   color: #FFFF;
-  padding: 0;
+  /* padding: 10px; */
   font-size: 30px;
-  gap: 10px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #111;
 }
+
 
 #sortButton {
   font-family: Futura LtCn BT;
@@ -178,12 +185,6 @@ canvas {
     gap: 20px;
   }
 
-  .drill {
-    align-items: center;
-    font-size: 24px;
-    width: 90vw;
-  }
-
   video,
   canvas {
     width: 80vw;
@@ -191,8 +192,7 @@ canvas {
   }
 
   #history-table-body {
-    width: 100%;
-    padding: 10px;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .dropdown,
@@ -220,6 +220,22 @@ canvas {
     padding: 12px;
   }
 }
+
+@media (max-width: 600px) {
+  #history-table-body {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .drill {
+    font-size: 20px;
+  }
+
+  .description {
+    font-size: 16px;
+    text-align: center;
+  }
+}
+
 
 .pagination {
   display: flex;
