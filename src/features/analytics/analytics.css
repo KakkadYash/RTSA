@@ -30,7 +30,7 @@
     align-items: center;
     flex-direction: column;
     font-family: Futura LtCn BT;
-    background-color: #202020;
+    background-color: rgba(0, 0, 0, 0.2);
     color: #FFFFFF;
     border: 0.1rem solid #FFFFFF;
     font-weight: bold;
@@ -45,11 +45,9 @@
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    justify-content: space-around;
+    justify-content: flex-start;
     min-height: 25vw;
-    /* safer baseline */
     height: 25vw;
-    /* allow content to define height */
     margin-bottom: 2vw;
     width: 100%;
     gap: 1em;
@@ -64,16 +62,18 @@
     position: relative;
     width: 50%;
     justify-content: space-around;
+    border-radius: 1em;
+    background: linear-gradient(to bottom, #444444, #000000);
 }
 
 #uploaded-video {
     width: 100%;
     height: 100%;
+    /* border: 1px solid rgb(255, 255, 255); */
 }
 
 video {
-    border-radius: 3%;
-    border: 0.1em solid #000000;
+    border-radius: 1em;
 }
 
 .vertical-output_canvas {
@@ -119,8 +119,9 @@ video {
 
 .chart-wrapper {
     background: linear-gradient(to bottom, #444444, #000000);
+    /* background-color: rgba(0, 0, 0, 1); */
     border-radius: 1em;
-    display: flex;
+    display: grid;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
@@ -128,18 +129,21 @@ video {
     width: 50%;
     min-height: 25vw;
     box-sizing: border-box;
-    padding: 0 0 0 0.5em;
-    gap: 0.5em;
+    padding: 0 0.5em 0 0.5em;
+    /* gap: 0.5em; */
+    /* border: 1px solid rgba(255, 255, 255, 1); */
+    grid-auto-flow: column;
+    grid-template-columns: 1fr;
 }
 
 #myChart2 {
-    width: 28vw !important;
+    width: 100% !important;
     height: 100% !important;
     display: block;
-    background: linear-gradient(to bottom, #444444, #000000);
+    /* background-color: rgba(0, 0, 0, 0.5); */
     border-radius: 0.6rem;
     box-sizing: border-box;
-    /* aspect-ratio: 16/9; */
+    /* aspect-ratio: 16 / 9; */
 }
 
 #videoForm {
@@ -183,7 +187,6 @@ video {
     font-size: 2vw;
     cursor: pointer;
     border: #ff4343 solid 0.3vw;
-    height: 100%;
 }
 
 .button {
@@ -227,6 +230,7 @@ video {
     justify-content: space-evenly;
     width: 100%;
     height: 85vh;
+    margin: 0 0 2% 0;
 }
 
 .card-container {
@@ -336,10 +340,6 @@ video {
     width: 100%;
 }
 
-.card-front:hover {
-    background-color: #575656;
-}
-
 p {
     letter-spacing: 0.1vw;
     font-family: Futura LtCn BT;
@@ -353,7 +353,7 @@ p {
     display: block;
     box-sizing: border-box;
     height: 100% !important;
-    width: 100% !important;
+    width: 35vw !important;
 }
 
 .description {
@@ -688,6 +688,11 @@ progress::-moz-progress-bar {
     text-align: center;
 }
 
+input.legend-checkbox {
+    height: 0px;
+    width: 0px;
+}
+
 .unified-legend {
     display: flex;
     height: 100%;
@@ -696,9 +701,7 @@ progress::-moz-progress-bar {
 }
 
 .unified-legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.3em;
+    display: grid;
     padding: 0.4em 0.4em;
     background: #202020;
     border: 1px solid #444;
@@ -708,8 +711,8 @@ progress::-moz-progress-bar {
     color: white;
     transition: 0.2s;
     height: 3em;
-    width: 8em;
-    flex-direction: row;
+    width: 5em;
+    justify-items: center;
 }
 
 .unified-legend-item:hover {

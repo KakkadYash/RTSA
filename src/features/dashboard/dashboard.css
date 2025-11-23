@@ -8,7 +8,8 @@
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-attachment: scroll, scroll, scroll;
   background-size: 50px, 65px auto;
-  padding: 1vw;
+  margin: 0 0 1em 0;
+  padding: 1em;
 }
 
 main span {
@@ -44,7 +45,7 @@ button#one-page-report {
 .hello {
   display: flex;
   flex-direction: column;
-  padding-left: 20px;
+  margin: 1em 0 0 0;
 }
 
 #nameInfo {
@@ -54,11 +55,11 @@ button#one-page-report {
 }
 
 .userData span {
-  padding-left: 10px;
   display: flex;
   line-height: 1;
-  font-size: 35px;
-  color: red;
+  font-size: 2em;
+  color: white;
+  padding: 0;
 }
 
 #bg .line {
@@ -74,14 +75,14 @@ main .line2 {
 }
 
 .userData {
-  padding-left: 20px;
   display: flex;
   flex-direction: column;
-  /* gap: 20px; */
+  padding: 0 1em 0 1em;
+  height: 100%;
+  justify-content: space-evenly;
 }
 
 canvas {
-  border: 2px solid #000000;
   background-color: #A7A7A7;
   border-radius: 1vw;
   width: 30em;
@@ -107,9 +108,9 @@ canvas {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  padding: 1vw 0 1vw 1vw;
+  /* padding: 1vw 0 1vw 1vw; */
   width: 100%;
-  height: 7em;
+  height: 5em;
   /* flex-wrap: wrap; */
   /* align-items: flex-start; */
   /* flex-direction: column; */
@@ -122,7 +123,6 @@ canvas {
   height: 400px;
   /* ✅ fixed height */
   position: relative;
-  padding-left: 10px;
 }
 
 #prevChart {
@@ -251,4 +251,52 @@ canvas {
   .chart-container {
     width: 56.5vw;
   }
+}
+
+.chart-wrapper {
+  background: linear-gradient(to bottom, #444444, #000000);
+  border-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0.5em;
+  width: 100%;
+  margin: 0 0 4em 0;
+}
+
+.unified-legend {
+  display: flex;
+  gap: 0.4em;
+  width: 100%;
+  padding: 0.4em 0;
+  justify-content: space-evenly;
+}
+
+input.legend-checkbox {
+  display: none;
+}
+
+.unified-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  color: white;
+  font-family: "Futura LtCn BT";
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.unified-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+#dashboardChart {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0.6rem;
+  background-color: transparent;
+  overflow: hidden;
 }
