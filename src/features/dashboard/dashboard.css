@@ -283,7 +283,8 @@ input.legend-checkbox {
   gap: 0.4em;
   color: white;
   font-family: "Futura LtCn BT";
-  font-size: 1vw;
+  font-size: 1em;
+  cursor: pointer;
 }
 
 .unified-legend-color {
