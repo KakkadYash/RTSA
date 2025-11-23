@@ -7,6 +7,13 @@ function loadProfile() {
     return;
   }
 
+  // --- Common DOM refs used in multiple sections ---
+  const fileInput = document.getElementById("file-input");
+  const imagePreview = document.getElementById("img-preview");
+  const form = document.getElementById("userProfileForm");
+  const openModalBtn = document.getElementById("openModalBtn");
+  const cancelBtn = document.getElementById("cancelSubscriptionBtn");
+
   // ====== Fetch existing profile to populate UI ======
   (async () => {
     try {
@@ -18,10 +25,8 @@ function loadProfile() {
       if (imagePreview) {
         if (data.profilePicUrl) {
           imagePreview.src = data.profilePicUrl;
-          // Optional: cache for other pages
           localStorage.setItem("profilePicUrl", data.profilePicUrl);
         } else {
-          // Fallback to default
           imagePreview.src = "../../../public/assets/images/profilepic.png";
         }
       }
@@ -45,34 +50,41 @@ function loadProfile() {
       document.getElementById("sports").value = Array.isArray(data.sports)
         ? data.sports.join(", ")
         : "";
-      // Set profile picture from backend if available
-      if (data.profilePicUrl) {
-        if (imagePreview) {
-          imagePreview.src = data.profilePicUrl;
-        }
-      }
-
 
       // Reflect checkbox states in dropdown
       const checkboxes = document.querySelectorAll("#sportsDropdown input[type='checkbox']");
       checkboxes.forEach(cb => {
         cb.checked = Array.isArray(data.sports) && data.sports.includes(cb.value);
       });
+
+      // ====== Subscription Section Fill ======
+      const subPlan = document.getElementById("sub_plan");
+      const subStatus = document.getElementById("sub_status");
+      const subNextBilling = document.getElementById("sub_next_billing");
+
+      if (subPlan) subPlan.textContent = data.subscription_plan_type || "None";
+      if (subStatus) subStatus.textContent = data.subscription_status || "inactive";
+
+      if (subNextBilling) {
+        if (data.subscription_next_billing) {
+          const dt = new Date(data.subscription_next_billing);
+          subNextBilling.textContent = dt.toDateString();
+        } else {
+          subNextBilling.textContent = "—";
+        }
+      }
     } catch (err) {
       console.error("Error loading profile:", err);
     }
   })();
 
-  const fileInput = document.getElementById("file-input");
-  const imagePreview = document.getElementById("img-preview");
-  const form = document.getElementById("userProfileForm");
-  const openModalBtn = document.getElementById("openModalBtn");
   // === Click avatar to choose new profile photo ===
   if (imagePreview && fileInput) {
     imagePreview.addEventListener("click", () => {
       fileInput.click();
     });
   }
+
   // === Upload selected profile picture to backend ===
   if (fileInput && imagePreview) {
     fileInput.addEventListener("change", async () => {
@@ -101,7 +113,6 @@ function loadProfile() {
           throw new Error(data.detail || "Failed to upload profile picture");
         }
 
-        // Show new picture instantly
         const objectUrl = URL.createObjectURL(file);
         imagePreview.src = objectUrl;
 
@@ -113,7 +124,6 @@ function loadProfile() {
     });
   }
 
-
   // ====== Helper: Load Calibration Modal HTML, CSS, JS ======
   async function loadCalibrationModal() {
     const res = await fetch("../../../src/features/calibration/calibration.html");
@@ -123,66 +133,50 @@ function loadProfile() {
     container.innerHTML = html;
     container.classList.remove("hidden");
 
-    // Load CSS
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = "../../../src/features/calibration/calibration.css";
     document.head.appendChild(link);
 
-    // Load JS and wait until ready
     await new Promise((resolve, reject) => {
       const script = document.createElement("script");
       script.src = "../../../src/features/calibration/calibration.js";
       script.onload = () => {
-        // ✅ Once calibration.js is loaded, initialize modal + form events
         if (typeof initCalibrationModalEvents === "function") initCalibrationModalEvents();
         if (typeof initCalibrationFormHandler === "function") initCalibrationFormHandler();
-
-        // ✅ Initialize image preview AFTER modal HTML has been injected
         if (typeof initImagePreview === "function") {
           console.log("🖼️ Initializing image preview after modal load");
           initImagePreview();
         } else {
           console.warn("⚠️ initImagePreview not found yet");
         }
-
         resolve();
       };
-
       script.onerror = reject;
       document.body.appendChild(script);
     });
   }
 
-
-  // ====== Helper: Open Modal After It’s Loaded ======
-  // ====== Helper: Open Modal After It’s Loaded ======
   async function handleOpenModal() {
     console.log("Clicked Upload Photo Button on Profile page");
 
-    // 1️⃣ Load modal HTML, CSS, and JS
     await loadCalibrationModal();
 
-    // 2️⃣ Verify modal loaded
     const modal = document.getElementById("popupModal");
     if (!modal) {
       console.error("❌ Modal not found after loading calibration.html");
       return;
     }
 
-    // 3️⃣ Extract existing profile data
     const fullName = document.getElementById("name").value || "";
     const nameParts = fullName.split(" ");
-
     const first_name = nameParts[0] || "";
     const last_name = nameParts.slice(1).join(" ") || "";
     const age = document.getElementById("age").value || "";
 
-    // Handle dropdown or text-based sport field
     const sportsField = document.getElementById("sports");
     let sportValue = "";
     if (sportsField) {
-      // For custom dropdown with hidden input
       if (sportsField.tagName === "INPUT") {
         sportValue = sportsField.value || "";
       } else if (sportsField.multiple) {
@@ -192,8 +186,6 @@ function loadProfile() {
       }
     }
 
-    // 4️⃣ Fill the calibration modal fields
-    // Match backend field names (snake_case)
     const modalFirst = document.getElementById("first_name") || document.getElementById("firstName");
     const modalLast = document.getElementById("last_name") || document.getElementById("lastName");
     const modalAge = document.getElementById("popupAge");
@@ -205,23 +197,18 @@ function loadProfile() {
     if (modalAge) modalAge.value = age;
     if (modalSport) modalSport.value = sportValue;
 
-    // Optional: prefill height if already known (from calibration cache)
     const userData = JSON.parse(localStorage.getItem("userData") || "{}");
     if (modalHeight && userData.calibrated_height_m) {
       modalHeight.value = (userData.calibrated_height_m * 100).toFixed(1);
     }
 
-    // 5️⃣ Show modal and freeze background scroll
     modal.classList.remove("hidden");
     modal.setAttribute("aria-hidden", "false");
 
-    // 6️⃣ Initialize modal & form behavior (once HTML is ready)
     if (typeof initCalibrationModalEvents === "function") initCalibrationModalEvents();
     if (typeof initCalibrationFormHandler === "function") initCalibrationFormHandler();
   }
 
-
-  // ====== Register Click Event (AFTER defining functions) ======
   if (openModalBtn) {
     openModalBtn.addEventListener("click", handleOpenModal);
   } else {
@@ -235,36 +222,30 @@ function loadProfile() {
   const checkboxes = optionsContainer.querySelectorAll("input[type='checkbox']");
   const hiddenInput = document.getElementById("sports");
 
-  // Toggle dropdown open/close
   dropdown.addEventListener("click", (e) => {
     e.stopPropagation();
 
     const isActive = dropdown.classList.toggle("active");
     optionsContainer.classList.toggle("hidden");
 
-    // When open
     if (isActive) {
-      dropdown.style.backgroundColor = "#e62a2a"; // RT red
+      dropdown.style.backgroundColor = "#e62a2a";
       selected.style.color = "black";
     } else {
-      // When closed
       dropdown.style.backgroundColor = "#111";
       selected.style.color = "white";
     }
   });
 
-  // Close dropdown when clicking outside
   document.addEventListener("click", (e) => {
     if (!dropdown.contains(e.target)) {
       dropdown.classList.remove("active");
       optionsContainer.classList.add("hidden");
-
-      dropdown.style.backgroundColor = "#111"; // reset background
-      selected.style.color = "white"; // reset text color
+      dropdown.style.backgroundColor = "#111";
+      selected.style.color = "white";
     }
   });
 
-  // Handle selections
   checkboxes.forEach((checkbox) => {
     checkbox.addEventListener("change", () => {
       const selectedValues = Array.from(checkboxes)
@@ -278,6 +259,53 @@ function loadProfile() {
       hiddenInput.value = selectedValues.join(", ");
     });
   });
+
+  // ====== Cancel Subscription Button ======
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", async () => {
+      if (!confirm("Are you sure you want to cancel your subscription?")) return;
+
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        alert("User ID missing. Please login again.");
+        window.location.href = "../login/login.html";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("userId", userId);
+
+      try {
+        const res = await fetch(`${API_BASE}cancel-subscription`, {
+          method: "POST",
+          body: formData
+        });
+
+        const out = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          console.error("Cancel error:", out);
+          alert(out.detail || "Failed to cancel subscription.");
+          return;
+        }
+
+        alert("Your subscription has been cancelled.");
+
+        // Clear login session
+        localStorage.removeItem("userId");
+        localStorage.removeItem("profilePicUrl");
+        localStorage.removeItem("userData");
+
+        // Redirect to login page
+        window.location.href = "../login/login.html";
+
+      } catch (err) {
+        console.error("Cancel subscription error:", err);
+        alert("Something went wrong while canceling subscription.");
+      }
+    });
+  }
+
   // ====== Save Button Handler ======
   const saveButton = document.getElementById("saveButton");
   if (saveButton) {
@@ -300,7 +328,6 @@ function loadProfile() {
         ? sportsInput.split(",").map(s => s.trim()).filter(Boolean)
         : [];
 
-      // Build payload with only provided fields
       const payload = { userId };
 
       if (name) payload.name = name;
@@ -309,7 +336,7 @@ function loadProfile() {
       if (state) payload.state = state;
       if (sports.length) payload.sports = sports;
 
-      if (Object.keys(payload).length === 1) { // only userId present
+      if (Object.keys(payload).length === 1) {
         alert("No changes to update.");
         return;
       }
@@ -330,7 +357,6 @@ function loadProfile() {
         console.log(result.message, "Updated fields:", result.updated_fields);
         alert("Profile updated successfully!");
 
-        // Update top info panel instantly (optional but nice UX)
         if (payload.name) {
           const nameInfo = document.getElementById("nameInfo");
           if (nameInfo) nameInfo.textContent = payload.name;
@@ -340,7 +366,6 @@ function loadProfile() {
           if (sportInfo) sportInfo.textContent = payload.sports.join(", ");
         }
 
-        // Navigate to home page after update
         window.location.href = "../home/home.html";
       } catch (err) {
         console.error("Error updating profile:", err);
@@ -348,7 +373,6 @@ function loadProfile() {
       }
     });
   }
-
-
 }
+
 window.loadProfile = loadProfile;

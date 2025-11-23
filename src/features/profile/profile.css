@@ -1,3 +1,4 @@
+/* profile.css */
 @import url("../../../src/shared/stylesheet.css");
 @import url("../../../src/shared/components.css");
 
@@ -113,26 +114,34 @@ h2 {
   background-color: #000000;
   color: #797979;
   font-weight: bold;
-  border-radius: 1vw;
   display: flex;
   flex-direction: column;
-  align-items: start;
   padding: 2vw;
-  line-height: 9vh;
-  width: 76.5vw;
   border: 1px solid #FFFFFF;
-  font-size: 2.2vw;
+  font-size: 1.5em;
   transition: max-height 0.25s ease-in-out;
   overflow: hidden;
-  height: 20em;
+}
+
+.subscription {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  height: 4em;
+  gap: 7em;
+}
+
+.sub-data label {
+  font-family: 'FUTURA LTCN BT';
 }
 
 #userProfileForm {
-  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  gap: 1em;
+  margin: 1em 0 1em 0;
 }
 
 .subHeader {
@@ -177,7 +186,7 @@ button#openModalBtn {
   opacity: 100%;
   height: 40px;
   width: 50%;
-  font-size: 30px;
+  font-size: 0.8em;
   color: white;
   background-color: #111111;
   border: 2px solid red;
@@ -211,7 +220,7 @@ select {
 /* === Custom Dropdown === */
 .custom-dropdown {
   position: relative;
-  width: 61%;
+  width: 60%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -220,7 +229,7 @@ select {
 
 .dropdown-container {
   position: relative;
-  width: 51%;
+  width: 50%;
   background-color: #111111;
   border: 1px solid #d02720;
   border-radius: 6px;
@@ -340,7 +349,6 @@ input:-webkit-autofill {
   z-index: 999;
   display: flex;
   flex-direction: column;
-  /* padding: 0.5vw 0; */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
@@ -369,10 +377,9 @@ input:-webkit-autofill {
 .dropdown-options label {
   margin: 0.2em 0;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
   color: #fff;
-  /* padding: 0.6vw 1vw; */
   cursor: pointer;
   font-size: 1.6vw;
   transition: background 0.25s ease, color 0.25s ease;
@@ -386,4 +393,25 @@ input:-webkit-autofill {
 
 img#img-preview {
   cursor: pointer;
+}
+
+/* === Subscription Box === */
+.subscription-box {
+  /* margin-top: 2vw; */
+  padding-top: 2vw;
+  border-top: 1px solid #444;
+  display: flex;
+  flex-direction: column;
+}
+
+.subscription-box h3 {
+  color: #D02720;
+  font-size: 3vw;
+}
+
+.sub-value {
+  color: #ffffff;
+  /* font-size: 2em; */
+  font-family: 'Futura LtCn BT';
+  font-weight: normal;
 }
