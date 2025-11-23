@@ -141,24 +141,38 @@ function loadDashboard() {
   console.log("[DEBUG] Calling fetchUploadCount() in 100ms...");
   setTimeout(fetchUploadCount, 100);
 
-  // Report button setup (unchanged)
+  // ==== One Page Report button shake setup ====
   const reportBtn = document.getElementById("one-page-report");
+
+  // Remove the shake class after the animation finishes so it can retrigger
   if (reportBtn) {
-    reportBtn.addEventListener("click", () => {
-      console.log("clicked one-page-report");
-      window.open("../../../src/features/reportForm/reportform.html", "_blank");
+    reportBtn.addEventListener("animationend", () => {
+      reportBtn.classList.remove("shake-report");
     });
-  } else {
-    console.warn("⚠️ One Page Report button not found.");
   }
 
+  function triggerReportShake() {
+    const btn = document.getElementById("one-page-report");
+    if (!btn) return;
+
+    // Reset class so re-click retriggers animation
+    btn.classList.remove("shake-report");
+    // Force reflow to restart animation
+    void btn.offsetWidth;
+    btn.classList.add("shake-report");
+  }
+
+  // Use a single delegated listener so clicks on the text, lock icon, etc. all count
   document.addEventListener("click", function (e) {
-    const reportBtn = e.target.closest("#one-page-report");
-    if (reportBtn) {
+    const clickedReportBtn = e.target.closest("#one-page-report");
+    if (clickedReportBtn) {
       console.log("clicked one-page-report");
-      window.open("../../../src/features/reportForm/reportform.html", "_blank");
+      triggerReportShake();
+      // Comment out the line below when you want One Page Report feature
+      // window.open("../../../src/features/reportForm/reportform.html", "_blank");
     }
   });
+
 }
 
 // Required so home.js can access it globally

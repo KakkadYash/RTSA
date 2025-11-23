@@ -13,16 +13,21 @@
 }
 
 main span {
-  padding-top: 10px;
-  padding-left: 10px;
-  line-height: 1;
   color: #fff;
 }
 
+img.lock {
+  padding: 0 0 0.2em 0;
+  width: 20%;
+  height: 80%;
+}
+
 button#one-page-report {
-  width: 6em;
-  height: 2em;
+  width: 7em;
+  height: 2.2em;
   font-size: 1em;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .header-wrapper {
@@ -40,44 +45,53 @@ button#one-page-report {
   justify-content: flex-start;
   gap: 0.5rem;
   font-size: 2em;
+  flex-direction: column;
+}
+
+.name-wrapper {
+  display: flex;
+  align-items: center;
+  font-size: 1.5em;
+  gap: 0.2em;
 }
 
 .hello {
   display: flex;
   flex-direction: column;
-  margin: 1em 0 0 0;
 }
 
 #nameInfo {
   display: flex;
   line-height: 1;
-  color: #fff;
+  color: #d02720;
 }
 
 .userData span {
   display: flex;
   line-height: 1;
-  font-size: 2em;
+  font-size: 1.5em;
   color: white;
   padding: 0;
 }
 
+.chart-heading-wrapper span {
+  color: #d02720;
+  font-size: 2.5em;
+}
+
 #bg .line {
-  padding-left: 6px;
   height: auto;
   width: 150px;
 }
 
 main .line2 {
-  padding-left: 6px;
   height: auto;
-  width: 165px;
+  width: 12em;
 }
 
 .userData {
   display: flex;
   flex-direction: column;
-  padding: 0 1em 0 1em;
   height: 100%;
   justify-content: space-evenly;
 }
@@ -110,18 +124,7 @@ canvas {
   gap: 1.2rem;
   width: 100%;
   align-items: stretch;
-  margin-bottom: 1.5rem;
 }
-
-
-.chart-container {
-  width: 100%;
-  max-width: 950px;
-  height: 400px;
-  position: relative;
-  margin: 0 auto;
-}
-
 
 #prevChart {
   background-image: url(../../../public/assets/images/left-navigation-button.png);
@@ -156,15 +159,14 @@ canvas {
 .small-box {
   background-color: #000000;
   color: #FFFFFF;
-  font-size: 2.5vw;
   border-radius: 1vw;
   display: flex;
   flex-direction: column;
   align-items: start;
   justify-content: center;
   /* padding: 1vw; */
-  width: 100%;
-  min-height: 90px;
+  width: 20%;
+  min-height: 2.5em;
   font-size: clamp(18px, 2vw, 26px);
   border: 1px solid #FFFFFF;
 }
@@ -260,39 +262,33 @@ canvas {
   }
 }
 
-@media (max-width: 1300px) {
-  .chart-container {
-    max-width: 85vw;
-    height: 45vw;
-  }
+.greeting-wrapper {
+  font-size: clamp(20px, 2vw, 32px);
+}
 
-  .greeting-wrapper {
-    font-size: clamp(20px, 2vw, 32px);
-  }
+.chart-wrapper {
+  background: linear-gradient(to bottom, #444444, #000000);
+  border-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0.5em;
+  width: 100%;
+  height: 65%;
+  margin: 0 0 2em 0;
+}
 
-  .chart-wrapper {
-    background: linear-gradient(to bottom, #444444, #000000);
-    border-radius: 1em;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 0.5em;
-    width: 100%;
-    margin: 0 0 4em 0;
-  }
+.unified-legend {
+  display: flex;
+  gap: 0.4em;
+  width: 100%;
+  padding: 0.4em 0;
+  justify-content: space-evenly;
+}
 
-  .unified-legend {
-    display: flex;
-    gap: 0.4em;
-    width: 100%;
-    padding: 0.4em 0;
-    justify-content: space-evenly;
-  }
-
-  input.legend-checkbox {
-    display: none;
-  }
+input.legend-checkbox {
+  display: none;
 }
 
 .unified-legend-item {
@@ -317,4 +313,75 @@ canvas {
   border-radius: 0.6rem;
   background-color: transparent;
   overflow: hidden;
+}
+
+
+/* === TOOLTIP SYSTEM (same as analytics) === */
+.tooltip-label {
+  position: relative;
+  cursor: help;
+  font-weight: bold;
+}
+
+/* Tooltip box */
+.tooltip-label .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  width: 8em;
+  background: #fff;
+  color: #222;
+  text-align: left;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  font-size: 0.8em;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 130%;
+  right: 0;
+  z-index: 10;
+  transition: opacity 0.25s ease;
+}
+
+/* Tooltip arrow */
+.tooltip-label .tooltip-text::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  right: 10%;
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent #fff transparent;
+}
+
+/* Show tooltip on hover */
+.tooltip-label:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* === One Page Report click shake animation === */
+@keyframes one-page-report-shake-horizontal {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  15%,
+  45%,
+  75% {
+    transform: translateX(-5px);
+  }
+
+  30%,
+  60%,
+  90% {
+    transform: translateX(5px);
+  }
+}
+
+/* Class added via JS when button is clicked */
+#one-page-report.shake-report {
+  animation: one-page-report-shake-horizontal 0.4s ease;
 }
