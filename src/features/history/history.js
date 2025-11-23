@@ -23,17 +23,9 @@ function loadHistory() {
     history.forEach((item, index) => {
       const videoUrl = item.video_url;
       const videoName = item.videoName || "Untitled Video";
-      const uploadDate = item.uploadDate 
+      const uploadDate = item.uploadDate
         ? new Date(item.uploadDate).toLocaleString()
         : "Unknown date";
-
-      if (index % 3 === 0) {
-        const row = document.createElement("div");
-        row.className = "drill-row";
-        tableBody.appendChild(row);
-      }
-
-      const row = tableBody.lastElementChild;
 
       const div = document.createElement("div");
       div.className = "drill";
@@ -47,7 +39,7 @@ function loadHistory() {
         </div>
       `;
 
-      row.appendChild(div);
+      tableBody.appendChild(div);
     });
   };
 
