@@ -7,6 +7,44 @@ document.addEventListener("DOMContentLoaded", () => {
   const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
   const tabs = document.querySelectorAll(".nav-link");
+  // 🔹 Background parallax for elements with .parallax-bg
+  function initParallax() {
+    const SPEED = 0.15; // lower = more subtle
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        document.querySelectorAll(".parallax-bg").forEach(el => {
+          el.style.transform = `translateY(${scrollY * SPEED * -1}px)`;
+        });
+      },
+      { passive: true }
+    );
+  }
+
+  initParallax();
+
+  // 🔹 Create sliding underline inside the sidebar nav
+  const nav = document.querySelector("aside nav");
+  let navIndicator = null;
+  if (nav) {
+    navIndicator = document.createElement("div");
+    navIndicator.id = "nav-indicator";
+    nav.appendChild(navIndicator);
+  }
+
+  function moveIndicator(activeLink) {
+    if (!navIndicator || !activeLink) return;
+    const glowTop = activeLink.offsetTop;
+    navIndicator.style.top = `${glowTop}px`;
+    navIndicator.style.opacity = "1";
+
+    // Trigger breathing pulse on active tab
+    navIndicator.classList.add("active-pulse");
+
+  }
+
 
   const pageFunctionMap = {
     dashboard: "loadDashboard",
@@ -92,15 +130,40 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!page) return;
 
     try {
+      // 1️⃣ Exit animation on current page
+      contentArea.classList.add("page-exit");
+
+      // Wait for the exit to finish
+      await new Promise(resolve => setTimeout(resolve, 550));
+
+      // 2️⃣ Load new HTML/CSS/JS
       await loadHTML(page);
       loadCSS(page, cssFile);
       loadJS(page, jsFile);
       updateActiveTab(link);
+
+      // 3️⃣ Set initial enter state
+      contentArea.classList.add("page-enter");
+
+      // 4️⃣ Animate to final state on next frame
+      requestAnimationFrame(() => {
+        contentArea.classList.add("page-enter-active");
+        contentArea.classList.remove("page-exit");
+      });
+
+      // 5️⃣ Cleanup helper classes after animation
+      setTimeout(() => {
+        contentArea.classList.remove("page-enter", "page-enter-active");
+      }, 550);
+
     } catch (error) {
       console.error("Tab load error:", error);
       contentArea.innerHTML = `<p class="error">Failed to load page. Please try again later.</p>`;
     }
   }
+
+
+
 
   /**
    * Update active tab styling.
@@ -108,14 +171,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateActiveTab(activeLink) {
     tabs.forEach(tab => tab.classList.remove("active"));
     activeLink.classList.add("active");
+    moveIndicator(activeLink); // 🔥 animate underline to this tab
   }
+
 
   // Attach event listeners to tabs
   tabs.forEach(link => {
     link.addEventListener("click", e => {
       e.preventDefault();
+
+      // Ripple flash
+      if (navIndicator) {
+        navIndicator.classList.remove("ripple");
+        void navIndicator.offsetWidth;  // force reflow to restart animation
+        navIndicator.classList.add("ripple");
+      }
+
       handleTabClick(link);
     });
+
   });
 });
 

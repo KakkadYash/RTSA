@@ -20,7 +20,7 @@ img {
 
 aside {
     position: sticky;
-    padding: 0.5vw;
+    padding: 0.5vw 0.5vw 0.5vw 1vw;
     background-color: #e62a2a;
     height: 100vh;
     top: 0;
@@ -31,7 +31,10 @@ nav {
     flex-direction: column;
     height: 100%;
     justify-content: space-between;
+    position: relative;
+    /* ⬅ needed for sliding underline */
 }
+
 
 aside a {
     color: #000000;
@@ -39,11 +42,17 @@ aside a {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+    z-index: 2;
+    /* ensure text is above glow */
 }
 
 aside ul {
     list-style: none;
     padding: 0;
+    display: flex;
+    gap: 0.2em;
+    flex-direction: column;
 }
 
 aside a.active,
@@ -230,4 +239,120 @@ form {
     margin-top: 5px;
     margin-right: 16px;
     font-size: 17px;
+}
+
+/* -------------------------------
+   PREMIUM PAGE TRANSITION SYSTEM
+   ------------------------------- */
+
+/* -----------------------------------
+   PREMIUM PAGE TRANSITION + BLUR
+   ----------------------------------- */
+
+#content-area {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+    filter: blur(0px);
+    transition:
+        opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+        filter 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform, filter;
+}
+
+/* Old page leaving */
+.page-exit {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+    filter: blur(6px);
+}
+
+/* New page initial state */
+.page-enter {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+    filter: blur(6px);
+}
+
+/* New page animates to final state */
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+    filter: blur(0px);
+}
+
+/* =======================================================
+    Sliding Glowing Highlight Bar for Active Sidebar Link
+   ======================================================= */
+#nav-indicator {
+    position: absolute;
+    left: -0.6em;
+    right: 0;
+    height: 3.8vw;
+    border-radius: 0.5em;
+    top: 0;
+    opacity: 0;
+    z-index: 1;
+    width: 105%;
+    pointer-events: none;
+    background: linear-gradient(20deg, rgba(255, 255, 255, 1.85), rgba(255, 0, 1, 0), rgba(255, 255, 255, 0.85));
+    background-size: 200% 200%;
+    animation: glowShift 6s ease infinite;
+    box-shadow: 0 0 18px rgba(255, 255, 255, 0.6), 0 0 28px rgba(255, 0, 0, 0.35), inset 0 0 20px rgba(255, 255, 255, 0.25);
+    transition: top 0.45s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s ease, opacity 0.3s ease-out;
+}
+
+
+/* 👇 Neon gradient shifting animation */
+@keyframes glowShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Slight glow when hovering items */
+aside a:hover {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35));
+}
+
+/* Breathing pulse for active tab glow */
+#nav-indicator.active-pulse {
+    animation: glowShift 6s ease infinite, pulseGlow 2.8s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 26px rgba(255, 255, 255, 0.8);
+    }
+
+    100% {
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Ripple flash on click */
+#nav-indicator.ripple {
+    animation: rippleFlash 0.4s ease;
+}
+
+@keyframes rippleFlash {
+    0% {
+        filter: brightness(1.8);
+    }
+
+    100% {
+        filter: brightness(1);
+    }
 }
