@@ -36,14 +36,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function moveIndicator(activeLink) {
     if (!navIndicator || !activeLink) return;
-    const glowTop = activeLink.offsetTop;
-    navIndicator.style.top = `${glowTop}px`;
+
+    // Height of each tab
+    const tabHeight = activeLink.offsetHeight;
+
+    // Position the bottom of the dashed underline
+    navIndicator.style.top = `${activeLink.offsetTop + tabHeight - 3}px`;
+
     navIndicator.style.opacity = "1";
-
-    // Trigger breathing pulse on active tab
-    navIndicator.classList.add("active-pulse");
-
   }
+
 
 
   const pageFunctionMap = {
@@ -179,17 +181,8 @@ document.addEventListener("DOMContentLoaded", () => {
   tabs.forEach(link => {
     link.addEventListener("click", e => {
       e.preventDefault();
-
-      // Ripple flash
-      if (navIndicator) {
-        navIndicator.classList.remove("ripple");
-        void navIndicator.offsetWidth;  // force reflow to restart animation
-        navIndicator.classList.add("ripple");
-      }
-
       handleTabClick(link);
     });
-
   });
 });
 
