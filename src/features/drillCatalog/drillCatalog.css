@@ -29,44 +29,6 @@
   width: 150px;
 }
 
-.scrollmenu {
-  overflow: auto;
-  white-space: wrap;
-}
-
-.scrollmenu a {
-  display: inline-block;
-  color: white;
-  text-align: center;
-  padding: 14px;
-  text-decoration: none;
-}
-
-.scrollmenu a:hover {
-  background-color: #777;
-}
-
-/* Hide scrollbar for Webkit-based browsers (Chrome, Safari) */
-div.scrollmenu::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for Firefox */
-div.scrollmenu {
-  scrollbar-width: none;
-}
-
-/* Video and Canvas Styles */
-#video-container {
-  display: flex;
-  justify-content: space-evenly;
-  gap: 20px;
-  width: 100%;
-  /* margin-top: 30px; */
-  /* overflow: scroll; */
-  flex-wrap: wrap;
-}
-
 video,
 canvas {
   width: 25vw;
@@ -132,22 +94,6 @@ canvas {
     padding-bottom: 10px;
   }
 
-  #video-container {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 16px;
-    width: auto;
-    margin-left: 10px;
-  }
-
-  .drill {
-    min-width: 70vw;
-    font-size: 20px;
-    align-items: center;
-    text-align: center;
-  }
-
   video,
   canvas {
     width: 70vw;
@@ -163,5 +109,71 @@ canvas {
   /* Allow horizontal scrolling */
   .scrollmenu {
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* --- DRILL CATALOG NEW HISTORY-STYLE LAYOUT --- */
+.drill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  padding: 20px 0;
+}
+
+.drill-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  background: #111;
+  border-radius: 14px;
+  border: 1px solid #444;
+  padding: 16px 20px;
+  color: white;
+  font-family: 'Futura LtCn BT';
+  gap: 1em;
+}
+
+.drill-video-col video {
+  width: 100%;
+  height: 20em;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid white;
+}
+
+.drill-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 1.5em;
+  height: 100%;
+  width: 100%;
+}
+
+.drill-title {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.drill-desc {
+  font-size: 1.2em;
+  opacity: 0.85;
+}
+
+/* Responsive */
+@media (max-width: 850px) {
+  .drill-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .drill-video-col video {
+    width: 85%;
+    height: auto;
+  }
+
+  .drill-info-col {
+    align-items: center;
   }
 }
