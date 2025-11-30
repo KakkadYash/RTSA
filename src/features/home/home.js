@@ -132,36 +132,51 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!page) return;
 
     try {
-      // 1️⃣ Exit animation on current page
+      // 1️⃣Darkening background starts
+      document.getElementById("transition-overlay").style.background = "rgba(0,0,0,0.6)";
       contentArea.classList.add("page-exit");
 
-      // Wait for the exit to finish
-      await new Promise(resolve => setTimeout(resolve, 550));
+      // ⏱ Wait for exit animation to fully finish (1.5s)
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // 2️⃣ Load new HTML/CSS/JS
+      // 2️⃣ Load new page content
       await loadHTML(page);
       loadCSS(page, cssFile);
       loadJS(page, jsFile);
       updateActiveTab(link);
+      // Add stagger animation to all children after HTML is loaded
+      const children = [...contentArea.querySelectorAll("*")].filter(el => el.tagName !== "SCRIPT");
 
-      // 3️⃣ Set initial enter state
+      children.forEach((el, index) => {
+        el.classList.add("stagger-child");
+        setTimeout(() => {
+          el.classList.add("visible");
+        }, index * 60);  // 60ms delay per element (adjust to taste)
+      });
+
+      // 3️⃣ Set new page into initial hidden state
       contentArea.classList.add("page-enter");
 
-      // 4️⃣ Animate to final state on next frame
+      // 4️⃣ Animate it into view
       requestAnimationFrame(() => {
         contentArea.classList.add("page-enter-active");
         contentArea.classList.remove("page-exit");
+
+        // Remove dark background when new page starts appearing
+        document.getElementById("transition-overlay").style.background = "rgba(0,0,0,0)";
       });
 
-      // 5️⃣ Cleanup helper classes after animation
+
+      // 5️⃣ Cleanup classes after animation ends (1.5s)
       setTimeout(() => {
         contentArea.classList.remove("page-enter", "page-enter-active");
-      }, 550);
+      }, 1500);
 
     } catch (error) {
       console.error("Tab load error:", error);
       contentArea.innerHTML = `<p class="error">Failed to load page. Please try again later.</p>`;
     }
+
   }
 
 

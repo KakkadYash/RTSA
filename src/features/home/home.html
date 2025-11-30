@@ -1,114 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-    <link rel="stylesheet" href="home.css" />
-    <link rel="stylesheet" href="../../../src/shared/components.css">
-    <link rel="stylesheet" href="../../../src/shared/stylesheet.css">
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home</title>
+  <link rel="stylesheet" href="home.css" />
+  <link rel="stylesheet" href="../../../src/shared/components.css">
+  <link rel="stylesheet" href="../../../src/shared/stylesheet.css">
+</head>
 
-  <body>
-    <aside class="aside">
-      <nav>
-        <div class="logo-container">
-          <a href="home.html">
-            <img src="../../../public/assets/images/Reaction Technologies logo samples bw-02.png" alt="Company Logo"
-              class="logo">
-          </a>
-        </div>
-
-        <ul>
-          <li>
-            <div class="links">
-              <a href="#" data-page="profile" data-css="profile.css" data-js="profile.js" class="nav-link">
-                <span class='  click-animation'>PROFILE</span>
-              </a>
-            </div>
-          </li>
-          <li>
-            <div class="links">
-              <a href="#" data-page="dashboard" data-css="dashboard.css" data-js="dashboard.js" class="nav-link">
-                <span class='  click-animation'>DASHBOARD</span>
-              </a>
-            </div>
-          </li>
-          <li>
-            <div class="links">
-              <a href="#" data-page="analytics" data-css="analytics.css" data-js="analytics.js" class="nav-link">
-                <span class='  click-animation'>ANALYTICS</span>
-              </a>
-            </div>
-          </li>
-          <li>
-            <div class="links">
-              <a href="#" data-page="history" data-css="history.css" data-js="history.js" class="nav-link">
-                <span class='  click-animation'>HISTORY</span>
-              </a>
-            </div>
-          </li>
-          <li>
-            <div class="links">
-              <a href="#" data-page="drillCatalog" data-css="drillCatalog.css" data-js="drillCatalog.js"
-                class="nav-link">
-                <span class='  click-animation'>DRILL CATALOG</span>
-              </a>
-            </div>
-          </li>
-        </ul>
-
-        <div class="footer">
-          <div class="logOut">
-            <span class="  click-animation" id="logoutButton" onclick="logout()">LOG OUT</span>
-          </div>
-          <div class="socials">
-            <div class="social-box">
-              <a href="https://www.instagram.com/reactiontech/"><img
-                  src="../../../public/assets/images/icons8-instagram-50.png" alt="insta" class="icons" /></a>
-            </div>
-            <div class="social-box">
-              <a href="https://www.facebook.com/ReactionTech/"><img
-                  src="../../../public/assets/images/icons8-facebook-64.png" alt="facebook" class="icons" /></a>
-            </div>
-            <div class="social-box">
-              <a href="https://www.linkedin.com/company/reaction-technologies/"><img
-                  src="../../../public/assets/images/icons8-linkedin-50.png" alt="linkedin" class="icons" /></a>
-            </div>
-          </div>
-        </div>
-      </nav>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main id="content-area" class="main">
-      <!-- This is the default home page content -->
-      <img src="../../../public/assets/images/Banner.png" alt="Banner" />
-      <img src="../../../public/assets/images/SplashScreen.png" alt="Splash" />
-      <img src="../../../public/assets/images/Quote.png" alt="Quote" />
-      <img src="../../../public/assets/images/Analytics.png" alt="Analytics" />
-      <img src="../../../public/assets/images/HowTo.png" alt="HowTo" />
-      <img src="../../../public/assets/images/HowItWorks.png" alt="HowItWorks" />
-      <div class="contact">
-        <div class="blurb">
-          <h1>CONTACT US</h1>
-          <p>Have a general question about Reaction<br /> Technologies? Feel free to drop us a note<br /></p>
-        </div>
-        <form id="contactForm">
-          <input type="text" id="name" class="form-control" placeholder="NAME" required />
-          <input type="text" id="email" class="form-control" placeholder="EMAIL" required />
-          <input type="text" id="note" class="form-control" placeholder="NOTE" required />
-          <button id="submitButton" type="submit" class="button">SUBMIT</button>
-        </form>
+<body>
+  <div id="transition-overlay"></div>
+  <aside class="aside">
+    <nav>
+      <div class="logo-container">
+        <a href="home.html">
+          <img src="../../../public/assets/images/Reaction Technologies logo samples bw-02.png" alt="Company Logo"
+            class="logo">
+        </a>
       </div>
-    </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
-    <script src="home.js"></script>
-  </body>
+      <ul>
+        <li>
+          <div class="links">
+            <a href="#" data-page="profile" data-css="profile.css" data-js="profile.js" class="nav-link">
+              <span class='  click-animation'>PROFILE</span>
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="#" data-page="dashboard" data-css="dashboard.css" data-js="dashboard.js" class="nav-link">
+              <span class='  click-animation'>DASHBOARD</span>
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="#" data-page="analytics" data-css="analytics.css" data-js="analytics.js" class="nav-link">
+              <span class='  click-animation'>ANALYTICS</span>
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="#" data-page="history" data-css="history.css" data-js="history.js" class="nav-link">
+              <span class='  click-animation'>HISTORY</span>
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="#" data-page="drillCatalog" data-css="drillCatalog.css" data-js="drillCatalog.js" class="nav-link">
+              <span class='  click-animation'>DRILL CATALOG</span>
+            </a>
+          </div>
+        </li>
+      </ul>
+
+      <div class="footer">
+        <div class="logOut">
+          <span class="  click-animation" id="logoutButton" onclick="logout()">LOG OUT</span>
+        </div>
+        <div class="socials">
+          <div class="social-box">
+            <a href="https://www.instagram.com/reactiontech/"><img
+                src="../../../public/assets/images/icons8-instagram-50.png" alt="insta" class="icons" /></a>
+          </div>
+          <div class="social-box">
+            <a href="https://www.facebook.com/ReactionTech/"><img
+                src="../../../public/assets/images/icons8-facebook-64.png" alt="facebook" class="icons" /></a>
+          </div>
+          <div class="social-box">
+            <a href="https://www.linkedin.com/company/reaction-technologies/"><img
+                src="../../../public/assets/images/icons8-linkedin-50.png" alt="linkedin" class="icons" /></a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main id="content-area" class="main">
+    <!-- This is the default home page content -->
+    <img src="../../../public/assets/images/Banner.png" alt="Banner" />
+    <img src="../../../public/assets/images/SplashScreen.png" alt="Splash" />
+    <img src="../../../public/assets/images/Quote.png" alt="Quote" />
+    <img src="../../../public/assets/images/Analytics.png" alt="Analytics" />
+    <img src="../../../public/assets/images/HowTo.png" alt="HowTo" />
+    <img src="../../../public/assets/images/HowItWorks.png" alt="HowItWorks" />
+    <div class="contact">
+      <div class="blurb">
+        <h1>CONTACT US</h1>
+        <p>Have a general question about Reaction<br /> Technologies? Feel free to drop us a note<br /></p>
+      </div>
+      <form id="contactForm">
+        <input type="text" id="name" class="form-control" placeholder="NAME" required />
+        <input type="text" id="email" class="form-control" placeholder="EMAIL" required />
+        <input type="text" id="note" class="form-control" placeholder="NOTE" required />
+        <button id="submitButton" type="submit" class="button">SUBMIT</button>
+      </form>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+  <script src="home.js"></script>
+</body>
 
 </html>

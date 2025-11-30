@@ -239,45 +239,47 @@ form {
     font-size: 17px;
 }
 
-/* -------------------------------
-   PREMIUM PAGE TRANSITION SYSTEM
-   ------------------------------- */
+/* ============================
+   APPLE + FRAMER MOTION STYLE
+   ============================ */
 
-/* -----------------------------------
-   PREMIUM PAGE TRANSITION + BLUR
-   ----------------------------------- */
+/* ================================
+   TRUE FRAMER-MOTION STYLE ACTION
+   ================================ */
 
 #content-area {
     opacity: 1;
     transform: translateY(0px) scale(1);
     filter: blur(0px);
+
     transition:
-        opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-        filter 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        opacity 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 1.5s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: opacity, transform, filter;
 }
 
-/* Old page leaving */
+/* PAGE EXIT (current page leaving) */
 .page-exit {
     opacity: 0;
-    transform: translateY(8px) scale(0.99);
-    filter: blur(6px);
+    transform: translateY(20px) scale(0.94);
+    filter: blur(10px);
 }
 
-/* New page initial state */
+/* NEW PAGE INITIAL STATE */
 .page-enter {
     opacity: 0;
-    transform: translateY(8px) scale(0.99);
-    filter: blur(6px);
+    transform: translateY(20px) scale(0.94);
+    filter: blur(14px);
 }
 
-/* New page animates to final state */
+/* NEW PAGE ENTERING (animate to final) */
 .page-enter-active {
     opacity: 1;
     transform: translateY(0px) scale(1);
     filter: blur(0px);
 }
+
 
 
 
@@ -301,4 +303,38 @@ form {
         top 0.40s cubic-bezier(0.16, 1, 0.3, 1),
         bottom 0.40s cubic-bezier(0.16, 1, 0.3, 1),
         opacity 0.25s ease-out;
+}
+
+/* ============================
+   BACKGROUND DARKEN OVERLAY
+   ============================ */
+
+#transition-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    /* start transparent */
+    pointer-events: none;
+    z-index: 9999;
+    transition: background 1.5s ease;
+}
+
+/* ===============================
+   STAGGERED CHILD REVEAL ANIMATION
+   =============================== */
+
+.stagger-child {
+    opacity: 0;
+    transform: translateY(15px) scale(0.96);
+    filter: blur(6px);
+    transition:
+        opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stagger-child.visible {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+    filter: blur(0px);
 }
