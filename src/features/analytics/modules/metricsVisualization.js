@@ -166,60 +166,7 @@ export function showUnifiedChart(state, metricIndices = []) {
     },
   };
   Chart.register(legendFixPlugin);
-
-  // Debug plugin: log all Chart.js drawing stages (especially legend)
-  const legendDebugPlugin = {
-    id: "legendDebugPlugin",
-    beforeInit(chart) {
-      console.log("[DEBUG] Chart initialized:", chart.id || "(no id)");
-    },
-    beforeDraw(chart) {
-      console.log("[DEBUG] → beforeDraw() - about to draw chart area");
-    },
-    afterDraw(chart) {
-      console.log("[DEBUG] → afterDraw() - finished drawing everything");
-    },
-    beforeDatasetsDraw(chart) {
-      console.log("[DEBUG] → beforeDatasetsDraw() - about to draw datasets");
-    },
-    afterDatasetsDraw(chart) {
-      console.log("[DEBUG] → afterDatasetsDraw() - finished drawing datasets");
-    },
-    beforeTooltipDraw(chart) {
-      console.log("[DEBUG] → beforeTooltipDraw()");
-    },
-    afterTooltipDraw(chart) {
-      console.log("[DEBUG] → afterTooltipDraw()");
-    },
-    beforeEvent(chart, args) {
-      if (args.event?.type === "click") {
-        console.log("[DEBUG] Click detected on chart");
-      }
-    },
-    afterLayout(chart) {
-      console.log("[DEBUG] → afterLayout() - legend positioned:", chart.legend?.legendHitBoxes);
-    },
-    beforeDatasetsUpdate(chart) {
-      console.log("[DEBUG] → beforeDatasetsUpdate()");
-    },
-    afterDatasetsUpdate(chart) {
-      console.log("[DEBUG] → afterDatasetsUpdate()");
-    },
-    beforeRender(chart) {
-      console.log("[DEBUG] → beforeRender() - starting full render");
-    },
-    afterRender(chart) {
-      console.log("[DEBUG] → afterRender() - chart fully rendered");
-    },
-    beforeDatasetDraw(chart, args) {
-      console.log(`[DEBUG]   ↳ Drawing dataset index ${args.index}:`, chart.data.datasets[args.index].label);
-    },
-    afterDatasetDraw(chart, args) {
-      console.log(`[DEBUG]   ↳ Finished dataset index ${args.index}`);
-    },
-  };
-  Chart.register(legendDebugPlugin);
-
+  
   state.currentChart = new Chart(ctx, {
     type: "line",
     data: {
@@ -428,8 +375,6 @@ export function resetCharts(state, doughnutChart) {
     state.currentChart.update();
   }
 }
-
-
 
 export function resetMetricSlidersUI(CONFIG) {
   updateProgress("topSpeed", "topSpeedBar", 0, CONFIG.MAX_SPEED);
