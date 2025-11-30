@@ -316,7 +316,7 @@ form {
     /* start transparent */
     pointer-events: none;
     z-index: 9999;
-    transition: background 1.5s ease;
+    transition: background 0.2s ease;
 }
 
 /* ===============================
@@ -328,9 +328,9 @@ form {
     transform: translateY(15px) scale(0.96);
     filter: blur(6px);
     transition:
-        opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-        filter 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .stagger-child.visible {
