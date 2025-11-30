@@ -316,7 +316,7 @@ form {
     /* start transparent */
     pointer-events: none;
     z-index: 9999;
-    transition: background 0.2s ease;
+    transition: background 0.01s ease;
 }
 
 /* ===============================
