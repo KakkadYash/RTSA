@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
       contentArea.classList.add("page-exit");
 
       // ⏱ Wait for exit animation to fully finish (1.5s)
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // 2️⃣ Load new page content
       await loadHTML(page);
