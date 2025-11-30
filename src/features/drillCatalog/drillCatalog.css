@@ -177,3 +177,11 @@ canvas {
     align-items: center;
   }
 }
+
+.drill-category-header {
+  font-size: 2.4em;
+  color: #e62a2a;
+  margin-top: 40px;
+  margin-bottom: 10px;
+  font-family: 'Futura LtCn BT';
+}
