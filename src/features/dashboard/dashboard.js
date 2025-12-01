@@ -43,7 +43,15 @@ function loadDashboard() {
     const ctx = chartCanvas.getContext("2d");
     if (dashboardChart) dashboardChart.destroy();
 
-    const labels = Array.from({ length: Math.max(topSpeed.length, maxAccel.length, headUp.length) }, (_, i) => `Video ${i + 1}`);
+    const labels = window.dashboardUploadDates && window.dashboardUploadDates.length
+      ? window.dashboardUploadDates.map(d => {
+        const date = new Date(d);
+        return (
+          String(date.getMonth() + 1).padStart(2, "0") + "/" +
+          String(date.getDate()).padStart(2, "0")
+        );
+      })
+      : Array.from({ length: topSpeed.length }, (_, i) => `Video ${i + 1}`);
 
     const datasets = [
       { label: "Head Angle", key: "headUp", color: "#E93632", bg: "rgba(255,0,0,0.12)", data: headUp },
@@ -130,6 +138,8 @@ function loadDashboard() {
       const topSpeed = metrics.topSpeed || [];
       const maxAccel = metrics.maxAcceleration || [];
       const headUp = metrics.headUpPercentage || [];
+      window.dashboardUploadDates = metrics.uploadDates || [];
+
 
       renderUnifiedChart(topSpeed, maxAccel, headUp);
     } catch (err) {

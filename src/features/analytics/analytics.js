@@ -320,7 +320,6 @@ import {
             els.loadingOverlay.style.display = "block";
             setPlayButtonEnabled(false);
 
-            // 3) Call /analyze-video with the file
             const analyzeJson = await callAnalyzeVideo({
                 apiBase: CONFIG.API_BASE,
                 userId: localStorage.getItem("userId"),
@@ -330,13 +329,16 @@ import {
             if (!analyzeJson || !analyzeJson.metrics) {
                 console.warn("[WARN] /analyze-video returned unexpected structure:", analyzeJson);
                 alert("Something went wrong with the analysis data. Please re-upload your video.");
-                // fullReset();
                 return;
             }
 
+            // ⬅️ grab videoId from backend
+            const backendVideoId = analyzeJson.videoId;
+
             // 4) Cache metrics locally (no UI yet)
-            applyBackendResultsToState(state, analyzeJson.metrics || analyzeJson);
-            localStorage.setItem("rtsa_metrics", JSON.stringify(analyzeJson.metrics || analyzeJson));
+            const metricsPayload = analyzeJson.metrics || analyzeJson;
+            applyBackendResultsToState(state, metricsPayload);
+            localStorage.setItem("rtsa_metrics", JSON.stringify(metricsPayload));
 
             // 5) Trigger /upload asynchronously (non-blocking)
             console.log("[NETWORK] Starting background upload to /upload...");
@@ -344,8 +346,10 @@ import {
                 apiBase: CONFIG.API_BASE,
                 userId: localStorage.getItem("userId"),
                 video: state.video,
-                metrics: analyzeJson.metrics || analyzeJson
+                videoId: backendVideoId,       // ⬅️ send it
+                metrics: metricsPayload
             })
+
                 .then(resp => {
                     console.log("[BACKGROUND] Upload finished:", resp);
                     // ✅ After full analysis & background upload — ensure overlay and metrics both checked
@@ -625,11 +629,16 @@ import {
         // IMPORTANT: do NOT call showUnifiedChart, updateDoughnutChartFromData, or updateSlidersFromData here
     }
 
-    async function callUploadVideo({ apiBase, userId, video, metrics }) {
+    async function callUploadVideo({ apiBase, userId, video, videoId, metrics }) {
         console.log("[NETWORK] Uploading video to /upload AFTER analysis...");
         const form = new FormData();
         form.append("userId", userId || "");
+        if (videoId) {
+            form.append("videoId", videoId);   // ⬅️ link to analyze-video
+        }
         form.append("video", video);
+
+        // (optional) still send metrics if you want for future use
         if (metrics) {
             form.append("metrics", JSON.stringify(metrics));
         }
