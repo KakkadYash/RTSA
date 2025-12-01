@@ -11,7 +11,7 @@ body {
     font-family: SCHABO Condensed;
     background-color: #0e0e0e;
     display: grid;
-    grid-template-columns: 15% 1fr;
+    grid-template-columns: 17% 83%;
 }
 
 img {
@@ -82,7 +82,10 @@ aside a span {
 }
 
 li {
+    display: flex;
     margin: 0.5vh 0vw 0.5vh 0vw;
+    width: 100%;
+    justify-content: space-between;
 }
 
 #logoutButton {
@@ -337,4 +340,65 @@ form {
     opacity: 1;
     transform: translateY(0px) scale(1);
     filter: blur(0px);
+}
+
+.lock {
+    filter: brightness(0);
+}
+
+.unlock {
+    filter: brightness(0);
+}
+
+/* Both icons hidden initially */
+.lock,
+.unlock {
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
+    display: none;
+    height: 2em;
+    width: 2em;
+}
+
+/* Locked state */
+.nav-link.locked .lock {
+    display: inline-block;
+}
+
+.nav-link.locked .unlock {
+    display: none;
+}
+
+/* Unlocked state */
+.nav-link:not(.locked) .unlock {
+    display: inline-block;
+}
+
+.nav-link:not(.locked) .lock {
+    display: none;
+}
+
+.shake {
+    animation: shake 0.4s;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-6px);
+    }
+
+    50% {
+        transform: translateX(6px);
+    }
+
+    75% {
+        transform: translateX(-6px);
+    }
 }
