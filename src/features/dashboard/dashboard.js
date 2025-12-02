@@ -120,8 +120,8 @@ function loadDashboard() {
 
   async function fetchUploadCount() {
     try {
-      console.log("[NETWORK] Triggering /get-total-uploads for userId", userId);
-      const res = await fetch(`${API_BASE}get-total-uploads?userId=${userId}`);
+      console.log("[NETWORK] Triggering /dashboard for userId", userId);
+      const res = await fetch(`${API_BASE}dashboard?userId=${userId}`);
       console.log("[NETWORK] Response status:", res.status);
 
       if (!res.ok) {

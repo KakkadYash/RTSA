@@ -27,7 +27,7 @@ function loadHistory() {
         ? new Date(item.uploadDate).toLocaleString()
         : "Unknown date";
 
-      const avgSpeed = item.avgSpeed ?? "—";
+      const avgSpeed = item.averageSpeed ?? "—";
       const dominantPosture = item.dominantPosture ?? "—";
       const stepFrequency = item.stepFrequency ?? "—";
 
