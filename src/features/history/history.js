@@ -28,7 +28,7 @@ function loadHistory() {
         : "Unknown date";
 
       const avgSpeed = item.avgSpeed ?? "—";
-      const jumpHeight = item.jumpHeight ?? "—";
+      const dominantPosture = item.dominantPosture ?? "—";
       const stepFrequency = item.stepFrequency ?? "—";
 
       const div = document.createElement("div");
@@ -46,7 +46,7 @@ function loadHistory() {
 
   <div class="history-col metric-col">
     <span>Avg Speed: ${avgSpeed}</span>
-    <span>Jump Height: ${jumpHeight}</span>
+    <span>Posture: ${dominantPosture}</span>
     <span>Step Frequency: ${stepFrequency}</span>
   </div>
 `;

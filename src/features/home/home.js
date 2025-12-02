@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
       contentArea.classList.add("page-exit");
 
       // ⏱ Wait for exit animation to fully finish (1.5s)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // 2️⃣ Load new page content
       await loadHTML(page);
@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
         el.classList.add("stagger-child");
         setTimeout(() => {
           el.classList.add("visible");
-        }, index * 60);  // 60ms delay per element (adjust to taste)
+        }, index * 10);  // 60ms delay per element (adjust to taste)
       });
 
       // 3️⃣ Set new page into initial hidden state
@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // 5️⃣ Cleanup classes after animation ends (1.5s)
       setTimeout(() => {
         contentArea.classList.remove("page-enter", "page-enter-active");
-      }, 1500);
+      }, 500);
 
     } catch (error) {
       console.error("Tab load error:", error);

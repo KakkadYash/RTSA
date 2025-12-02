@@ -4,8 +4,6 @@
 .library {
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  padding: 1em;
 }
 
 .catagory {
@@ -118,7 +116,7 @@ canvas {
   flex-direction: column;
   gap: 18px;
   width: 100%;
-  padding: 20px 0;
+  padding: 1em;
 }
 
 .drill-card {
@@ -176,4 +174,10 @@ canvas {
   .drill-info-col {
     align-items: center;
   }
+}
+
+.drill-category-header {
+  font-size: 2.4em;
+  color: #e62a2a;
+  font-family: 'Futura LtCn BT';
 }
