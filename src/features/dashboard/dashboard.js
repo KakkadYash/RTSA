@@ -1,3 +1,5 @@
+import { buildUnifiedLegend } from "../analytics/modules/metricsVisualization.js";
+
 function loadDashboard() {
   console.log("[DEBUG] loadDashboard() executed");
   // ✅ Retrieve cached user info
@@ -44,94 +46,68 @@ function loadDashboard() {
     const labels = Array.from({ length: Math.max(topSpeed.length, maxAccel.length, headUp.length) }, (_, i) => `Video ${i + 1}`);
 
     const datasets = [
-      { label: "Top Speed (yd/s)", data: topSpeed, borderColor: "#1F43E5", fill: false, yAxisID: "y0" },
-      { label: "Max Acceleration (yd/s²)", data: maxAccel, borderColor: "#7DD859", fill: false, yAxisID: "y1" },
-      { label: "Head Up %", data: headUp, borderColor: "#ff6600ff", fill: false, yAxisID: "y2" },
+      { label: "Head Angle", key: "headUp", color: "#E93632", bg: "rgba(255,0,0,0.12)", data: headUp },
+      { label: "Top Speed", key: "speed", color: "#1F43E5", bg: "rgba(31,67,229,0.15)", data: topSpeed },
+      { label: "Acceleration", key: "acceleration", color: "#7DD859", bg: "rgba(125,216,89,0.15)", data: maxAccel },
     ];
 
-    const yAxes = {};
-    datasets.forEach((ds, i) => {
-      yAxes[`y${i}`] = {
-        type: "linear",
-        display: false,
-        position: "left",
-        offset: true,
-        grid: { drawOnChartArea: false },
-        ticks: { color: ds.borderColor },
-      };
-    });
+    // Legend color restore plugin — same as Analytics
+    const legendFixPlugin = {
+      id: "legendFixPlugin",
+      afterDraw(chart) {
+        const legend = chart.legend;
+        if (!legend) return;
+
+        const ctx = chart.ctx;
+        legend.legendItems.forEach((item) => {
+          const ds = chart.data.datasets[item.datasetIndex];
+          ctx.save();
+          ctx.fillStyle = ds.borderColor;
+          ctx.fillText(item.text, item.textX, item.textY);
+          ctx.restore();
+        });
+      }
+    };
+    Chart.register(legendFixPlugin);
 
     dashboardChart = new Chart(ctx, {
       type: "line",
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: "nearest", intersect: true },
-        elements: { point: { radius: 3 }, line: { tension: 0.25 } },
-        plugins: {
-          legend: {
-            position: "top",
-            labels: { font: { size: 13, weight: "bold" }, color: "#000" },
-            onClick(e, legendItem, legend) {
-              const chart = legend.chart;
-              const datasetIndex = legendItem.datasetIndex;
-
-              // Which datasets are currently visible?
-              const visibleIndexes = chart.data.datasets
-                .map((ds, i) => ({ i, meta: chart.getDatasetMeta(i) }))
-                .filter(({ meta }) => meta && meta.hidden !== true)
-                .map(({ i }) => i);
-
-              const clickedMeta = chart.getDatasetMeta(datasetIndex);
-              const isClickedVisible = clickedMeta && clickedMeta.hidden !== true;
-
-              const allVisible = visibleIndexes.length === chart.data.datasets.length;
-              const singleVisible = visibleIndexes.length === 1 && visibleIndexes[0] === datasetIndex;
-
-              if (allVisible) {
-                // First click → show only clicked dataset
-                chart.data.datasets.forEach((ds, i) => {
-                  chart.getDatasetMeta(i).hidden = i !== datasetIndex;
-                });
-              } else if (singleVisible && isClickedVisible) {
-                // Second click → restore all datasets
-                chart.data.datasets.forEach((ds, i) => {
-                  chart.getDatasetMeta(i).hidden = false;
-                });
-              } else {
-                // General case → solo mode
-                chart.data.datasets.forEach((ds, i) => {
-                  chart.getDatasetMeta(i).hidden = i !== datasetIndex;
-                });
-              }
-
-              // Manage Y-axis visibility exactly like analytics
-              Object.keys(chart.options.scales).forEach(axis => {
-                if (axis.startsWith("y")) chart.options.scales[axis].display = false;
-              });
-
-              const visibleDatasets = chart.data.datasets.filter((ds, i) => {
-                return !chart.getDatasetMeta(i).hidden;
-              });
-
-              if (visibleDatasets.length === 1) {
-                const singleAxis = visibleDatasets[0].yAxisID;
-                chart.options.scales[singleAxis].display = true;
-              }
-
-              chart.update();
-            },
-
-          },
-        },
-        scales: {
-          x: { title: { display: true, text: "Index" } },
-          ...yAxes,
-        },
+      data: {
+        labels,
+        datasets: datasets.map((d, i) => ({
+          label: d.label,
+          data: d.data,
+          borderColor: d.color,
+          backgroundColor: d.bg,
+          borderWidth: 1.5,
+          fill: true,
+          tension: 0.25,
+          pointRadius: 0.5,
+          yAxisID: `y${i}`,
+        })),
       },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        interaction: { mode: "nearest", intersect: true },
+        plugins: { legend: { display: false } },
+        scales: (() => {
+          const yAxes = {};
+          datasets.forEach((d, i) => {
+            yAxes[`y${i}`] = {
+              display: false,
+              offset: true,
+              grid: { drawOnChartArea: false }
+            };
+          });
+          return { x: { ticks: { color: "white" } }, ...yAxes };
+        })(),
+      }
     });
+
+    buildUnifiedLegend(dashboardChart, datasets);
   }
+
 
 
   async function fetchUploadCount() {
@@ -165,24 +141,38 @@ function loadDashboard() {
   console.log("[DEBUG] Calling fetchUploadCount() in 100ms...");
   setTimeout(fetchUploadCount, 100);
 
-  // Report button setup (unchanged)
+  // ==== One Page Report button shake setup ====
   const reportBtn = document.getElementById("one-page-report");
+
+  // Remove the shake class after the animation finishes so it can retrigger
   if (reportBtn) {
-    reportBtn.addEventListener("click", () => {
-      console.log("clicked one-page-report");
-      window.open("../../../src/features/reportForm/reportform.html", "_blank");
+    reportBtn.addEventListener("animationend", () => {
+      reportBtn.classList.remove("shake-report");
     });
-  } else {
-    console.warn("⚠️ One Page Report button not found.");
   }
 
+  function triggerReportShake() {
+    const btn = document.getElementById("one-page-report");
+    if (!btn) return;
+
+    // Reset class so re-click retriggers animation
+    btn.classList.remove("shake-report");
+    // Force reflow to restart animation
+    void btn.offsetWidth;
+    btn.classList.add("shake-report");
+  }
+
+  // Use a single delegated listener so clicks on the text, lock icon, etc. all count
   document.addEventListener("click", function (e) {
-    const reportBtn = e.target.closest("#one-page-report");
-    if (reportBtn) {
+    const clickedReportBtn = e.target.closest("#one-page-report");
+    if (clickedReportBtn) {
       console.log("clicked one-page-report");
-      window.open("../../../src/features/reportForm/reportform.html", "_blank");
+      triggerReportShake();
+      // Comment out the line below when you want One Page Report feature
+      // window.open("../../../src/features/reportForm/reportform.html", "_blank");
     }
   });
+
 }
 
 // Required so home.js can access it globally

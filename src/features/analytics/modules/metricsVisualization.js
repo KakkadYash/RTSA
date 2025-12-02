@@ -88,12 +88,12 @@ export function showUnifiedChart(state, metricIndices = []) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const datasets = [
-    { label: "Head Angle (°)", key: "headAngleData", color: "#E93632", bg: "rgba(255,140,0,0.10)" },
-    { label: "Speed (yd/s)", key: "speedData", color: "#1F43E5", bg: "rgba(31,67,229,0.10)" },
-    { label: "Acceleration (yd/s²)", key: "accelerationData", color: "#7DD859", bg: "rgba(125,216,89,0.10)" },
-    { label: "Deceleration (yd/s²)", key: "decelerationData", color: "#E93632", bg: "rgba(233,54,50,0.10)" },
-    { label: "Step Length (yd)", key: "stepLengthData", color: "#FFA500", bg: "rgba(255,165,0,0.10)" },
-    { label: "Jump Height (yd)", key: "jumpData", color: "#800080", bg: "rgba(128,0,128,0.10)" },
+    { label: "Head Angle", key: "headAngleData", color: "#E93632", bg: "rgba(255,140,0,0.10)" },
+    { label: "Speed", key: "speedData", color: "#1F43E5", bg: "rgba(31,67,229,0.10)" },
+    { label: "Acceleration", key: "accelerationData", color: "#7DD859", bg: "rgba(125,216,89,0.10)" },
+    // { label: "Deceleration", key: "decelerationData", color: "#E93632", bg: "rgba(233,54,50,0.10)" },
+    { label: "Step Length", key: "stepLengthData", color: "#FFA500", bg: "rgba(255,165,0,0.10)" },
+    { label: "Jump Height", key: "jumpData", color: "#800080", bg: "rgba(128,0,128,0.10)" },
   ];
 
   // Store originals for fade recovery
@@ -173,7 +173,12 @@ export function showUnifiedChart(state, metricIndices = []) {
       labels: state.backend.chartLabels || [],
       datasets: datasets.map((d, i) => ({
         label: d.label,
-        data: state.backend[d.key] || [],
+        // 👉 Apply rounding per metric
+        data: (state.backend[d.key] || []).map((v) =>
+          d.key === "jumpData" || d.key === "stepLengthData"
+            ? round2(v)      // Jump Height + Step Length → 2 decimals
+            : roundWhole(v)  // Everything else → whole number
+        ),
         borderColor: d.color,
         borderWidth: 1.5,
         fill: true,
@@ -181,6 +186,7 @@ export function showUnifiedChart(state, metricIndices = []) {
         yAxisID: `y${i}`,
       })),
     },
+
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -192,71 +198,29 @@ export function showUnifiedChart(state, metricIndices = []) {
       },
       plugins: {
         legend: {
-          position: "top",
-          onClick(e, legendItem, legend) {
-            console.log("[DEBUG] Legend onClick() triggered:", legendItem.text);
-            // existing click logic...
-          },
-          onHover(e, legendItem, legend) {
-            console.log("[DEBUG] Legend hover:", legendItem.text);
-          },
-          labels: {
-            usePointStyle: false,
-            boxWidth: 0,
-            padding: 8,
-            font: { size: 15, weight: "500" },
-            color: "#fff",
-            textStrokeWidth: 0,
-            textDecoration: "none",
-          },
-          onClick(e, legendItem, legend) {
-            const chart = legend.chart;
-            const datasetIndex = legendItem.datasetIndex;
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const dsMeta = datasets[ctx.datasetIndex];
+              const label = dsMeta?.label || ctx.dataset.label || "";
+              const key = dsMeta?.key;
+              const rawValue = ctx.parsed.y;
 
-            // Determine visibility state
-            const visibleIndexes = chart.data.datasets
-              .map((ds, i) => ({ i, meta: chart.getDatasetMeta(i) }))
-              .filter(({ meta }) => meta && meta.hidden !== true)
-              .map(({ i }) => i);
+              let formatted;
+              if (key === "jumpData" || key === "stepLengthData") {
+                formatted = round2(rawValue);     // Jump / Step Length → 2 decimals
+              } else {
+                formatted = roundWhole(rawValue); // Others → whole number
+              }
 
-            const clickedMeta = chart.getDatasetMeta(datasetIndex);
-            const isClickedVisible = clickedMeta && clickedMeta.hidden !== true;
-            const allVisible = visibleIndexes.length === chart.data.datasets.length;
-            const singleVisible = visibleIndexes.length === 1 && visibleIndexes[0] === datasetIndex;
-
-            if (allVisible) {
-              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = i !== datasetIndex));
-            } else if (singleVisible && isClickedVisible) {
-              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = false));
-            } else {
-              chart.data.datasets.forEach((ds, i) => (chart.getDatasetMeta(i).hidden = i !== datasetIndex));
-            }
-
-            //  Fade logic with color restoration (no black issue)
-            chart.data.datasets.forEach((ds, i) => {
-              const meta = chart.getDatasetMeta(i);
-              const isVisible = meta.hidden !== true;
-              const original = datasets[i];
-              ds.borderColor = original.color; // restore base color
-              ds.backgroundColor = isVisible
-                ? original.bg
-                : original.bg.replace(/,0\.10\)/, ",0.03)"); // faded alpha
-              ds.borderWidth = isVisible ? 2 : 1;
-            });
-
-            // Manage Y-axis visibility
-            Object.keys(chart.options.scales).forEach((axis) => {
-              if (axis.startsWith("y")) chart.options.scales[axis].display = false;
-            });
-            const visibleDatasets = chart.data.datasets.filter((ds, i) => !chart.getDatasetMeta(i).hidden);
-            if (visibleDatasets.length === 1) {
-              chart.options.scales[visibleDatasets[0].yAxisID].display = true;
-            }
-
-            chart.update();
+              return `${label}: ${formatted}`;
+            },
           },
         },
       },
+
       scales: (() => {
         const yAxes = {};
         datasets.forEach((d, i) => {
@@ -276,6 +240,8 @@ export function showUnifiedChart(state, metricIndices = []) {
       })(),
     },
   });
+  // 🔥 Build Custom HTML Legend for Unified Chart
+  buildUnifiedLegend(state.currentChart, datasets);
 
   state.chartType = "line";
   state.currentChart.data.datasets.forEach((ds, idx) => {
@@ -322,24 +288,28 @@ export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
 
 
   const mm = backend.maxMetrics || {};
-  const speed = Math.round( // prefer backend.topSpeed or mm.maxSpeed
+
+  // 👉 Whole-number rounding for speed / accel / decel
+  const speed = roundWhole(
     Number.isFinite(backend.topSpeed) && backend.topSpeed > 0
       ? backend.topSpeed
       : (Number.isFinite(mm.maxSpeed) ? mm.maxSpeed : maxOrZero(speedArr))
   );
 
-  const accel = Math.round(
+  const accel = roundWhole(
     Number.isFinite(mm.maxAcceleration) ? mm.maxAcceleration : maxOrZero(accelArr)
   );
 
-  const decel = Math.round(
+  const decel = roundWhole(
     Math.abs(
       Number.isFinite(mm.maxDeceleration) ? mm.maxDeceleration : minOrZero(decelArr)
     )
   );
 
+  // 👉 Jump height & step frequency: keep 2 decimals
   const jump = round2(avgOrZero(jumpArr));
   const stride = round2(avgOrZero(strideArr));
+
 
   updateProgress("topSpeed", "topSpeedBar", speed, CONFIG.MAX_SPEED);
   updateProgress("peakAcceleration", "peakAccelerationBar", accel, CONFIG.MAX_ACCEL);
@@ -352,7 +322,6 @@ export function updateSlidersFromData(backend, CONFIG, uptoIndex = null) {
   const avgScore = avgOrZero([
     scores.footworkScore, scores.speedScore, scores.accelerationScore, scores.headAngleScore, scores.postureScore
   ]);
-  document.getElementById("athleticScoreValue").textContent = `${round1(avgScore)}%`;
 }
 
 
@@ -360,6 +329,10 @@ export function updateTopMetricBoxes({ timeSecs, totalDistanceYards, steps }) {
   document.getElementById("drillTimeValue").textContent = `${Number(timeSecs || 0).toFixed(1)} SECS`;
   document.getElementById("distanceValue").textContent = `${Number(totalDistanceYards || 0).toFixed(1)} YARDS`;
   document.getElementById("stepsValue").textContent = `${Number(steps || 0)}`;
+}
+export function updateAverageSpeedBox(avgSpeed) {
+  document.getElementById("averageSpeedValue").textContent =
+    `${Number(avgSpeed || 0).toFixed(2)} YD/S`;
 }
 
 export function resetCharts(state, doughnutChart) {
@@ -382,10 +355,10 @@ export function resetMetricSlidersUI(CONFIG) {
   updateProgress("peakDeceleration", "peakDecelerationBar", 0, CONFIG.MAX_DECEL);
   updateProgress("averageJumpHeight", "averageJumpHeightBar", 0, CONFIG.MAX_JUMP);
   updateProgress("averageStrideLength", "averageStrideLengthBar", 0, CONFIG.MAX_STRIDE);
-  document.getElementById("athleticScoreValue").textContent = `0%`;
   document.getElementById("drillTimeValue").textContent = `0 SECS`;
   document.getElementById("distanceValue").textContent = `0 YARDS`;
   document.getElementById("stepsValue").textContent = `0`;
+  document.getElementById("averageSpeedValue").textContent = `0 YD/S`;
 }
 
 // ---- helpers
@@ -410,3 +383,97 @@ const minOrZero = (arr) => {
 };
 const round1 = (n) => Math.round((Number(n) || 0) * 10) / 10;
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+
+// Round to whole number with custom rule:
+// - decimals < 0.5  → floor
+// - decimals >= 0.5 → ceil
+const roundWhole = (n) => {
+  const num = Number(n) || 0;
+  const base = Math.floor(num);
+  const decimal = num - base;
+  if (decimal < 0.5) return base;
+  return base + 1;
+};
+export function buildUnifiedLegend(chart, datasets) {
+  const container = document.getElementById("unifiedLegend");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  datasets.forEach((d, index) => {
+    // WRAPPER
+    const item = document.createElement("div");
+    item.classList.add("unified-legend-item");
+
+    // Color box
+    const color = document.createElement("span");
+    color.classList.add("unified-legend-color");
+    color.style.backgroundColor = d.color;
+
+    // Label
+    const label = document.createElement("span");
+    label.classList.add("unified-legend-text");
+    label.innerText = d.label;
+
+    // CHECKBOX
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.classList.add("legend-checkbox");
+
+    // Assemble
+    item.appendChild(color);
+    item.appendChild(label);
+    item.appendChild(checkbox);
+    container.appendChild(item);
+
+    // ---- SHARED TOGGLE FUNCTION ----
+    const applyToggle = () => {
+      if (checkbox.checked) {
+        // SHOW ONLY ONE METRIC
+        chart.data.datasets.forEach((ds, i) => {
+          chart.getDatasetMeta(i).hidden = i !== index;
+        });
+
+        // Fade UI
+        [...container.children].forEach((el, i) => {
+          el.style.opacity = i === index ? "1" : "0.25";
+        });
+
+        // Show only correct y-axis
+        Object.keys(chart.options.scales).forEach(axis => {
+          if (axis.startsWith("y"))
+            chart.options.scales[axis].display = axis === `y${index}`;
+        });
+
+      } else {
+        // RESTORE ALL METRICS
+        chart.data.datasets.forEach((ds, i) => {
+          chart.getDatasetMeta(i).hidden = false;
+        });
+
+        [...container.children].forEach(el => el.style.opacity = "1");
+
+        Object.keys(chart.options.scales).forEach(axis => {
+          if (axis.startsWith("y"))
+            chart.options.scales[axis].display = false;
+        });
+      }
+
+      chart.update();
+    };
+
+    // ---- ON CHECKBOX CLICK ----
+    checkbox.addEventListener("change", applyToggle);
+
+    // ---- ON LEGEND ROW CLICK (label or color or empty space) ----
+    item.addEventListener("click", (e) => {
+      // Prevent double-trigger if clicking checkbox directly
+      if (e.target === checkbox) return;
+
+      checkbox.checked = !checkbox.checked;
+      applyToggle();
+    });
+  });
+
+
+}

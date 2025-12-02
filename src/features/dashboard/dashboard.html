@@ -1,17 +1,27 @@
 <header class="header">
   <h1 class="title">DASHBOARD</h1>
 </header>
-<div id="bg">
+<div id="bg" class="parallax-bg">
   <div class="hello">
     <div class="header-wrapper">
       <div class="greeting-wrapper">
-        <span>HEY,</span>
-        <div id=nameInfo></div>
+        <div class="name-wrapper">
+          <span>HEY,</span>
+          <div id=nameInfo></div>
+        </div>
+        <img src="../../../public/assets/images/single white line rt.png" alt="Line" class="line">
       </div>
-      <button type="button" id="one-page-report" class="button hover-animation click-animation hover-box-shadow">One
-        Page Report</button>
+      <!-- comment out the line below for animations and delete the line below it -->
+      <!-- <button type="button" id="one-page-report" class="button hover-animation click-animation hover-box-shadow">One -->
+      <button type="button" id="one-page-report"
+        class="button tooltip-label">
+        One Page Report
+        <span class="tooltip-text">
+          Feature Comming Soon...
+        </span>
+        <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="">
+      </button>
     </div>
-    <img src="../../../public/assets/images/single white line rt.png" alt="Line" class="line">
   </div>
   <div class="userData">
     <div class="uploads">
@@ -23,8 +33,10 @@
     <div class="chart-heading-wrapper">
       <span>PERFORMANCE METRICS OVER TIME</span>
       <img src="../../../public/assets/images/single white line rt.png" alt="Line" class="line2">
+      <img src="../../../public/assets/images/single white line rt.png" alt="Line" class="line2">
     </div>
-    <div class="chart-container">
+    <div class="chart-container chart-wrapper">
+      <div id="unifiedLegend" class="unified-legend"></div>
       <canvas id="dashboardChart"></canvas>
     </div>
   </div>

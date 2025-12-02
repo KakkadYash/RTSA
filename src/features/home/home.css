@@ -9,8 +9,13 @@
 
 body {
     font-family: SCHABO Condensed;
-    background-color: #383838;
-    display: flex;
+    background-color: #0e0e0e;
+    display: grid;
+    grid-template-columns: 15% 1fr;
+}
+
+img {
+    width: 100%;
 }
 
 aside {
@@ -18,16 +23,19 @@ aside {
     padding: 0.5vw;
     background-color: #e62a2a;
     height: 100vh;
-    width: 20vw;
     top: 0;
 }
+
 
 nav {
     display: flex;
     flex-direction: column;
     height: 100%;
     justify-content: space-between;
+    position: relative;
+    /* ⬅ needed for sliding underline */
 }
+
 
 aside a {
     color: #000000;
@@ -39,7 +47,10 @@ aside a {
 
 aside ul {
     list-style: none;
-    padding: 0 0 0 1em;
+    padding: 0;
+    gap: 0.5em;
+    display: flex;
+    flex-direction: column;
 }
 
 aside a.active,
@@ -48,7 +59,7 @@ aside a:focus-visible {
     color: #FFFFFF;
 }
 
-aside a:hover span{
+aside a:hover span {
     text-shadow: 0.1em 0.1em 0.1em black;
 }
 
@@ -64,29 +75,23 @@ aside a span {
 .links {
     display: flex;
     flex-direction: column;
-    padding: 0 2em 0 0;
 }
 
 .arrow {
     width: 20%;
 }
 
-.line {
-    height: auto;
-    width: 100%;
-}
-
 li {
     margin: 0.5vh 0vw 0.5vh 0vw;
 }
 
-#logoutButton{
+#logoutButton {
     display: inline-block;
 }
 
 .logOut:hover span {
     color: #FFFFFF;
-    text-shadow: 0.1em 0.1em  0.1em black;
+    text-shadow: 0.1em 0.1em 0.1em black;
 }
 
 .logOut {
@@ -106,12 +111,11 @@ li {
 }
 
 main {
-    display: flex;
+    display: grid;
     flex-direction: column;
     justify-content: flex-start;
     overflow: hidden;
-    width: 80vw;
-    overflow: auto;
+    grid-template-columns: 1fr;
 }
 
 .header {
@@ -123,6 +127,7 @@ main {
     align-content: center;
     flex-direction: row;
     align-items: center;
+    padding: 1em;
 }
 
 .contact {
@@ -143,7 +148,6 @@ h1 {
     font-weight: normal;
     display: flex;
     align-items: center;
-    padding: 1vh 0vw 0vh 1vw;
     color: #FFFFFF;
 
 }
@@ -233,4 +237,104 @@ form {
     margin-top: 5px;
     margin-right: 16px;
     font-size: 17px;
+}
+
+/* ============================
+   APPLE + FRAMER MOTION STYLE
+   ============================ */
+
+/* ================================
+   TRUE FRAMER-MOTION STYLE ACTION
+   ================================ */
+
+#content-area {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+    filter: blur(0px);
+
+    transition:
+        opacity 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform, filter;
+}
+
+/* PAGE EXIT (current page leaving) */
+.page-exit {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+    filter: blur(10px);
+}
+
+/* NEW PAGE INITIAL STATE */
+.page-enter {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+    filter: blur(14px);
+}
+
+/* NEW PAGE ENTERING (animate to final) */
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+    filter: blur(0px);
+}
+
+
+
+
+/* === Sliding underline for active sidebar link === */
+/* === Full-width dashed sliding underline === */
+#nav-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-bottom: 3px dashed #ffffff;
+
+    /* 👇 place underline at bottom of the tab */
+    top: unset;
+    bottom: 0;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition:
+        top 0.40s cubic-bezier(0.16, 1, 0.3, 1),
+        bottom 0.40s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.25s ease-out;
+}
+
+/* ============================
+   BACKGROUND DARKEN OVERLAY
+   ============================ */
+
+#transition-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    /* start transparent */
+    pointer-events: none;
+    z-index: 9999;
+    transition: background 1.5s ease;
+}
+
+/* ===============================
+   STAGGERED CHILD REVEAL ANIMATION
+   =============================== */
+
+.stagger-child {
+    opacity: 0;
+    transform: translateY(15px) scale(0.96);
+    filter: blur(6px);
+    transition:
+        opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stagger-child.visible {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+    filter: blur(0px);
 }

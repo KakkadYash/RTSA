@@ -1,7 +1,7 @@
 <header class="header">
   <h1 class="title">PROFILE</h1>
 </header>
-<div class="userData">
+<div class="userData  parallax-bg">
   <div class="profileHead">
     <label for="file-input"></label>
     <div class="avatar">
@@ -20,53 +20,81 @@
     </div>
   </div>
   <div class="main-box">
-    <div class="subHeader">
-      <h3>PERSONAL INFORMATION</h3>
-      <div class="button-wrapper">
-        <button type="button" id="openModalBtn" class="button hover-animation click-animation hover-box-shadow">Update
-          Photo</button>
-        <button class="button hover-animation click-animation hover-box-shadow" type="submit" id="saveButton"
-          form="userProfileForm">SAVE
-          <img src="../../../public/assets/images/save-icon.png" alt="save" class="save">
+    <div class="personal-info">
+      <div class="subHeader">
+        <h3>PERSONAL INFORMATION</h3>
+        <div class="button-wrapper">
+          <button type="button" id="openModalBtn" class="button hover-animation click-animation hover-box-shadow">Update
+            Photo</button>
+          <button class="button hover-animation click-animation hover-box-shadow" type="submit" id="saveButton"
+            form="userProfileForm">SAVE
+            <img src="../../../public/assets/images/save-icon.png" alt="save" class="save">
+          </button>
+        </div>
+      </div>
+      <form id="userProfileForm">
+        <div class="data">
+          <label for="name" class="form-label">NAME</label> <input type="text" id="name" class="form-control" required>
+        </div>
+        <div class="data">
+          <label for="email" class="form-label">EMAIL</label> <input type="email" id="email" class="form-control"
+            required>
+        </div>
+        <div class="data">
+          <label for="age" class="form-label">AGE OF ATHLETE</label> <input type="text" id="age" class="form-control"
+            required autocomplete="age">
+        </div>
+        <div class="data">
+          <label for="state" class="form-label">STATE OF RESIDENCE</label> <input type="text" id="state"
+            class="form-control" required required autocomplete="state">
+        </div>
+        <div class="data custom-dropdown">
+          <label for="sports">SPORTS INTEREST</label>
+
+          <div class="dropdown-container" id="sportsDropdown">
+            <div class="dropdown-selected">Select Sport</div>
+            <div class="dropdown-options hidden">
+              <label><span>Football</span><input type="checkbox" value="Football"></label>
+              <label><span>Basketball</span><input type="checkbox" value="Basketball"></label>
+              <label><span>Soccer</span><input type="checkbox" value="Soccer"></label>
+              <label><span>Baseball</span><input type="checkbox" value="Baseball"></label>
+              <label><span>Tennis</span><input type="checkbox" value="Tennis"></label>
+
+            </div>
+          </div>
+
+          <input type="hidden" id="sports" name="sports">
+        </div>
+    </div>
+    </form>
+
+    <!-- SUBSCRIPTION SECTION -->
+    <div id="subscriptionSection" class="subscription-box">
+
+      <h3>SUBSCRIPTION</h3>
+
+      <div class="subscription">
+        <div class="sub-data">
+          <label>PLAN TYPE</label>
+          <div id="sub_plan" class="sub-value"></div>
+        </div>
+
+        <div class="sub-data">
+          <label>NEXT BILLING DATE</label>
+          <div id="sub_next_billing" class="sub-value"></div>
+        </div>
+
+        <div class="sub-data">
+          <label>STATUS</label>
+          <div id="sub_status" class="sub-value"></div>
+        </div>
+
+        <button id="cancelSubscriptionBtn" class="button hover-animation click-animation hover-box-shadow">
+          Cancel
         </button>
       </div>
     </div>
-    <form id="userProfileForm">
-      <div class="data">
-        <label for="name" class="form-label">NAME</label> <input type="text" id="name" class="form-control"
-          required>
-      </div>
-      <div class="data">
-        <label for="email" class="form-label">EMAIL</label> <input type="email" id="email" class="form-control"
-          required>
-      </div>
-      <div class="data">
-        <label for="age" class="form-label">AGE OF ATHLETE</label> <input type="text" id="age" class="form-control"
-          required autocomplete="age">
-      </div>
-      <div class="data">
-        <label for="state" class="form-label">STATE OF RESIDENCE</label> <input type="text" id="state"
-          class="form-control" required required autocomplete="state">
-      </div>
-      <div class="data custom-dropdown">
-        <label for="sports">SPORTS INTEREST</label>
 
-        <div class="dropdown-container" id="sportsDropdown">
-          <div class="dropdown-selected">Select Sport</div>
-          <div class="dropdown-options hidden">
-            <label><span>Football</span><input type="checkbox" value="Football"></label>
-            <label><span>Basketball</span><input type="checkbox" value="Basketball"></label>
-            <label><span>Soccer</span><input type="checkbox" value="Soccer"></label>
-            <label><span>Baseball</span><input type="checkbox" value="Baseball"></label>
-            <label><span>Tennis</span><input type="checkbox" value="Tennis"></label>
-
-          </div>
-        </div>
-
-        <input type="hidden" id="sports" name="sports">
-      </div>
-
-    </form>
   </div>
 </div>
 <!-- Dynamic Calibration Modal Container -->

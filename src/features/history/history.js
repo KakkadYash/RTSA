@@ -20,35 +20,41 @@ function loadHistory() {
       return;
     }
 
-    history.forEach((item, index) => {
+    history.forEach((item) => {
       const videoUrl = item.video_url;
       const videoName = item.videoName || "Untitled Video";
-      const uploadDate = item.uploadDate 
+      const uploadDate = item.uploadDate
         ? new Date(item.uploadDate).toLocaleString()
         : "Unknown date";
 
-      if (index % 3 === 0) {
-        const row = document.createElement("div");
-        row.className = "drill-row";
-        tableBody.appendChild(row);
-      }
-
-      const row = tableBody.lastElementChild;
+      const avgSpeed = item.avgSpeed ?? "—";
+      const jumpHeight = item.jumpHeight ?? "—";
+      const stepFrequency = item.stepFrequency ?? "—";
 
       const div = document.createElement("div");
-      div.className = "drill";
+      div.className = "history-row";
       div.innerHTML = `
-        <video controls>
-          <source src="${videoUrl}" type="video/mp4">
-        </video>
-        <div class="description">
-          <span>${videoName}</span>
-          <span>${uploadDate}</span>
-        </div>
-      `;
+<div class="history-col video-col">
+  <video src="${videoUrl}" controls muted preload="metadata"></video>
 
-      row.appendChild(div);
+  <div class="video-info">
+    <span class="video-name">${videoName}</span>
+    <span class="upload-date">${uploadDate}</span>
+  </div>
+</div>
+
+
+  <div class="history-col metric-col">
+    <span>Avg Speed: ${avgSpeed}</span>
+    <span>Jump Height: ${jumpHeight}</span>
+    <span>Step Frequency: ${stepFrequency}</span>
+  </div>
+`;
+
+
+      tableBody.appendChild(div);
     });
+
   };
 
   const updateControls = () => {
@@ -66,6 +72,7 @@ function loadHistory() {
       const res = await fetch(url);
       const data = await res.json();
 
+      console.log("[HISTORY API RESPONSE]", data); // 👈 log everything
       renderHistory(data.history || []);
       lastResponseHasNext = data.nextPageAvailable;
       currentPage = data.currentPage;
