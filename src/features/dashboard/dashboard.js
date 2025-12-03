@@ -91,6 +91,7 @@ function loadDashboard() {
           fill: true,
           tension: 0.25,
           pointRadius: 0.5,
+          spanGaps: true,
           yAxisID: `y${i}`,
         })),
       },
@@ -135,10 +136,11 @@ function loadDashboard() {
       uploadCounter.textContent = data.total_uploads || "0";
 
       const metrics = data.recent_analytics || {};
-      const topSpeed = metrics.topSpeed || [];
-      const maxAccel = metrics.maxAcceleration || [];
-      const headUp = metrics.headUpPercentage || [];
-      window.dashboardUploadDates = metrics.uploadDates || [];
+      
+      const topSpeed = (metrics.topSpeed || []).slice().reverse();
+      const maxAccel = (metrics.maxAcceleration || []).slice().reverse();
+      const headUp = (metrics.headUpPercentage || []).slice().reverse();
+      window.dashboardUploadDates = (metrics.uploadDates || []).slice().reverse();
 
 
       renderUnifiedChart(topSpeed, maxAccel, headUp);
