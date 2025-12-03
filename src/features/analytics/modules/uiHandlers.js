@@ -141,10 +141,10 @@ export function resetPlayButton(el) {
   el.disabled = false;
 }
 
-export function setPlayButtonEnabled(isEnabled) {
-  const playBtn = document.getElementById("playProcessedButton");
-  if (playBtn) playBtn.disabled = !isEnabled;
-}
+// export function setPlayButtonEnabled(isEnabled) {
+//   const playBtn = document.getElementById("playProcessedButton");
+//   if (playBtn) playBtn.disabled = !isEnabled;
+// }
 
 export function disableInteractiveButton(el) {
   if (!el) return;
