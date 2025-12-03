@@ -98,7 +98,37 @@ export function showUnifiedChart(state, metricIndices = []) {
 
   // Store originals for fade recovery
   datasets.forEach((d) => (d.originalBorderColor = d.color));
-  // 🧠 Plugin: force legend colors + remove strike-through
+
+  // Plugin: disable default legend text drawing
+  const disableLegendTextPlugin = {
+    id: "disableLegendTextPlugin",
+    beforeDraw(chart, args, opts) {
+      const legend = chart.legend;
+      if (!legend) return;
+
+      const ctx = chart.ctx;
+      // Temporarily override fillText & strokeText so the legend can't draw its text
+      if (!ctx._originalFillText) {
+        ctx._originalFillText = ctx.fillText;
+        ctx._originalStrokeText = ctx.strokeText;
+        ctx.fillText = function () { };  // block text draw
+        ctx.strokeText = function () { }; // block stroke draw
+      }
+    },
+    afterDraw(chart) {
+      const ctx = chart.ctx;
+      // Restore the original text methods for rest of chart drawing
+      if (ctx._originalFillText) {
+        ctx.fillText = ctx._originalFillText;
+        ctx.strokeText = ctx._originalStrokeText;
+        delete ctx._originalFillText;
+        delete ctx._originalStrokeText;
+      }
+    },
+  };
+  Chart.register(disableLegendTextPlugin);
+
+  // Plugin: force legend colors + remove strike-through
   const legendFixPlugin = {
     id: "legendFixPlugin",
     afterDraw(chart) {
@@ -106,28 +136,37 @@ export function showUnifiedChart(state, metricIndices = []) {
       if (!legend) return;
 
       const ctx = chart.ctx;
-      legend.legendItems.forEach((item, i) => {
-        // Find the matching dataset color
-        const ds = chart.data.datasets[item.datasetIndex];
-        const color = ds?.borderColor || "#000";
+      const items = legend.legendItems || [];
+      const font = Chart.helpers.toFont(legend.options.labels.font);
 
-        // Get legend text box geometry
-        const { text, textAlign, textBaseline, fontString, x, y } = item;
-        const font = Chart.helpers.toFont(fontString);
-        ctx.save();
-        ctx.font = font.string;
-        ctx.textAlign = textAlign || "left";
-        ctx.textBaseline = textBaseline || "middle";
-        ctx.fillStyle = color;        // ✅ dataset color text
+      ctx.save();
+      ctx.font = font.string;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+
+      items.forEach((item) => {
+        const ds = chart.data.datasets[item.datasetIndex];
+        const lighten = (hex, amt = 40) =>
+          "#" +
+          hex
+            .replace(/^#/, "")
+            .replace(/../g, (c) =>
+              ("0" + Math.min(255, Math.max(0, parseInt(c, 16) + amt)).toString(16)).slice(-2)
+            );
+        const color = lighten(ds?.borderColor || "#FFF");
+        // remove any previous dash / strike
+        ctx.setLineDash([]);
         ctx.strokeStyle = "transparent";
-        ctx.setLineDash([]);          // ✅ remove strike-through dash
+
+        // draw the text in its dataset color
+        ctx.fillStyle = color;
         ctx.fillText(item.text, item.textX, item.textY);
-        ctx.restore();
       });
+      ctx.restore();
     },
   };
   Chart.register(legendFixPlugin);
-
+  
   state.currentChart = new Chart(ctx, {
     type: "line",
     data: {
@@ -309,8 +348,6 @@ export function resetCharts(state, doughnutChart) {
     state.currentChart.update();
   }
 }
-
-
 
 export function resetMetricSlidersUI(CONFIG) {
   updateProgress("topSpeed", "topSpeedBar", 0, CONFIG.MAX_SPEED);

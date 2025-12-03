@@ -90,11 +90,11 @@ document.getElementById("loginForm").addEventListener("submit", async function (
 
       // ✅ Store compact user cache
       localStorage.setItem("userCache", JSON.stringify(userCache));
-
-      // (Optional: keep old single values too)
-      localStorage.setItem("userId", data.userId);
-      localStorage.setItem("user_name", data.email);
-
+      // Store subscription + free-trial gating info
+      localStorage.setItem("subscriptionPlanType", data.subscription_plan_type || "None");
+      localStorage.setItem("subscriptionStatus", data.subscription_status || "inactive");
+      localStorage.setItem("isFirstLogin", String(data.is_first_login));
+      localStorage.setItem("calibratedHeightM", data.calibrated_height_m ?? "");
 
       // Store userId and email in localStorage
       localStorage.setItem("userId", data.userId);

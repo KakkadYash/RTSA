@@ -26,8 +26,6 @@ export function initPoseOverlay({ video, canvas, ctx2D: ctx }) {
 
   // Process frames while the video is playing
   videoEl.addEventListener("play", () => {
-    playing = true;
-    processFrameLoop();
   });
   videoEl.addEventListener("pause", () => {
     playing = false;

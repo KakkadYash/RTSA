@@ -396,6 +396,7 @@ input:-webkit-autofill {
 
 img#img-preview {
   cursor: pointer;
+  filter: invert(1);
 }
 
 /* === Subscription Box === */
