@@ -82,7 +82,7 @@ function loadDashboard() {
       type: "line",
       data: {
         labels,
-        datasets: datasets.map((d) => ({
+        datasets: datasets.map((d, i) => ({
           label: d.label,
           data: d.data,
           borderColor: d.color,
@@ -90,9 +90,8 @@ function loadDashboard() {
           borderWidth: 1.5,
           fill: true,
           tension: 0.25,
-          pointRadius: 2,
-          spanGaps: true,
-          yAxisID: "y",
+          pointRadius: 0.5,
+          yAxisID: `y${i}`,
         })),
       },
       options: {
@@ -100,22 +99,24 @@ function loadDashboard() {
         responsive: true,
         interaction: { mode: "nearest", intersect: true },
         plugins: { legend: { display: false } },
-
-        scales: {
-          x: {
-            ticks: { color: "white" }
-          },
-          y: {
-            display: true,
-            ticks: { color: "white" },
-            grid: { color: "rgba(255,255,255,0.1)" }
-          }
-        }
+        scales: (() => {
+          const yAxes = {};
+          datasets.forEach((d, i) => {
+            yAxes[`y${i}`] = {
+              display: false,
+              offset: true,
+              grid: { drawOnChartArea: false }
+            };
+          });
+          return { x: { ticks: { color: "white" } }, ...yAxes };
+        })(),
       }
     });
 
     buildUnifiedLegend(dashboardChart, datasets);
   }
+
+
 
   async function fetchUploadCount() {
     try {
