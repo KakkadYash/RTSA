@@ -4,6 +4,68 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // =====================================================
+  //  FREE TRIAL STATE SETUP
+  // =====================================================
+  const userCache = JSON.parse(localStorage.getItem("userCache") || "{}");
+  const subscription = userCache.subscriptionPlanType || "free_trial";
+  let freeTrialStep = Number(localStorage.getItem("freeTrialStep") || 0);
+
+  // ======================================================
+  // FREE TRIAL STEP 2 → 3 (Unlock everything after 10 uploads)
+  // Backend must give: userCache.uploadCount
+  // ======================================================
+  if (subscription === "free_trial") {
+    if (userCache.uploadCount >= 10 && freeTrialStep < 3) {
+      console.log("🔥 User has 10 uploads → unlocking ALL sections");
+      freeTrialStep = 3;
+      localStorage.setItem("freeTrialStep", 3);
+      document.dispatchEvent(new Event("freeTrialStepUpdated"));
+    }
+  }
+
+  // 0 = Intro locked
+  // 1 = Profile unlocked
+  // 2 = Profile + Analytics unlocked
+  // 3 = All unlocked
+
+  function saveStep(step) {
+    freeTrialStep = step;
+    localStorage.setItem("freeTrialStep", step);
+    document.dispatchEvent(new Event("freeTrialStepUpdated")); // sidebar.js listens
+  }
+
+  // ======================================================
+  // Sidebar listens to this event to refresh lock states
+  // ======================================================
+  document.addEventListener("freeTrialStepUpdated", () => {
+    console.log("🔄 Sidebar should update lock/unlock icons now");
+  });
+
+  // =====================================================
+  // Only show Free Trial intro ONCE:
+  // Condition: free trial plan + step = 0
+  // =====================================================
+  if (subscription === "free_trial" && freeTrialStep === 0) {
+    showFreeTrialIntro();   // will move step to 1
+  }
+
+
+  function showFreeTrialIntro() {
+    // Replace alert() with your modal later
+    alert("👋 Welcome to RTSA! Let's get you started.");
+    alert("First step → Update your profile photo to unlock Analytics.");
+
+    saveStep(1);
+  }
+
+  // FREE TRIAL ENTRY POINT
+  if (subscription === "free_trial") {
+    if (freeTrialStep === 0) {
+      showIntroPopup();
+    }
+  }
+
   const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
   const tabs = document.querySelectorAll(".nav-link");
@@ -195,10 +257,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // Attach event listeners to tabs
   tabs.forEach(link => {
     link.addEventListener("click", e => {
+
+      if (subscription === "free_trial" && link.classList.contains("locked")) {
+        e.preventDefault();
+        link.classList.add("shake");
+        setTimeout(() => link.classList.remove("shake"), 450);
+        return;
+      }
+
       e.preventDefault();
       handleTabClick(link);
     });
+
   });
+
+
+  function showIntroPopup() {
+    alert("👋 Welcome to RTSA! Let's get you started.");
+    alert("First step: update your Profile to unlock Analytics.");
+
+    // Move to Step 1
+    saveStep(1);
+  }
+
 });
 
 /**

@@ -86,6 +86,8 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         profilePicUrl: data.profilePicUrl,
         is_first_login: data.is_first_login,
         timestamp: Date.now(),
+        subscriptionPlanType: data.subscription_plan_type,
+        uploadCount: data.upload_count || 0,
       };
 
       // ✅ Store compact user cache

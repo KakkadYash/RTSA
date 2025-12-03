@@ -386,3 +386,7 @@ input.legend-checkbox {
 #one-page-report.shake-report {
   animation: one-page-report-shake-horizontal 0.4s ease;
 }
+
+img.one-page-report-lock.lock.stagger-child.visible {
+  display: flex;
+}
