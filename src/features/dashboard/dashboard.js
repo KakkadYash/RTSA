@@ -82,7 +82,7 @@ function loadDashboard() {
       type: "line",
       data: {
         labels,
-        datasets: datasets.map((d) => ({
+        datasets: datasets.map((d, i) => ({
           label: d.label,
           data: d.data,
           borderColor: d.color,
@@ -90,9 +90,9 @@ function loadDashboard() {
           borderWidth: 1.5,
           fill: true,
           tension: 0.25,
-          pointRadius: 2,
+          pointRadius: 0.5,
           spanGaps: true,
-          yAxisID: "y",
+          yAxisID: `y${i}`,
         })),
       },
       options: {
@@ -100,22 +100,24 @@ function loadDashboard() {
         responsive: true,
         interaction: { mode: "nearest", intersect: true },
         plugins: { legend: { display: false } },
-
-        scales: {
-          x: {
-            ticks: { color: "white" }
-          },
-          y: {
-            display: true,
-            ticks: { color: "white" },
-            grid: { color: "rgba(255,255,255,0.1)" }
-          }
-        }
+        scales: (() => {
+          const yAxes = {};
+          datasets.forEach((d, i) => {
+            yAxes[`y${i}`] = {
+              display: false,
+              offset: true,
+              grid: { drawOnChartArea: false }
+            };
+          });
+          return { x: { ticks: { color: "white" } }, ...yAxes };
+        })(),
       }
     });
 
     buildUnifiedLegend(dashboardChart, datasets);
   }
+
+
 
   async function fetchUploadCount() {
     try {
@@ -134,10 +136,11 @@ function loadDashboard() {
       uploadCounter.textContent = data.total_uploads || "0";
 
       const metrics = data.recent_analytics || {};
-      const topSpeed = metrics.topSpeed || [];
-      const maxAccel = metrics.maxAcceleration || [];
-      const headUp = metrics.headUpPercentage || [];
-      window.dashboardUploadDates = metrics.uploadDates || [];
+      
+      const topSpeed = (metrics.topSpeed || []).slice().reverse();
+      const maxAccel = (metrics.maxAcceleration || []).slice().reverse();
+      const headUp = (metrics.headUpPercentage || []).slice().reverse();
+      window.dashboardUploadDates = (metrics.uploadDates || []).slice().reverse();
 
 
       renderUnifiedChart(topSpeed, maxAccel, headUp);
