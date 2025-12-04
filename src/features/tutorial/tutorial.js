@@ -1,6 +1,6 @@
 //tutorial.js 
 import steps from "./WalkThroughSteps.js";
-
+const FORCED_NAVIGATION_STEPS = ["profile-highlight", "profile-open-modal"];
 let state = {
   idx: 0,
   nodes: { backdrop: null, ring: null, tip: null }
@@ -48,12 +48,28 @@ function onKey(e) {
 }
 
 function next(firstRun = false) {
+  const currentStep = steps[state.idx];
+
+  // 🚫 If current step is a forced navigation step → block Next
+  if (FORCED_NAVIGATION_STEPS.includes(currentStep.id)) {
+    console.warn("[TUTORIAL] Next disabled on this step. User must click target.");
+    // OPTIONAL: small shake animation to show "no"
+    const btn = state.nodes.tip.querySelector('[data-act="next"]');
+    if (btn) {
+      btn.classList.add("rt-disabled-shake");
+      setTimeout(() => btn.classList.remove("rt-disabled-shake"), 400);
+    }
+    return; // Stop here
+  }
+
+  // Normal behavior
   let i = state.idx;
   do { i++; } while (i < steps.length && !query(steps[i].selector));
   if (i >= steps.length) return finish();
   state.idx = i;
   placeStep(firstRun);
 }
+
 
 function prev() {
   let i = state.idx;
@@ -193,34 +209,20 @@ function placeStep(firstRun = false) {
       `${aside.offsetWidth}px`
     );
   }
-  // ⭐ SPECIAL CASE: Wait until profile DOM is loaded
-  if (step.id === "profile-open-modal" || step.id === "profile-open-modal-btn") {
 
-    // If button DOES NOT exist yet → wait
-    if (!document.querySelector("#openModalBtn")) {
-      document.addEventListener(
-        "profile-loaded",
-        () => placeStep(true),
-        { once: true }
-      );
-      return; // stop execution and wait
-    }
-  }
-
-  // 🟡 Wait for profile page to finish loading
+  // ⭐ Unified wait-for-Profile DOM logic
   if (step.id === "profile-open-modal") {
     const btn = document.querySelector("#openModalBtn");
-
-    // If the button DOES NOT exist → wait
     if (!btn) {
+      console.log("[TUTORIAL] Waiting for Profile DOM (openModalBtn)...");
       document.addEventListener("profile-loaded", () => {
-        // Run step again when profile is ready
+        console.log("[TUTORIAL] Profile DOM ready → re-running step");
         placeStep(true);
       }, { once: true });
-
-      return; // IMPORTANT: Stop executing spotlight logic
+      return;
     }
   }
+
 
   // For full-screen welcome/intro steps, disable spotlight
   if (["welcome", "intro-message"].includes(step.id)) {
@@ -258,8 +260,7 @@ function placeStep(firstRun = false) {
 
   // CUSTOM SPOTLIGHT LOGIC — for all aside menu items
   // ------------------------------------------------------
-  if (["profile-highlight", "profile-open-modal", "analytics-highlight"].includes(step.id)) {
-    // 1) Special case: waiting for profile DOM (openModalBtn)
+  if (["profile-highlight", "analytics-highlight"].includes(step.id)) {    // 1) Special case: waiting for profile DOM (openModalBtn)
     if (step.id === "profile-open-modal") {
       const maybeBtn = document.querySelector("#openModalBtn");
 

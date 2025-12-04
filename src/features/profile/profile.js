@@ -373,6 +373,11 @@ function loadProfile() {
       }
     });
   }
+  // === Tutorial Hook: Notify tutorial engine that Profile page is ready ===
+  setTimeout(() => {
+    console.log("[PROFILE] Dispatching profile-loaded event for tutorial");
+    document.dispatchEvent(new Event("profile-loaded"));
+  }, 250);
 }
 
 window.loadProfile = loadProfile;
