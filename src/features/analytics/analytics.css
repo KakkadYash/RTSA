@@ -76,22 +76,19 @@ video {
     border-radius: 1em;
 }
 
+.vertical-output_canvas,
+.horizonatl-output_canvas {
+    display: none;
+    width: 100%;
+    border-radius: 2%;
+}
+
 .vertical-output_canvas {
     height: 90%;
-    border-radius: 2%;
-    /* border: 0.1em solid #000000; */
-    display: none;
-    /* position: absolute; */
-    width: 100%;
 }
 
 .horizonatl-output_canvas {
     height: 100%;
-    border-radius: 2%;
-    /* border: 0.1em solid #000000; */
-    display: none;
-    /* position: absolute; */
-    width: 100%;
 }
 
 .vertical-canvas-wrapper {
@@ -179,14 +176,7 @@ video {
 }
 
 #playProcessedButton {
-    font-family: SCHABO Condensed;
-    background-color: #000000;
-    border-radius: 1.6vw;
-    color: #FFFFFF;
     display: none;
-    font-size: 2vw;
-    cursor: pointer;
-    border: #ff4343 solid 0.3vw;
 }
 
 .button {
@@ -251,11 +241,6 @@ video {
     cursor: pointer;
 }
 
-.card.is-flipped {
-    transform: rotateY(180deg);
-    transition: transform 0.5s ease-in;
-}
-
 .card-face {
     position: absolute;
     width: 100%;
@@ -265,7 +250,7 @@ video {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    padding-top: 1vw;
+    padding: 1vw;
     font-size: 3vw;
     color: white;
     border: 1px solid #FFFFFF;
@@ -300,10 +285,9 @@ video {
 
 .card-front {
     background-color: #202020;
-    transform: rotateY(0deg);
     padding: 1vw;
     overflow: hidden;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 .front-card-title {
@@ -318,16 +302,6 @@ video {
     align-items: center;
     justify-content: flex-start;
     flex-direction: column;
-}
-
-.card-back2 .front-card-title {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    background-position: 1vw 9vw;
-    height: 18vw;
-    padding: 0 1vw;
-    align-content: space-between;
 }
 
 .card-metrics-container {
@@ -355,8 +329,8 @@ p {
 #myChart {
     display: block;
     box-sizing: border-box;
-    height: 100% ;
-    width: 35vw ;
+    height: 100%;
+    width: 35vw;
 }
 
 .description {
@@ -374,7 +348,7 @@ p {
     align-items: start;
 }
 
-.card-back {
+#technique_card .card-front {
     background-color: #202020;
     background-image: url(../../../public/assets/images/redScuff_rotated.png);
     background-position: -13vw -10vw;
@@ -418,7 +392,7 @@ p {
     transition: width 0.3s ease;
 }
 
-progress::-webkit-progress-bar {
+/* progress::-webkit-progress-bar {
     background-color: #c32222;
 }
 
@@ -428,13 +402,9 @@ progress::-webkit-progress-value {
 
 progress::-moz-progress-bar {
     background-color: #c32222;
-}
+} */
 
-.card-back2 {
-    background-color: #202020;
-}
-
-.card-back3 {
+#footwork_card .card-front {
     background-color: #202020;
     background-image: url(../../../public/assets/images/redScuff.png);
     background-position: 0vw 11vw;
@@ -465,7 +435,7 @@ progress::-moz-progress-bar {
     align-items: baseline;
 }
 
-#outerLegend .legend-color-box {
+.legend-color-box {
     width: 12px;
     height: 12px;
     display: inline-block;
@@ -530,15 +500,6 @@ progress::-moz-progress-bar {
 #outerLegend div {
     display: flex;
     align-items: center;
-}
-
-
-#innerLegend .legend-color-box {
-    width: 12px;
-    height: 12px;
-    display: inline-block;
-    margin-right: 6px;
-    border-radius: 2px;
 }
 
 #innerLegend div {
@@ -629,14 +590,6 @@ progress::-moz-progress-bar {
 }
 
 /* ========= HTML/CSS Double Doughnut ========= */
-
-.donut-chart-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 14vw;
-}
 
 .double-donut {
     position: relative;
@@ -731,4 +684,48 @@ input.legend-checkbox {
 
 .unified-legend-text {
     pointer-events: none;
+}
+
+/* NEW card layout (replaces old card-container) */
+#cards-container {
+    width: 100%;
+    height: 90vh;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    perspective: 2000px;
+    margin-top: 1vw;
+    gap: 1vw;
+}
+
+#cards-container .card {
+    width: 30%;
+    height: 95%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+    cursor: pointer;
+}
+
+#cards-container .card.is-flipped {
+    transform: rotateY(180deg);
+}
+
+/* Keep front visible by default */
+.card-face.card-front {
+    transform: rotateY(0deg);
+}
+
+/* Back should be rotated */
+.card-face.card-back {
+    transform: rotateY(180deg);
+}
+
+/* WHEN CARD IS FLIPPED: swap face rotations */
+.card.is-flipped .card-front {
+    transform: rotateY(180deg);
+}
+
+.card.is-flipped .card-back {
+    transform: rotateY(0deg);
 }
