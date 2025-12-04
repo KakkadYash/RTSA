@@ -238,7 +238,7 @@ video {
     backface-visibility: hidden;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     flex-direction: column;
     padding: 1vw;
     font-size: 3vw;
@@ -387,9 +387,10 @@ progress::-moz-progress-bar {
     background-color: #c32222;
 } */
 
-.card-front{
+.card-front {
     background-color: #202020;
 }
+
 #footwork_card .card-front {
     background-color: #202020;
     background-image: url(../../../public/assets/images/redScuff.png);
@@ -706,6 +707,7 @@ input.legend-checkbox {
 .card-face.card-back {
     transform: rotateY(180deg);
     gap: 1em;
+    background-color: #202020;
 }
 
 /* WHEN CARD IS FLIPPED: swap face rotations */
@@ -728,4 +730,12 @@ input.legend-checkbox {
 /* Flip trigger */
 .card.is-flipped .card-inner {
     transform: rotateY(180deg);
+}
+
+.technique_card_content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    /* height: 100%; */
 }
