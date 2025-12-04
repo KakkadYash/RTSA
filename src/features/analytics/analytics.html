@@ -79,146 +79,149 @@
     <!-- Stats Cards -->
     <div id="cards-container">
       <div id="technique_card" class="card card-hover">
-        <div class="card-face card-front">
-          <div class="front-card-title">
-            <span>TECHNIQUE</span>
-          </div>
-        </div>
-        <div class="card-face card-back">
-          <div class="back-card-title-container">
-            <div class="back-card-title">
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="front-card-title">
               <span>TECHNIQUE</span>
             </div>
           </div>
-          <div class="legends-wrapper">
-            <div id="innerLegend"></div>
-            <div id="outerLegend"></div>
-          </div>
-          <div class="donut-chart-wrapper">
-            <div class="double-donut" id="doubleDonut">
-              <!-- Outer ring (Running / Standing / Crouching) -->
-              <div class="outer-ring"></div>
+          <div class="card-face card-back">
+            <div class="back-card-title-container">
+              <div class="back-card-title">
+                <span>TECHNIQUE</span>
+              </div>
+            </div>
+            <div class="legends-wrapper">
+              <div id="innerLegend"></div>
+              <div id="outerLegend"></div>
+            </div>
+            <div class="donut-chart-wrapper">
+              <div class="double-donut" id="doubleDonut">
+                <!-- Outer ring (Running / Standing / Crouching) -->
+                <div class="outer-ring"></div>
 
-              <!-- Inner ring (Head Up / Head Down) -->
-              <div class="inner-ring"></div>
+                <!-- Inner ring (Head Up / Head Down) -->
+                <div class="inner-ring"></div>
 
-              <!-- Center label (we use Head Up %) -->
-              <div class="center-label" id="donutCenterLabel">--%</div>
+                <!-- Center label (we use Head Up %) -->
+                <div class="center-label" id="donutCenterLabel">--%</div>
+              </div>
+            </div>
+            <div class="description ai-video-wrap">
+              <video class="ai-preview-video" preload="auto" autoplay muted loop playsinline>
+                <source src="../../../public/assets/videos/Metrics_Card_Animation.mp4" type="video/mp4">
+              </video>
+              <div class="ai-video-text">AI coach insights coming soon</div>
             </div>
           </div>
-          <div class="description ai-video-wrap">
-            <video class="ai-preview-video" preload="auto" autoplay muted loop playsinline>
-              <source src="../../../public/assets/videos/Metrics_Card_Animation.mp4" type="video/mp4">
-            </video>
-            <div class="ai-video-text">AI coach insights coming soon</div>
-          </div>
-
         </div>
       </div>
       <div id="metrics_card" class="card card-hover">
-        <div class="card-face card-front">
-          <div class="front-card-title">
-            <span>SPEED &</span>
-            <span>MOVEMENT</span>
-          </div>
-        </div>
-        <div class="card-face card-back">
-          <div class="progressBars">
-            <div class="back-card-title">
-              <span>SPEED & MOVEMENT</span>
-            </div>
-            <div class="card-metrics-container">
-              <div class="slideContainer">
-                <div class="sliderHead">
-                  <label for="speed" class="tooltip-label">TOP SPEED<span class="tooltip-text">The highest speed a
-                      player
-                      reaches. Measured in yards per second
-                      (yd/sec)</span></label>
-                  <div id="topSpeed">0</div>
-                </div>
-                <div class="progressWrapper">
-                  <div class="progressFill" id="topSpeedBar"></div>
-                </div>
-                <!-- <progress id="speedValue" value="0" max="100"></progress> -->
-              </div>
-              <div class="slideContainer">
-                <div class="sliderHead">
-                  <label for="acceleration" class="tooltip-label">PEAK
-                    ACCELERATION<span class="tooltip-text">The fastest rate of speed increase during the session.
-                      Measured in yards per
-                      second squared (yd/s2)</span></label>
-                  <div id="peakAcceleration">0</div>
-                </div>
-                <div class="progressWrapper">
-                  <div class="progressFill" id="peakAccelerationBar"></div>
-                </div>
-              </div>
-              <div class="slideContainer">
-                <div class="sliderHead">
-                  <label for="deceleration" class="tooltip-label">PEAK
-                    DECELERATION<span class="tooltip-text">The fastest rate of slowing down during the session.
-                      Measured in yards per
-                      second squared (yd/s2)</span></label>
-                  <div id="peakDeceleration">0</div>
-                </div>
-                <div class="progressWrapper">
-                  <div class="progressFill" id="peakDecelerationBar"></div>
-                </div>
-              </div>
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="front-card-title">
+              <span>SPEED &</span>
+              <span>MOVEMENT</span>
             </div>
           </div>
-          <div class="description ai-video-wrap">
-            <video class="ai-preview-video" preload="auto" autoplay muted loop playsinline>
-              <source src="../../../public/assets/videos/Metrics_Card_Animation.mp4" type="video/mp4">
-            </video>
-            <div class="ai-video-text">AI coach insights coming soon</div>
+          <div class="card-face card-back">
+            <div class="progressBars">
+              <div class="back-card-title">
+                <span>SPEED & MOVEMENT</span>
+              </div>
+              <div class="card-metrics-container">
+                <div class="slideContainer">
+                  <div class="sliderHead">
+                    <label for="speed" class="tooltip-label">TOP SPEED<span class="tooltip-text">The highest speed a
+                        player
+                        reaches. Measured in yards per second
+                        (yd/sec)</span></label>
+                    <div id="topSpeed">0</div>
+                  </div>
+                  <div class="progressWrapper">
+                    <div class="progressFill" id="topSpeedBar"></div>
+                  </div>
+                  <!-- <progress id="speedValue" value="0" max="100"></progress> -->
+                </div>
+                <div class="slideContainer">
+                  <div class="sliderHead">
+                    <label for="acceleration" class="tooltip-label">PEAK
+                      ACCELERATION<span class="tooltip-text">The fastest rate of speed increase during the session.
+                        Measured in yards per
+                        second squared (yd/s2)</span></label>
+                    <div id="peakAcceleration">0</div>
+                  </div>
+                  <div class="progressWrapper">
+                    <div class="progressFill" id="peakAccelerationBar"></div>
+                  </div>
+                </div>
+                <div class="slideContainer">
+                  <div class="sliderHead">
+                    <label for="deceleration" class="tooltip-label">PEAK
+                      DECELERATION<span class="tooltip-text">The fastest rate of slowing down during the session.
+                        Measured in yards per
+                        second squared (yd/s2)</span></label>
+                    <div id="peakDeceleration">0</div>
+                  </div>
+                  <div class="progressWrapper">
+                    <div class="progressFill" id="peakDecelerationBar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="description ai-video-wrap">
+              <video class="ai-preview-video" preload="auto" autoplay muted loop playsinline>
+                <source src="../../../public/assets/videos/Metrics_Card_Animation.mp4" type="video/mp4">
+              </video>
+              <div class="ai-video-text">AI coach insights coming soon</div>
+            </div>
           </div>
-
         </div>
       </div>
       <div id="footwork_card" class="card card-hover">
-        <div class="card-face card-front">
-          <div class="front-card-title">
-            <span>FOOTWORK</span>
-          </div>
-        </div>
-        <div class="card-face card-back">
-          <div class="progressBars">
-            <div class="back-card-title">
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="front-card-title">
               <span>FOOTWORK</span>
             </div>
-            <div class="card-metrics-container">
-              <div class="slideContainer">
-                <div class="sliderHead">
-                  <label for="strideLength" class="tooltip-label">STEP FREQUENCY<span class="tooltip-text">The average
-                      number of steps/sec</span></label>
-                  <div id="averageStrideLength">0</div>
-                </div>
-                <div class="progressWrapper">
-                  <div class="progressFill" id="averageStrideLengthBar"></div>
-                </div>
+          </div>
+          <div class="card-face card-back">
+            <div class="progressBars">
+              <div class="back-card-title">
+                <span>FOOTWORK</span>
               </div>
-              <div class="slideContainer">
-                <div class="sliderHead">
-                  <label for="jumpHeight" class="tooltip-label">MAX
-                    JUMP HEIGHT<span class="tooltip-text">The maximum height reached across all recorded jumps during
-                      the session. Measured
-                      in yards (yd).</span></label>
-                  <div id="averageJumpHeight">0</div>
+              <div class="card-metrics-container">
+                <div class="slideContainer">
+                  <div class="sliderHead">
+                    <label for="strideLength" class="tooltip-label">STEP FREQUENCY<span class="tooltip-text">The average
+                        number of steps/sec</span></label>
+                    <div id="averageStrideLength">0</div>
+                  </div>
+                  <div class="progressWrapper">
+                    <div class="progressFill" id="averageStrideLengthBar"></div>
+                  </div>
                 </div>
-                <div class="progressWrapper">
-                  <div class="progressFill" id="averageJumpHeightBar"></div>
+                <div class="slideContainer">
+                  <div class="sliderHead">
+                    <label for="jumpHeight" class="tooltip-label">MAX
+                      JUMP HEIGHT<span class="tooltip-text">The maximum height reached across all recorded jumps during
+                        the session. Measured
+                        in yards (yd).</span></label>
+                    <div id="averageJumpHeight">0</div>
+                  </div>
+                  <div class="progressWrapper">
+                    <div class="progressFill" id="averageJumpHeightBar"></div>
+                  </div>
                 </div>
               </div>
             </div>
+            <div class="description ai-video-wrap">
+              <video class="ai-preview-video" preload="auto" autoplay muted loop playsinline muted>
+                <source src="../../../public/assets/videos/Metrics_Card_Animation.mp4" type="video/mp4">
+              </video>
+              <div class="ai-video-text">AI coach insights coming soon</div>
+            </div>
           </div>
-          <div class="description ai-video-wrap">
-            <video class="ai-preview-video" preload="auto" autoplay muted loop playsinline muted>
-              <source src="../../../public/assets/videos/Metrics_Card_Animation.mp4" type="video/mp4">
-            </video>
-            <div class="ai-video-text">AI coach insights coming soon</div>
-          </div>
-
         </div>
       </div>
     </div>
