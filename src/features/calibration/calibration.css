@@ -19,8 +19,9 @@ div#calibrationModalContainer {
   background-color: rgba(0, 0, 0, 0.8);
   /* dim background */
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  padding: 2em;
 }
 
 .modal-content {
