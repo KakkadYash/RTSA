@@ -701,6 +701,7 @@ input.legend-checkbox {
 /* Keep front visible by default */
 .card-face.card-front {
     transform: rotateY(0deg);
+    justify-content: center;
 }
 
 /* Back should be rotated */
