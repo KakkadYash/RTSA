@@ -26,6 +26,7 @@ button#one-page-report {
   width: 7em;
   height: 2.2em;
   font-size: 1em;
+  font-weight: normal;
   align-items: center;
   justify-content: space-between;
 }
