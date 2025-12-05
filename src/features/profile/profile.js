@@ -203,6 +203,8 @@ function loadProfile() {
     }
 
     modal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";   // ⛔ lock background scroll
+
     modal.setAttribute("aria-hidden", "false");
 
     if (typeof initCalibrationModalEvents === "function") initCalibrationModalEvents();
