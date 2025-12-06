@@ -2,68 +2,112 @@
 <div id="popupModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"
   aria-hidden="true">
   <div class="modal-content" tabindex="-1">
+    <!-- HEIGHT ESTIMATION GUIDE -->
+    <!-- ✅ HEIGHT GUIDE OVERLAY (BLOCKING POPUP) -->
+    <div id="heightGuideOverlay" class="height-guide-overlay">
+
+      <div class="height-guide-popup">
+
+        <h2>Accurate Height Estimation Guide</h2>
+        <div class="content">
+          <ol class="height-steps">
+            <li>
+              <span>Take a Full-Body Picture</span>
+              <p>Make sure the athlete is fully visible in the photo — head to toe with nothing cut off.</p>
+            </li>
+
+            <li>
+              <span>Hold a Football at Chest Level</span>
+              <p>
+                The athlete should hold a football against their chest.
+                (We use the size of the ball as a reference for height measurement.)
+              </p>
+            </li>
+
+            <li>
+              <span>Upload the Picture</span>
+              <p>Press Upload and let the software automatically estimate height.</p>
+            </li>
+          </ol>
+
+          <div class="height-example">
+            <p class="example-label">Example</p>
+            <img src="../../../public/assets/images/OIP.png" alt="Correct pose example for height estimation">
+            <p class="example-note">
+              Refer to the sample photo above to see the correct pose and framing.
+            </p>
+          </div>
+        </div>
+        <!-- ✅ REQUIRED OK BUTTON -->
+        <button id="heightGuideOkBtn" class="button hover-animation click-animation hover-box-shadow">
+          OK, GOT IT
+        </button>
+
+      </div>
+    </div>
+
     <div class="heading">
       <h2 id="modalTitle">Update Profile</h2>
       <button id="closeBtn" class="close-btn click-animation hover-animation" aria-label="Close modal">&times;</button>
     </div>
+    <div id="calibrationFormWrapper" class="hidden">
+      <form id="popupProfileForm">
+        <div>
+          <label for="first_name">First Name:</label>
+          <input type="text" id="first_name" name="first_name" required>
+        </div>
+        <div>
+          <label for="last_name">Last Name:</label>
+          <input type="text" id="last_name" name="last_name" required>
+        </div>
+        <div>
+          <label for="age">Age:</label>
+          <input type="number" id="popupAge" name="age" min="0" required>
+        </div>
+        <div>
+          <label for="height_ft">Height (ft / in):</label>
 
-    <form id="popupProfileForm">
-      <div>
-        <label for="first_name">First Name:</label>
-        <input type="text" id="first_name" name="first_name" required>
-      </div>
-      <div>
-        <label for="last_name">Last Name:</label>
-        <input type="text" id="last_name" name="last_name" required>
-      </div>
-      <div>
-        <label for="age">Age:</label>
-        <input type="number" id="popupAge" name="age" min="0" required>
-      </div>
-      <div>
-        <label for="height_ft">Height (ft / in):</label>
+          <div class="height-row">
+            <select id="height_ft" aria-label="Height in feet" required>
+              <option value="" disabled selected>Feet</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+            </select>
 
-        <div class="height-row">
-          <select id="height_ft" aria-label="Height in feet" required>
-            <option value="" disabled selected>Feet</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-          </select>
+            <select id="height_in" aria-label="Height in inches" required>
+              <option value="" disabled selected>Inches</option>
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+            </select>
+          </div>
 
-          <select id="height_in" aria-label="Height in inches" required>
-            <option value="" disabled selected>Inches</option>
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-          </select>
+          <!-- keep backend the same: we'll fill this before submit -->
+          <input type="hidden" id="height_cm" name="height_cm">
         </div>
 
-        <!-- keep backend the same: we'll fill this before submit -->
-        <input type="hidden" id="height_cm" name="height_cm">
-      </div>
-
-      <div>
-        <label for="sport">Sport:</label>
-        <input type="text" id="sport" name="sport">
-      </div>
-      <div>
-        <label for="fullBodyPic">Full Body Picture:</label>
-        <input type="file" id="fullBodyPic" name="fullBodyPic" accept="image/*">
-      </div>
-      <button id="calibration" type="submit">Submit</button>
-    </form>
-
+        <div>
+          <label for="sport">Sport:</label>
+          <input type="text" id="sport" name="sport">
+        </div>
+        <div>
+          <label for="fullBodyPic">Full Body Picture:</label>
+          <input type="file" id="fullBodyPic" name="fullBodyPic" accept="image/*">
+        </div>
+        <button id="calibration" type="submit">Submit</button>
+      </form>
+    </div>
     <div class="scan-preview hidden">
       <p id="scanStatus" class="scan-status hidden">🔍 Scanning image...</p>
       <img id="fullBodyPreview" alt="Preview" />
