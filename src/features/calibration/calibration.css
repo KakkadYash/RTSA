@@ -2,28 +2,16 @@
   display: none;
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
 div#calibrationModalContainer {
-  position: fixed;
-  bottom: 70%;
-  left: 25%;
-  width: 50%;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* Modal styles */
 .modal {
   position: fixed;
-  z-index: 1000;
-  /* high to overlay */
   left: 0;
   top: 0;
   width: 100%;
@@ -31,23 +19,24 @@ div#calibrationModalContainer {
   background-color: rgba(0, 0, 0, 0.8);
   /* dim background */
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  padding: 1em;
 }
 
 .modal-content {
   background-color: #222;
   color: white;
-  padding: 1em;
+  padding: 0 1em;
   border-radius: 8px;
   font-size: 1.2rem;
-  width: 25em;
+  width: 30em;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
 }
 
-f .close-btn {
+.close-btn {
   background: transparent;
   border: none;
   font-size: 4rem;
@@ -82,14 +71,16 @@ button#closeBtn:hover {
   border: 1px solid #444;
   background-color: #000;
   color: white;
+  height: 3em;
+  font-size: 0.7em;
 }
 
 .modal form button[type="submit"] {
-  margin-top: 15px;
+  margin-top: 0.5em;
   width: 100%;
   background-color: #D02720;
   border: none;
-  padding: 10px;
+  padding: 0.5em;
   color: white;
   font-size: 1.2rem;
   border-radius: 5px;
@@ -102,15 +93,15 @@ button#closeBtn:hover {
 
 .scan-preview {
   position: absolute;
-  width: 50%;
+  width: 20%;
   margin: 15px auto;
   border: 3px solid #d02720;
   border-radius: 10px;
-  /* overflow: hidden; */
   box-shadow: 0 0 25px rgba(208, 39, 32, 0.8);
   transition: all 0.4s ease;
   animation: pulseGlow 2s ease-in-out infinite alternate;
-  left: 25%;
+  left: 40%;
+  bottom: 50%;
 }
 
 
@@ -195,8 +186,7 @@ button#closeBtn:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
-  /* ⬆ higher than modal */
+  z-index: -1;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -306,4 +296,95 @@ label {
   text-align: center;
   font-size: 1em;
   cursor: pointer;
+}
+
+/* ===========================
+   HEIGHT GUIDE BLOCKING POPUP
+   =========================== */
+
+.height-guide-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 1em;
+}
+
+
+
+.height-steps span {
+  font-weight: normal;
+  font-size: 1.2em;
+  letter-spacing: 1px;
+}
+
+.height-guide-popup {
+  display: flex;
+  background: #1e1c1c;
+  border: 2px solid #d02720;
+  border-radius: 18px;
+  padding: 1em;
+  width: 90%;
+  max-width: 30em;
+  color: white;
+  text-align: left;
+  box-shadow: 0 0 40px rgba(208, 39, 32, 0.5);
+  flex-direction: column;
+  justify-content: space-around;
+  height: 36em;
+  align-items: center;
+}
+
+.height-guide-popup h2 {
+  color: #d02720;
+  font-size: 2em;
+  text-align: center;
+}
+
+.content {
+  display: grid;
+  gap: 1em;
+  grid-auto-flow: column;
+}
+
+.height-steps {
+  padding: 0 0 0 1em;
+  font-size: 1.05em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.height-steps p {
+  font-size: 1em;
+}
+
+.height-example {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.height-example img {
+  width: 100%;
+  max-width: 13em;
+  border-radius: 12px;
+  outline: 2px solid #d02720;
+}
+
+.example-label {
+  color: #d02720;
+  font-size: 2em;
+}
+
+.example-note {
+  font-size: 1em;
+  color: #aaaaaa;
+}
+
+#heightGuideOkBtn {
+  width: 40%;
 }

@@ -49,18 +49,24 @@ export function wireCardsAndShowAll(showMetricsBtn, { onShowAllMetrics, onShowTe
   // Card flip logic
   // Card flip logic
   document.querySelectorAll(".card").forEach((card, index, allCards) => {
-    card.addEventListener("click", () => {
+    card.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const targetCard = e.currentTarget;  // ALWAYS the .card element
+
       setTimeout(() => {
-        const alreadyFlipped = card.classList.contains("is-flipped");
+        const alreadyFlipped = targetCard.classList.contains("is-flipped");
+
         allCards.forEach(c => c.classList.remove("is-flipped"));
 
         if (!alreadyFlipped) {
-          card.classList.add("is-flipped");
-          if (index === 0) onShowTechnique?.(); // Technique: Head Angle
-          if (index === 1) onShowSpeed?.();     // Speed & Movement
-          if (index === 2) onShowFootwork?.();  // Footwork
+          targetCard.classList.add("is-flipped");
+
+          if (index === 0) onShowTechnique?.();
+          if (index === 1) onShowSpeed?.();
+          if (index === 2) onShowFootwork?.();
+
         } else {
-          onShowAllMetrics?.(); // Restore unified full chart when card is unselected
+          onShowAllMetrics?.();
         }
       }, 200);
     });
