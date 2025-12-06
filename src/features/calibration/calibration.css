@@ -323,7 +323,7 @@ label {
 
 .height-guide-popup {
   display: flex;
-  background: #222222;
+  background: #1e1c1c;
   border: 2px solid #d02720;
   border-radius: 18px;
   padding: 1em;
@@ -386,5 +386,5 @@ label {
 }
 
 #heightGuideOkBtn {
-  width: 100%;
+  width: 40%;
 }

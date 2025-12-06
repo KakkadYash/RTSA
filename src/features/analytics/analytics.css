@@ -268,15 +268,8 @@ video {
 
 .front-card-title {
     display: flex;
-    background-image: url(../../../public/assets/images/Red-Streak.png);
-    background-attachment: initial;
-    background-repeat: no-repeat;
-    background-position: 0% 80%;
-    background-size: 19vw -18vw;
-    height: 13vw;
     align-content: stretch;
     align-items: center;
-    justify-content: flex-start;
     flex-direction: column;
 }
 
