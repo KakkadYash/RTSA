@@ -18,6 +18,14 @@ img {
     width: 100%;
 }
 
+.footer {
+    display: flex;
+    height: 6em;
+    flex-direction: column;
+    justify-content: space-evenly;
+    /* align-content: flex-start; */
+}
+
 aside {
     position: sticky;
     padding: 0.5em;
@@ -25,7 +33,6 @@ aside {
     height: 100vh;
     top: 0;
 }
-
 
 nav {
     display: flex;
