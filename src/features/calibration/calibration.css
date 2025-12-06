@@ -297,3 +297,94 @@ label {
   font-size: 1em;
   cursor: pointer;
 }
+
+/* ===========================
+   HEIGHT GUIDE BLOCKING POPUP
+   =========================== */
+
+.height-guide-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 1em;
+}
+
+
+
+.height-steps span {
+  font-weight: normal;
+  font-size: 1.2em;
+  letter-spacing: 1px;
+}
+
+.height-guide-popup {
+  display: flex;
+  background: #222222;
+  border: 2px solid #d02720;
+  border-radius: 18px;
+  padding: 1em;
+  width: 90%;
+  max-width: 30em;
+  color: white;
+  text-align: left;
+  box-shadow: 0 0 40px rgba(208, 39, 32, 0.5);
+  flex-direction: column;
+  justify-content: space-around;
+  height: 36em;
+  align-items: center;
+}
+
+.height-guide-popup h2 {
+  color: #d02720;
+  font-size: 2em;
+  text-align: center;
+}
+
+.content {
+  display: grid;
+  gap: 1em;
+  grid-auto-flow: column;
+}
+
+.height-steps {
+  padding: 0 0 0 1em;
+  font-size: 1.05em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.height-steps p {
+  font-size: 1em;
+}
+
+.height-example {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.height-example img {
+  width: 100%;
+  max-width: 13em;
+  border-radius: 12px;
+  outline: 2px solid #d02720;
+}
+
+.example-label {
+  color: #d02720;
+  font-size: 2em;
+}
+
+.example-note {
+  font-size: 1em;
+  color: #aaaaaa;
+}
+
+#heightGuideOkBtn {
+  width: 100%;
+}

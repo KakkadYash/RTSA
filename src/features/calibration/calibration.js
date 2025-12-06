@@ -27,6 +27,7 @@ function initCalibrationModalEvents() {
       container.classList.add("hidden");
     }
   });
+  initHeightGuideOverlay();
 }
 
 function initCalibrationFormHandler() {
@@ -173,3 +174,23 @@ function initImagePreview() {
   }, 200);
 }
 
+// ✅ Height Guide Popup Logic
+function initHeightGuideOverlay() {
+  const overlay = document.getElementById("heightGuideOverlay");
+  const okBtn = document.getElementById("heightGuideOkBtn");
+  const formWrapper = document.getElementById("calibrationFormWrapper");
+
+  if (!overlay || !okBtn || !formWrapper) {
+    console.warn("Height guide elements missing");
+    return;
+  }
+
+  // Always start with guide visible and form hidden
+  overlay.style.display = "flex";
+  formWrapper.classList.add("hidden");
+
+  okBtn.addEventListener("click", () => {
+    overlay.style.display = "none";
+    formWrapper.classList.remove("hidden");
+  });
+}
