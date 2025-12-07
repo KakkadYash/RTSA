@@ -378,11 +378,12 @@ label {
 .example-label {
   color: #d02720;
   font-size: 2em;
+  font-weight: 800;
 }
 
 .example-note {
   font-size: 1em;
-  color: #aaaaaa;
+  color: #ffffff;
 }
 
 #heightGuideOkBtn {
