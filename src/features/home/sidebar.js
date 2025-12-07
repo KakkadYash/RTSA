@@ -4,7 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Re-run sidebar lock logic automatically
     location.reload();
   });
-
+  const hideAllIcons = () => {
+    document.querySelectorAll(".lock").forEach(i => i.style.display = "none");
+    document.querySelectorAll(".unlock").forEach(i => i.style.display = "none");
+  };
   const subscription = localStorage.getItem("subscriptionPlanType");
   const step = Number(localStorage.getItem("freeTrialStep") || 0);
   const navLinks = document.querySelectorAll(".nav-link");
@@ -33,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🔥 PAID USERS: All unlocked
   if (subscription !== "free_trial") {
     unlockAll();
+    hideAllIcons();
     return;
   } else {
 
@@ -53,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (step === 3) {
       unlockAll();
+      hideAllIcons();
     }
   }
 

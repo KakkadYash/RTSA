@@ -43,7 +43,6 @@ nav {
     /* ⬅ needed for sliding underline */
 }
 
-
 aside a {
     color: #000000;
     text-decoration: none;
@@ -330,9 +329,12 @@ form {
     width: 20px;
     height: 20px;
     opacity: 0.8;
-    display: none;
     height: 2em;
     width: 2em;
+}
+
+.unlock {
+    display: none;
 }
 
 /* Locked state */
