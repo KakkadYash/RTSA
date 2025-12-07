@@ -1,3 +1,4 @@
+// login.js
 const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/"
 // Open modal on forgot password click
 document.getElementById("forgotPasswordLink").addEventListener("click", function () {

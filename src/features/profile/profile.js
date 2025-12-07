@@ -1,3 +1,4 @@
+// profile.js
 const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/";
 function loadProfile() {
   const userId = localStorage.getItem("userId");

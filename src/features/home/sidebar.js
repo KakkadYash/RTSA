@@ -1,4 +1,9 @@
+// sidebar.js
 document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("freeTrialStepUpdated", () => {
+    // Re-run sidebar lock logic automatically
+    location.reload();
+  });
 
   const subscription = localStorage.getItem("subscriptionPlanType");
   const step = Number(localStorage.getItem("freeTrialStep") || 0);

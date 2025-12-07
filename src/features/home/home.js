@@ -1,3 +1,4 @@
+// home.js
 /**
  * Page Loader Module
  * Handles navigation, dynamic resource loading, and tab switching.
@@ -8,7 +9,13 @@ document.addEventListener("DOMContentLoaded", () => {
   //  FREE TRIAL STATE SETUP
   // =====================================================
   const userCache = JSON.parse(localStorage.getItem("userCache") || "{}");
-  const subscription = userCache.subscriptionPlanType || "free_trial";
+
+  // 🔹 Single source of truth for subscription type
+  const subscription =
+    localStorage.getItem("subscriptionPlanType") ||
+    userCache.subscriptionPlanType ||
+    "free_trial";
+
   let freeTrialStep = Number(localStorage.getItem("freeTrialStep") || 0);
 
   // ======================================================
@@ -57,13 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("First step → Update your profile photo to unlock Analytics.");
 
     saveStep(1);
-  }
-
-  // FREE TRIAL ENTRY POINT
-  if (subscription === "free_trial") {
-    if (freeTrialStep === 0) {
-      showIntroPopup();
-    }
   }
 
   const PAGE_ROOT = "../../../src/features/";
@@ -270,15 +270,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   });
-
-
-  function showIntroPopup() {
-    alert("👋 Welcome to RTSA! Let's get you started.");
-    alert("First step: update your Profile to unlock Analytics.");
-
-    // Move to Step 1
-    saveStep(1);
-  }
 
 });
 
