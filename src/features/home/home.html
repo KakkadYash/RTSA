@@ -111,23 +111,24 @@
     <img src="../../../public/assets/images/SplashScreen.png" alt="Splash" />
     <img src="../../../public/assets/images/Quote.png" alt="Quote" />
     <img src="../../../public/assets/images/Analytics.png" alt="Analytics" />
-    <img src="../../../public/assets/images/HowTo.png" alt="HowTo" />
-    <img src="../../../public/assets/images/HowItWorks.png" alt="HowItWorks" />
-    <div class="contact">
+    <div class="contact" id="feedback">
       <div class="blurb">
         <h1>CONTACT US</h1>
-        <p><span>Have a general question about Reaction</span> <span>Technologies? Feel free to drop us a note</span>
+        <p><span>Have a question, idea, or challenge in mind? Our team at Reaction Technologies is here to turn your
+            curiosity into real solutions. Reach out today and let’s build smarter, high-performance technology
+            together.</span>
         </p>
       </div>
       <form id="contactForm">
+        <input type="hidden" id="feedbackUserId" />
         <input type="text" id="name" class="form-control" placeholder="NAME" required />
         <input type="text" id="email" class="form-control" placeholder="EMAIL" required />
-        <input type="text" id="note" class="form-control" placeholder="NOTE" required />
+        <textarea type="text" id="note" class="form-control" placeholder="NOTE" required minlength="20"
+          maxlength="300"></textarea>
         <button id="submitButton" type="submit" class="button hover-animation click-animation">SUBMIT</button>
       </form>
     </div>
   </main>
-
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

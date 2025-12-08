@@ -56,11 +56,11 @@ canvas {
 
 /* --- DRILL CATALOG NEW HISTORY-STYLE LAYOUT --- */
 .drill-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1em;
-  width: 100%;
-  padding: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    width: 100%;
+    padding: 1em 2em;
 }
 
 .drill-card {
@@ -104,9 +104,10 @@ canvas {
 }
 
 .drill-category-header {
-  font-size: 2.4em;
+  font-size: 3em;
   color: #e62a2a;
   font-family: 'Futura LtCn BT';
+  margin-top: 1em;
 }
 
 /* Responsive */

@@ -5,6 +5,28 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ===============================
+  // AUTO-FILL USER ID FOR FEEDBACK
+  // ===============================
+  const userCacheFB = JSON.parse(localStorage.getItem("userCache") || "{}");
+  const userIdFB = userCacheFB.userId;
+  const userField = document.getElementById("feedbackUserId");
+
+  if (userField && userIdFB) {
+    userField.value = userIdFB;
+  }
+
+  // ✅ AUTO SCROLL TO FEEDBACK SECTION ON HOME LOAD
+  setTimeout(() => {
+    const feedbackSection = document.getElementById("feedback");
+    if (feedbackSection) {
+      feedbackSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  }, 300);
+
   // =====================================================
   //  FREE TRIAL STATE SETUP
   // =====================================================
@@ -256,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Attach event listeners to tabs
   tabs.forEach(link => {
-    link.addEventListener("click", e => {
+    link.addEventListener("click", async (e) => {
 
       if (subscription === "free_trial" && link.classList.contains("locked")) {
         e.preventDefault();
@@ -266,10 +288,78 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       e.preventDefault();
-      handleTabClick(link);
-    });
+      await handleTabClick(link);
 
+      // ✅ AUTO-OPEN CALIBRATION MODAL ON STEP 1 PROFILE CLICK
+      const step = Number(localStorage.getItem("freeTrialStep") || 0);
+
+      if (
+        subscription === "free_trial" &&
+        step === 1 &&
+        link.dataset.page === "profile"
+      ) {
+        console.log("🎯 Free Trial Step 1 → Auto-opening Calibration Modal");
+
+        // Allow DOM to fully paint before clicking
+        setTimeout(() => {
+          const openBtn = document.getElementById("openModalBtn");
+          if (openBtn) {
+            openBtn.click();
+          } else {
+            console.warn("⚠️ openModalBtn not found for auto-trigger");
+          }
+        }, 100);
+      }
+    });
   });
+
+  // ===============================
+  // CONTACT FORM SUBMISSION LOGIC
+  // ===============================
+  const contactForm = document.getElementById("contactForm");
+
+  if (contactForm) {
+    contactForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const userId = document.getElementById("feedbackUserId").value;
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const note = document.getElementById("note").value.trim();
+
+      if (!userId) {
+        alert("User not logged in. Please log in again.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("userId", userId);
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("message", note);
+      try {
+        const res = await fetch(
+          "https://rtsa-backend-gpu-843332298202.us-central1.run.app/submit-feedback",
+          {
+            method: "POST",
+            body: formData
+          }
+        );
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert("Thank you! Your message has been submitted.");
+          contactForm.reset();
+        } else {
+          alert("Failed to submit. Please try again later.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error sending feedback.");
+      }
+    });
+  }
 
 });
 
