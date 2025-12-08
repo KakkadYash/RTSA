@@ -1,11 +1,29 @@
 const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/"
 // Open modal on forgot password click
+// ✅ Open Forgot Password Modal (Pure JS)
 document.getElementById("forgotPasswordLink").addEventListener("click", function () {
-  const modal = new bootstrap.Modal(document.getElementById("forgotPasswordModal"));
+  const modal = document.getElementById("forgotPasswordModal");
+
   document.getElementById("forgotPasswordForm").reset();
-  document.getElementById("forgotPasswordMessage").innerText = "";
-  modal.show();
+  document.getElementById("forgotPasswordMessage").style.display = "none";
+  document.getElementById("forgotEmail").style.display = "block";
+
+  modal.style.display = "flex";
+  document.body.style.overflow = "hidden";
 });
+function closeForgotModal() {
+  document.getElementById("forgotPasswordModal").style.display = "none";
+  document.body.style.overflow = "auto";
+}
+
+// ✅ X button close
+document.querySelector(".btn-close").addEventListener("click", closeForgotModal);
+
+// ✅ Outside click close
+document.getElementById("forgotPasswordModal").addEventListener("click", function (e) {
+  if (e.target === this) closeForgotModal();
+});
+
 
 // Forgot password form submission
 document.getElementById("forgotPasswordForm").addEventListener("submit", async function (event) {
@@ -30,8 +48,11 @@ document.getElementById("forgotPasswordForm").addEventListener("submit", async f
     console.log("Forgot Password Response:", result);
 
     document.getElementById("forgotEmail").style.display = "none";
-    document.getElementById("forgotPasswordModal").style.display = "flex";
-    document.getElementById("forgotPasswordMessage").style.display = "flex";
+    document.getElementById("forgotPasswordMessage").style.display = "block";
+    document.getElementById("forgotPasswordMessage").innerText =
+      "If this email exists, a reset link will be sent.";
+
+    setTimeout(closeForgotModal, 2500);
 
 
     document.getElementById("forgotPasswordMessage").innerText =
