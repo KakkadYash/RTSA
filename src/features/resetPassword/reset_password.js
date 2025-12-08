@@ -31,7 +31,7 @@ form.addEventListener("submit", async function (event) {
 
     try {
         const response = await fetch(
-            "https://rtsa-backend-gpu-843332298202.us-central1.run.app/reset_password/${token}",
+            `https://rtsa-backend-gpu-843332298202.us-central1.run.app/reset_password/${token}`,
             {
                 method: "POST",
                 headers: {
@@ -51,7 +51,7 @@ form.addEventListener("submit", async function (event) {
             form.style.display = "none";
 
             // ✅ Show success state
-            successBox.style.display = "block";
+            successBox.style.display = "flex";
 
             // ✅ Reset form inputs for clean state
             form.reset();
