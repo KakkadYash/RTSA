@@ -8,7 +8,7 @@
     width: 100%;
     background-image: url(../../../public/assets/images/Dashes.png), url(../../../public/assets/images/Logo-para-marca-personal-en-negro-y-rosa-15.png);
     background-position: right center, right bottom;
-    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-repeat: no-repeat, no-repeat;
     flex-direction: column;
     overflow: hidden;
 }
@@ -18,7 +18,7 @@
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: 9vw;
+    height: 9em;
     padding: 0 2.3em;
     border-radius: 25%;
     justify-content: space-between;
@@ -34,11 +34,11 @@
     color: #FFFFFF;
     border: 0.1rem solid #FFFFFF;
     font-weight: bold;
-    font-size: 2vw;
+    font-size: 2em;
     border-radius: 2rem;
-    padding: 0.8vh 0vw 0.8vh 0vw;
-    width: 12vw;
-    height: 60%;
+    padding: 0.2em 0em;
+    width: 6em;
+    height: 70%;
 }
 
 .video-section {
@@ -49,10 +49,10 @@
     min-height: 25vw;
     height: 25vw;
     margin-bottom: 2vw;
+    margin-bottom: 2em;
     width: 100%;
     gap: 1em;
 }
-
 
 .vid-chart {
     display: flex;
@@ -69,7 +69,6 @@
 #uploaded-video {
     width: 100%;
     height: 100%;
-    /* border: 1px solid rgb(255, 255, 255); */
 }
 
 video {
@@ -107,16 +106,15 @@ video {
 
 #analyzingIndicator {
     display: none;
-    font-size: 2vw;
+    font-size: 2em;
     color: #FFFFFF;
     background-color: rgba(0, 0, 0, 0.7);
-    padding: 1vw;
-    border-radius: 1vw;
+    padding: 0.5em;
+    border-radius: 0.5em;
 }
 
 .chart-wrapper {
     background: linear-gradient(to bottom, #444444, #000000);
-    /* background-color: rgba(0, 0, 0, 1); */
     border-radius: 1em;
     display: grid;
     flex-direction: row;
@@ -127,8 +125,6 @@ video {
     min-height: 25vw;
     box-sizing: border-box;
     padding: 0 0.5em 0 0.5em;
-    /* gap: 0.5em; */
-    /* border: 1px solid rgba(255, 255, 255, 1); */
     grid-auto-flow: column;
     grid-template-columns: 1fr;
 }
@@ -195,15 +191,13 @@ video {
 }
 
 .btns-container {
-    height: 4vw;
+    height: 4em;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     flex-wrap: wrap;
     align-content: center;
     width: 100%;
-    margin: 0 0 2vw 0;
-    /* padding: 0vw 3.5vw; */
     align-items: flex-start;
 }
 
@@ -240,8 +234,8 @@ video {
     align-items: center;
     justify-content: space-between;
     flex-direction: column;
-    padding: 1vw;
-    font-size: 3vw;
+    padding: 0.3em;
+    font-size: 3em;
     color: white;
     border: 1px solid #FFFFFF;
     border-radius: 10px;
@@ -255,9 +249,8 @@ video {
 }
 
 .back-card-title span {
-
     text-decoration: underline;
-    font-size: 3vw;
+    font-size: 1em;
 }
 
 .back-card-title {
@@ -275,20 +268,13 @@ video {
 
 .front-card-title {
     display: flex;
-    background-image: url(../../../public/assets/images/Red-Streak.png);
-    background-attachment: initial;
-    background-repeat: no-repeat;
-    background-position: 0% 80%;
-    background-size: 19vw -18vw;
-    height: 13vw;
     align-content: stretch;
     align-items: center;
-    justify-content: flex-start;
     flex-direction: column;
 }
 
 .card-metrics-container {
-    height: 20vw;
+    height: 7em;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -362,9 +348,9 @@ p {
 
 .progressWrapper {
     width: 100%;
-    height: 1.5vw;
+    height: 0.5em;
     background-color: #eee;
-    border-radius: 0.5vw;
+    border-radius: 0.5em;
     overflow: hidden;
 }
 
@@ -374,18 +360,6 @@ p {
     background: #c32222;
     transition: width 0.3s ease;
 }
-
-/* progress::-webkit-progress-bar {
-    background-color: #c32222;
-}
-
-progress::-webkit-progress-value {
-    background-color: #c32222;
-}
-
-progress::-moz-progress-bar {
-    background-color: #c32222;
-} */
 
 .card-front {
     background-color: #202020;
@@ -411,6 +385,7 @@ progress::-moz-progress-bar {
     display: flex;
     width: 100%;
     justify-content: space-between;
+    margin: 0.5em 0;
 }
 
 .inner-legend-wrapper {
@@ -423,18 +398,18 @@ progress::-moz-progress-bar {
 }
 
 .legend-color-box {
-    width: 12px;
-    height: 12px;
+    width: 0.3em;
+    height: 0.3em;
     display: inline-block;
-    margin-right: 6px;
+    margin-right: 0.1em;
     border-radius: 2px;
 }
 
 .legend-label-text {
     font-family: Futura LtCn BT;
-    font-size: 1vw;
+    font-size: 0.4em;
     color: white;
-    letter-spacing: 0.1vw;
+    letter-spacing: 0.1px;
 }
 
 .tooltip-label {
@@ -498,7 +473,6 @@ progress::-moz-progress-bar {
     padding: 0;
     position: relative;
     width: 100%;
-    height: 4em;
     border-radius: 10px;
     overflow: hidden;
     display: flex;
@@ -627,7 +601,6 @@ progress::-moz-progress-bar {
     color: #FFFFFF;
     font-family: Futura LtCn BT, sans-serif;
     font-weight: bold;
-    font-size: 1.6vw;
     text-align: center;
 }
 
@@ -676,13 +649,12 @@ input.legend-checkbox {
 /* NEW card layout (replaces old card-container) */
 #cards-container {
     width: 100%;
-    height: 90vh;
+    height: 45em;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
     perspective: 2000px;
-    margin-top: 1vw;
-    gap: 1vw;
+    margin-top: 2em;
 }
 
 #cards-container .card {
@@ -701,6 +673,7 @@ input.legend-checkbox {
 /* Keep front visible by default */
 .card-face.card-front {
     transform: rotateY(0deg);
+    justify-content: center;
 }
 
 /* Back should be rotated */

@@ -4,10 +4,10 @@
 
 #bg {
   background-image: url(../../../public/assets/images/route.png), url(../../../public/assets/images/Dashes.png);
-  background-position: right center, right bottom;
-  background-repeat: no-repeat, no-repeat, no-repeat;
-  background-attachment: scroll, scroll, scroll;
-  background-size: 50px, 65px auto;
+  background-position: right top, right center;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: scroll, scroll;
+  background-size: 4em auto;
   margin: 0 0 1em 0;
   padding: 1em;
 }
@@ -82,7 +82,7 @@ button#one-page-report {
 
 #bg .line {
   height: auto;
-  width: 150px;
+  width: 6em;
 }
 
 main .line2 {
@@ -95,28 +95,6 @@ main .line2 {
   flex-direction: column;
   height: 100%;
   justify-content: space-evenly;
-}
-
-canvas {
-  background-color: #A7A7A7;
-  border-radius: 1vw;
-  width: 30em;
-  height: 15em;
-}
-
-.avatar {
-  border-radius: 1vw;
-  background-color: #000000;
-  height: 100%;
-  width: clamp(120px, 18vw, 240px);
-  margin-right: 3vw;
-  display: flex;
-  align-items: center;
-  border: 1px solid #FFFFFF;
-  justify-content: center;
-  flex-wrap: wrap;
-  flex-direction: row;
-  align-content: center;
 }
 
 .uploads {
@@ -135,41 +113,20 @@ canvas {
   background-image: url(../../../public/assets/images/right.png);
 }
 
-.chart-arrows {
-  height: 2vw;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0vw 0.1vw;
-}
-
-.chart-arrows button {
-  background-repeat: no-repeat;
-  background-color: white;
-  width: 2vw;
-  height: 100%;
-  border-radius: 0.5vw;
-  cursor: pointer;
-  background-size: contain;
-}
-
-.chart-arrows button:hover {
-  transform: scale(1.1);
-}
-
 .small-box {
   background-color: #000000;
   color: #FFFFFF;
-  border-radius: 1vw;
+  border-radius: 1em;
   display: flex;
   flex-direction: column;
   align-items: start;
   justify-content: center;
-  /* padding: 1vw; */
-  width: 20%;
+  width: 10em;
   min-height: 2.5em;
   font-size: clamp(18px, 2vw, 26px);
   border: 1px solid #FFFFFF;
+  height: 100%;
+  font-weight: normal;
 }
 
 .info {
@@ -178,90 +135,6 @@ canvas {
   justify-content: space-evenly;
 }
 
-@media (max-width: 768px) {
-  .uploads {
-    grid-template-columns: 1fr;
-  }
-
-  .chart-container {
-    width: 100%;
-    height: 70vw;
-  }
-
-  main span,
-  .userData span {
-    font-size: 36px;
-  }
-
-  #nameInfo {
-    font-size: 40px;
-  }
-
-  .small-box {
-    font-size: 30px;
-    width: 30vw;
-    height: auto;
-    padding: 15px;
-    line-height: 40px;
-  }
-
-
-  .avatar {
-    width: 90vw;
-  }
-
-  #img-preview {
-    width: 100%;
-    height: auto;
-  }
-
-  #bg .line,
-  main .line2 {
-    width: 70vw;
-  }
-
-  .chart-container {
-    width: 65vw;
-    height: 35vw;
-    position: relative;
-    padding: 1vw;
-  }
-
-  .chart-arrows {
-    bottom: -25px;
-  }
-
-  .chart-arrows button {
-    font-size: 18px;
-    transform: scale(0.8);
-  }
-
-  .hello {
-    align-items: center;
-    padding-left: 0;
-    text-align: center;
-  }
-
-  .userData {
-    padding-left: 0;
-    align-items: center;
-  }
-
-}
-
-@media (max-width: 1024px) {
-  .small-box {
-    width: 20vw;
-  }
-
-  .avatar {
-    width: 300px;
-  }
-
-  .chart-container {
-    width: 56.5vw;
-  }
-}
 
 .greeting-wrapper {
   font-size: clamp(20px, 2vw, 32px);
@@ -385,4 +258,89 @@ input.legend-checkbox {
 /* Class added via JS when button is clicked */
 #one-page-report.shake-report {
   animation: one-page-report-shake-horizontal 0.4s ease;
+}
+
+@media (max-width: 768px) {
+  .uploads {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-container {
+    width: 100%;
+    height: 70vw;
+  }
+
+  main span,
+  .userData span {
+    font-size: 36px;
+  }
+
+  #nameInfo {
+    font-size: 40px;
+  }
+
+  .small-box {
+    font-size: 30px;
+    width: 30vw;
+    height: auto;
+    padding: 15px;
+    line-height: 40px;
+  }
+
+
+  .avatar {
+    width: 90vw;
+  }
+
+  #img-preview {
+    width: 100%;
+    height: auto;
+  }
+
+  #bg .line,
+  main .line2 {
+    width: 70vw;
+  }
+
+  .chart-container {
+    width: 65vw;
+    height: 35vw;
+    position: relative;
+    padding: 1vw;
+  }
+
+  .chart-arrows {
+    bottom: -25px;
+  }
+
+  .chart-arrows button {
+    font-size: 18px;
+    transform: scale(0.8);
+  }
+
+  .hello {
+    align-items: center;
+    padding-left: 0;
+    text-align: center;
+  }
+
+  .userData {
+    padding-left: 0;
+    align-items: center;
+  }
+
+}
+
+@media (max-width: 1024px) {
+  .small-box {
+    width: 20vw;
+  }
+
+  .avatar {
+    width: 300px;
+  }
+
+  .chart-container {
+    width: 56.5vw;
+  }
 }
