@@ -1,9 +1,93 @@
+// home.js
 /**
  * Page Loader Module
  * Handles navigation, dynamic resource loading, and tab switching.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ===============================
+  // AUTO-FILL USER ID FOR FEEDBACK
+  // ===============================
+  const userCacheFB = JSON.parse(localStorage.getItem("userCache") || "{}");
+  const userIdFB = userCacheFB.userId;
+  const userField = document.getElementById("feedbackUserId");
+
+  if (userField && userIdFB) {
+    userField.value = userIdFB;
+  }
+
+  // ✅ AUTO SCROLL TO FEEDBACK SECTION ON HOME LOAD
+  setTimeout(() => {
+    const feedbackSection = document.getElementById("feedback");
+    if (feedbackSection) {
+      feedbackSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  }, 300);
+
+  // =====================================================
+  //  FREE TRIAL STATE SETUP
+  // =====================================================
+  const userCache = JSON.parse(localStorage.getItem("userCache") || "{}");
+
+  // 🔹 Single source of truth for subscription type
+  const subscription =
+    localStorage.getItem("subscriptionPlanType") ||
+    userCache.subscriptionPlanType ||
+    "free_trial";
+
+  let freeTrialStep = Number(localStorage.getItem("freeTrialStep") || 0);
+
+  // ======================================================
+  // FREE TRIAL STEP 2 → 3 (Unlock everything after 10 uploads)
+  // Backend must give: userCache.uploadCount
+  // ======================================================
+  if (subscription === "free_trial") {
+    if (userCache.uploadCount >= 10 && freeTrialStep < 3) {
+      console.log("🔥 User has 10 uploads → unlocking ALL sections");
+      freeTrialStep = 3;
+      localStorage.setItem("freeTrialStep", 3);
+      document.dispatchEvent(new Event("freeTrialStepUpdated"));
+    }
+  }
+
+  // 0 = Intro locked
+  // 1 = Profile unlocked
+  // 2 = Profile + Analytics unlocked
+  // 3 = All unlocked
+
+  function saveStep(step) {
+    freeTrialStep = step;
+    localStorage.setItem("freeTrialStep", step);
+    document.dispatchEvent(new Event("freeTrialStepUpdated")); // sidebar.js listens
+  }
+
+  // ======================================================
+  // Sidebar listens to this event to refresh lock states
+  // ======================================================
+  document.addEventListener("freeTrialStepUpdated", () => {
+    console.log("🔄 Sidebar should update lock/unlock icons now");
+  });
+
+  // =====================================================
+  // Only show Free Trial intro ONCE:
+  // Condition: free trial plan + step = 0
+  // =====================================================
+  if (subscription === "free_trial" && freeTrialStep === 0) {
+    showFreeTrialIntro();   // will move step to 1
+  }
+
+
+  function showFreeTrialIntro() {
+    // Replace alert() with your modal later
+    alert("👋 Welcome to RTSA! Let's get you started.");
+    alert("First step → Update your profile photo to unlock Analytics.");
+
+    saveStep(1);
+  }
+
   const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
   const tabs = document.querySelectorAll(".nav-link");
@@ -194,11 +278,89 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Attach event listeners to tabs
   tabs.forEach(link => {
-    link.addEventListener("click", e => {
+    link.addEventListener("click", async (e) => {
+
+      if (subscription === "free_trial" && link.classList.contains("locked")) {
+        e.preventDefault();
+        link.classList.add("shake");
+        setTimeout(() => link.classList.remove("shake"), 450);
+        return;
+      }
+
       e.preventDefault();
-      handleTabClick(link);
+      await handleTabClick(link);
+
+      // ✅ AUTO-OPEN CALIBRATION MODAL ON STEP 1 PROFILE CLICK
+      const step = Number(localStorage.getItem("freeTrialStep") || 0);
+
+      if (
+        subscription === "free_trial" &&
+        step === 1 &&
+        link.dataset.page === "profile"
+      ) {
+        console.log("🎯 Free Trial Step 1 → Auto-opening Calibration Modal");
+
+        // Allow DOM to fully paint before clicking
+        setTimeout(() => {
+          const openBtn = document.getElementById("openModalBtn");
+          if (openBtn) {
+            openBtn.click();
+          } else {
+            console.warn("⚠️ openModalBtn not found for auto-trigger");
+          }
+        }, 100);
+      }
     });
   });
+
+  // ===============================
+  // CONTACT FORM SUBMISSION LOGIC
+  // ===============================
+  const contactForm = document.getElementById("contactForm");
+
+  if (contactForm) {
+    contactForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const userId = document.getElementById("feedbackUserId").value;
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const note = document.getElementById("note").value.trim();
+
+      if (!userId) {
+        alert("User not logged in. Please log in again.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("userId", userId);
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("message", note);
+      try {
+        const res = await fetch(
+          "https://rtsa-backend-gpu-843332298202.us-central1.run.app/submit-feedback",
+          {
+            method: "POST",
+            body: formData
+          }
+        );
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert("Thank you! Your message has been submitted.");
+          contactForm.reset();
+        } else {
+          alert("Failed to submit. Please try again later.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error sending feedback.");
+      }
+    });
+  }
+
 });
 
 /**

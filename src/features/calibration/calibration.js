@@ -106,6 +106,9 @@ function initCalibrationFormHandler() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       console.log("[CALIBRATION] Success:", data);
+      // ✅ FREE TRIAL UNLOCK SIGNAL
+      document.dispatchEvent(new Event("calibrationComplete"));
+
       if (res.status === 200) {
         // ✅ Stop scanning animation
         if (previewContainer) {

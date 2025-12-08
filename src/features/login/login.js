@@ -1,3 +1,4 @@
+// login.js
 const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/"
 // Open modal on forgot password click
 // ✅ Open Forgot Password Modal (Pure JS)
@@ -107,6 +108,8 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         profilePicUrl: data.profilePicUrl,
         is_first_login: data.is_first_login,
         timestamp: Date.now(),
+        subscriptionPlanType: data.subscription_plan_type,
+        uploadCount: data.upload_count || 0,
       };
 
       // ✅ Store compact user cache
