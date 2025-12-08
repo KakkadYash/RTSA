@@ -2,7 +2,7 @@
   <header class="header">
     <h1 class="title">ANALYTICS</h1>
   </header>
-  <div id="bg">
+  <div id="bg" class=" parallax-bg">
     <!-- Stats -->
     <div class="stats">
       <div class="box">
@@ -77,29 +77,36 @@
 
 
     <!-- Stats Cards -->
-    <div id="stats-container">
-      <div class="card-container card-hover">
-        <div class="card" id="technique_card">
+    <div id="cards-container">
+      <div id="technique_card" class="card card-hover">
+        <div class="card-inner">
           <div class="card-face card-front">
-            <div class="back-card-title-container">
-              <div class="back-card-title">
-                <span>TECHNIQUE</span>
+            <div class="front-card-title">
+              <span>TECHNIQUE</span>
+            </div>
+          </div>
+          <div class="card-face card-back">
+            <div class="technique_card_content">
+              <div class="back-card-title-container">
+                <div class="back-card-title">
+                  <span>TECHNIQUE</span>
+                </div>
               </div>
-            </div>
-            <div class="legends-wrapper">
-              <div id="innerLegend"></div>
-              <div id="outerLegend"></div>
-            </div>
-            <div class="donut-chart-wrapper">
-              <div class="double-donut" id="doubleDonut">
-                <!-- Outer ring (Running / Standing / Crouching) -->
-                <div class="outer-ring"></div>
+              <div class="legends-wrapper">
+                <div id="innerLegend"></div>
+                <div id="outerLegend"></div>
+              </div>
+              <div class="donut-chart-wrapper">
+                <div class="double-donut" id="doubleDonut">
+                  <!-- Outer ring (Running / Standing / Crouching) -->
+                  <div class="outer-ring"></div>
 
-                <!-- Inner ring (Head Up / Head Down) -->
-                <div class="inner-ring"></div>
+                  <!-- Inner ring (Head Up / Head Down) -->
+                  <div class="inner-ring"></div>
 
-                <!-- Center label (we use Head Up %) -->
-                <div class="center-label" id="donutCenterLabel">--%</div>
+                  <!-- Center label (we use Head Up %) -->
+                  <div class="center-label" id="donutCenterLabel">--%</div>
+                </div>
               </div>
             </div>
             <div class="description ai-video-wrap">
@@ -108,18 +115,18 @@
               </video>
               <div class="ai-video-text">AI coach insights coming soon</div>
             </div>
-
-          </div>
-          <div class="card-face card-back">
-            <div class="front-card-title">
-              <span>TECHNIQUE</span>
-            </div>
           </div>
         </div>
       </div>
-      <div class="card-container card-hover">
-        <div class="card" id="metrics_card">
+      <div id="metrics_card" class="card card-hover">
+        <div class="card-inner">
           <div class="card-face card-front">
+            <div class="front-card-title">
+              <span>SPEED &</span>
+              <span>MOVEMENT</span>
+            </div>
+          </div>
+          <div class="card-face card-back">
             <div class="progressBars">
               <div class="back-card-title">
                 <span>SPEED & MOVEMENT</span>
@@ -170,19 +177,17 @@
               </video>
               <div class="ai-video-text">AI coach insights coming soon</div>
             </div>
-
-          </div>
-          <div class="card-face card-back2">
-            <div class="front-card-title">
-              <span>SPEED &</span>
-              <span>MOVEMENT</span>
-            </div>
           </div>
         </div>
       </div>
-      <div class="card-container card-hover">
-        <div class="card" id="footwork_card">
+      <div id="footwork_card" class="card card-hover">
+        <div class="card-inner">
           <div class="card-face card-front">
+            <div class="front-card-title">
+              <span>FOOTWORK</span>
+            </div>
+          </div>
+          <div class="card-face card-back">
             <div class="progressBars">
               <div class="back-card-title">
                 <span>FOOTWORK</span>
@@ -190,7 +195,8 @@
               <div class="card-metrics-container">
                 <div class="slideContainer">
                   <div class="sliderHead">
-                    <label for="strideLength" class="tooltip-label">STEP FREQUENCY<span class="tooltip-text">The average
+                    <label for="strideLength" class="tooltip-label">STEP FREQUENCY<span class="tooltip-text">The
+                        average
                         number of steps/sec</span></label>
                     <div id="averageStrideLength">0</div>
                   </div>
@@ -201,7 +207,8 @@
                 <div class="slideContainer">
                   <div class="sliderHead">
                     <label for="jumpHeight" class="tooltip-label">MAX
-                      JUMP HEIGHT<span class="tooltip-text">The maximum height reached across all recorded jumps during
+                      JUMP HEIGHT<span class="tooltip-text">The maximum height reached across all recorded jumps
+                        during
                         the session. Measured
                         in yards (yd).</span></label>
                     <div id="averageJumpHeight">0</div>
@@ -217,12 +224,6 @@
                 <source src="../../../public/assets/videos/Metrics_Card_Animation.mp4" type="video/mp4">
               </video>
               <div class="ai-video-text">AI coach insights coming soon</div>
-            </div>
-
-          </div>
-          <div class="card-face card-back3">
-            <div class="front-card-title">
-              <span>FOOTWORK</span>
             </div>
           </div>
         </div>

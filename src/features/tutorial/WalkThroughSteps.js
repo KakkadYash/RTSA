@@ -1,5 +1,4 @@
 // WalkThroughSteps.js
-import profileSteps from "./tutorial_steps/profile.js";
 export default [
 
   /* ------------------ INTRO ------------------ */
@@ -34,7 +33,7 @@ export default [
     placement: "right",
     text: `This is your Profile section — update your personal and athletic details here to improve measurement accuracy.`
   },
-  ...profileSteps,
+
   {
     id: "analytics-highlight",
     selector: "#analytics",

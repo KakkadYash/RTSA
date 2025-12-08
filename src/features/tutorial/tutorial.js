@@ -1,6 +1,6 @@
 //tutorial.js 
 import steps from "./WalkThroughSteps.js";
-const FORCED_NAVIGATION_STEPS = ["profile-highlight", "profile-open-modal"];
+const FORCED_NAVIGATION_STEPS = ["profile-highlight"];
 let state = {
   idx: 0,
   nodes: { backdrop: null, ring: null, tip: null }
@@ -9,13 +9,37 @@ let state = {
 let controller = null;   // ← ADD THIS EXACTLY HERE
 
 export function startTutorial() {
+
+  // ✅ ✅ HARD GATE: Only allow tutorial after free trial is COMPLETE
+  const subscription = localStorage.getItem("subscriptionPlanType");
+  const step = Number(localStorage.getItem("freeTrialStep") || 0);
+
+  if (subscription === "free_trial" || step !== 3) {
+    console.warn("[TUTORIAL] Blocked → Trial not completed yet");
+    return; // ❌ STOP tutorial completely
+  }
+  const alreadyDone = localStorage.getItem("tutorialCompleted");
+
+  if (alreadyDone === "true") {
+    console.warn("[TUTORIAL] Already completed — blocked");
+    return;
+  }
+
   // Build overlay nodes once
   buildScaffold();
   // ✅ Jump directly to openModalBtn spotlight when PROFILE tab is clicked
   // ✅ Force jump to profile tutorial whenever PROFILE tab is clicked
   document.addEventListener("click", (e) => {
+
+    const subscription = localStorage.getItem("subscriptionPlanType");
+    const step = Number(localStorage.getItem("freeTrialStep") || 0);
+
+    // ❌ Block forced tutorial jumps during free trial
+    if (subscription === "free_trial" || step !== 3) return;
+
     const link = e.target.closest("#profile");
     if (!link) return;
+
 
     // ✅ allow page navigation to happen
     document.body.classList.remove("rt-disable-all");
@@ -25,6 +49,12 @@ export function startTutorial() {
     if (targetStepIndex === -1) return;
 
     state.idx = targetStepIndex;
+
+    // ✅ WAIT FOR PROFILE DOM THEN FORCE PLACE
+    document.addEventListener("profile-loaded", () => {
+      console.log("[TUTORIAL] ✅ Jumping to openModalBtn spotlight");
+      placeStep(true);
+    }, { once: true });
   });
 
   // Modern: use AbortController for cleanup
@@ -80,6 +110,7 @@ function prev() {
 }
 
 function finish() {
+  localStorage.setItem("tutorialCompleted", "true");
   teardown();
 
   try {
@@ -210,19 +241,6 @@ function placeStep(firstRun = false) {
     );
   }
 
-  // ⭐ Unified wait-for-Profile DOM logic
-  if (step.id === "profile-open-modal") {
-    const btn = document.querySelector("#openModalBtn");
-    if (!btn) {
-      console.log("[TUTORIAL] Waiting for Profile DOM (openModalBtn)...");
-      document.addEventListener("profile-loaded", () => {
-        console.log("[TUTORIAL] Profile DOM ready → re-running step");
-        placeStep(true);
-      }, { once: true });
-      return;
-    }
-  }
-
 
   // For full-screen welcome/intro steps, disable spotlight
   if (["welcome", "intro-message"].includes(step.id)) {
@@ -260,16 +278,7 @@ function placeStep(firstRun = false) {
 
   // CUSTOM SPOTLIGHT LOGIC — for all aside menu items
   // ------------------------------------------------------
-  if (["profile-highlight", "analytics-highlight"].includes(step.id)) {    // 1) Special case: waiting for profile DOM (openModalBtn)
-    if (step.id === "profile-open-modal") {
-      const maybeBtn = document.querySelector("#openModalBtn");
-
-      // If the button is NOT yet in DOM → wait for profile-loaded event
-      if (!maybeBtn) {
-        document.addEventListener("profile-loaded", () => placeStep(true), { once: true });
-        return; // stop here and wait
-      }
-    }
+  if (["profile-highlight", "analytics-highlight"].includes(step.id)) {
 
     // 2) Normal behavior
     const target = query(step.selector);

@@ -1,5 +1,5 @@
+const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/";
 function loadProfile() {
-  const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/";
   const userId = localStorage.getItem("userId");
   if (!userId) {
     alert("User ID not found. Redirecting to login.");

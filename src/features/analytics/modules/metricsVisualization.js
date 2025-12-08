@@ -75,13 +75,9 @@ export function showUnifiedChart(state, metricIndices = []) {
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
 
-  // Always destroy any existing chart before reusing canvas
+  // Always destroy any existing chart
   if (state.currentChart) {
-    try {
-      state.currentChart.destroy();
-    } catch (err) {
-      console.warn("Chart destroy failed:", err);
-    }
+    try { state.currentChart.destroy(); } catch { }
     state.currentChart = null;
   }
 
@@ -91,14 +87,11 @@ export function showUnifiedChart(state, metricIndices = []) {
     { label: "Head Angle", key: "headAngleData", color: "#E93632", bg: "rgba(255,140,0,0.10)" },
     { label: "Speed", key: "speedData", color: "#1F43E5", bg: "rgba(31,67,229,0.10)" },
     { label: "Acceleration", key: "accelerationData", color: "#7DD859", bg: "rgba(125,216,89,0.10)" },
-    // { label: "Deceleration", key: "decelerationData", color: "#E93632", bg: "rgba(233,54,50,0.10)" },
     { label: "Step Length", key: "stepLengthData", color: "#FFA500", bg: "rgba(255,165,0,0.10)" },
     { label: "Jump Height", key: "jumpData", color: "#800080", bg: "rgba(128,0,128,0.10)" },
   ];
 
-  // Store originals for fade recovery
-  datasets.forEach((d) => (d.originalBorderColor = d.color));
-  // 🧠 Plugin: force legend colors + remove strike-through
+  // OLD SIMPLE LEGEND FIX (brings back original working behavior)
   const legendFixPlugin = {
     id: "legendFixPlugin",
     afterDraw(chart) {
@@ -106,110 +99,108 @@ export function showUnifiedChart(state, metricIndices = []) {
       if (!legend) return;
 
       const ctx = chart.ctx;
-      legend.legendItems.forEach((item, i) => {
-        // Find the matching dataset color
+
+      const legendFont = Chart.helpers.toFont(legend.options.labels.font);
+
+      legend.legendItems.forEach((item) => {
         const ds = chart.data.datasets[item.datasetIndex];
         const color = ds?.borderColor || "#000";
 
-        // Get legend text box geometry
-        const { text, textAlign, textBaseline, fontString, x, y } = item;
-        const font = Chart.helpers.toFont(fontString);
         ctx.save();
-        ctx.font = font.string;
-        ctx.textAlign = textAlign || "left";
-        ctx.textBaseline = textBaseline || "middle";
-        ctx.fillStyle = color;        // ✅ dataset color text
-        ctx.strokeStyle = "transparent";
-        ctx.setLineDash([]);          // ✅ remove strike-through dash
+        ctx.font = legendFont.string;      // ✅ valid in Chart.js v4
+        ctx.fillStyle = color;
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+
         ctx.fillText(item.text, item.textX, item.textY);
         ctx.restore();
       });
-    },
+    }
   };
+
   Chart.register(legendFixPlugin);
 
+  // RESTORE OLD AXIS LOGIC (fixes Y-axis & hover hitbox)
   state.currentChart = new Chart(ctx, {
     type: "line",
     data: {
       labels: state.backend.chartLabels || [],
       datasets: datasets.map((d, i) => ({
         label: d.label,
-        // 👉 Apply rounding per metric
-        data: (state.backend[d.key] || []).map((v) =>
-          d.key === "jumpData" || d.key === "stepLengthData"
-            ? round2(v)      // Jump Height + Step Length → 2 decimals
-            : roundWhole(v)  // Everything else → whole number
+        data: (state.backend[d.key] || []).map(v =>
+          (d.key === "jumpData" || d.key === "stepLengthData") ? round2(v) : roundWhole(v)
         ),
         borderColor: d.color,
+        backgroundColor: d.bg,
         borderWidth: 1.5,
         fill: true,
-        backgroundColor: d.bg,
+        pointRadius: 1.5,
+        pointHoverRadius: 4,
         yAxisID: `y${i}`,
-      })),
+      }))
     },
 
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 500, easing: "easeOutQuart" },
-      interaction: { mode: "nearest", intersect: true },
-      elements: {
-        point: { radius: 0.5, hitRadius: 8 },
-        line: { tension: 0.25, borderWidth: 1.5 },
-      },
-      plugins: {
-        legend: {
-          display: false,
-        },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => {
-              const dsMeta = datasets[ctx.datasetIndex];
-              const label = dsMeta?.label || ctx.dataset.label || "";
-              const key = dsMeta?.key;
-              const rawValue = ctx.parsed.y;
 
-              let formatted;
-              if (key === "jumpData" || key === "stepLengthData") {
-                formatted = round2(rawValue);     // Jump / Step Length → 2 decimals
-              } else {
-                formatted = roundWhole(rawValue); // Others → whole number
-              }
-
-              return `${label}: ${formatted}`;
-            },
-          },
-        },
+      interaction: {
+        mode: "nearest",
+        intersect: false     // IMPORTANT → restores correct hover alignment
       },
 
       scales: (() => {
-        const yAxes = {};
+        const y = {};
         datasets.forEach((d, i) => {
-          yAxes[`y${i}`] = {
+          y[`y${i}`] = {
             type: "linear",
-            display: false,
             position: "left",
-            offset: true,
+            display: false,
             grid: { drawOnChartArea: false },
-            ticks: { color: d.color },
+            ticks: { color: d.color }
           };
         });
+
         return {
-          x: { title: { display: true, text: "Time (s)" }, ticks: { autoSkip: true, maxTicksLimit: 10 } },
-          ...yAxes,
+          x: {
+            title: { display: true, text: "Time (s)" },
+            ticks: { autoSkip: true, maxTicksLimit: 10 }
+          },
+          ...y
         };
       })(),
-    },
-  });
-  // 🔥 Build Custom HTML Legend for Unified Chart
-  buildUnifiedLegend(state.currentChart, datasets);
 
-  state.chartType = "line";
-  state.currentChart.data.datasets.forEach((ds, idx) => {
-    ds.hidden = metricIndices.length ? !metricIndices.includes(idx) : false;
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: "nearest",
+          intersect: false,
+          callbacks: {
+            label(ctx) {
+              const d = datasets[ctx.datasetIndex];
+              const raw = ctx.parsed.y;
+              return `${d.label}: ${(d.key === "jumpData" || d.key === "stepLengthData")
+                ? round2(raw)
+                : roundWhole(raw)
+                }`;
+            }
+          }
+        }
+      }
+    }
   });
+
+  // Respect metricIndices (like old version)
+  state.currentChart.data.datasets.forEach((ds, i) => {
+    ds.hidden = metricIndices.length ? !metricIndices.includes(i) : false;
+  });
+
   state.currentChart.update();
+
+  // Restore HTML Legend
+  buildUnifiedLegend(state.currentChart, datasets);
 }
+
 
 export function buildLegend(containerId, labels, colors) {
   const container = document.getElementById(containerId);
@@ -309,8 +300,6 @@ export function resetCharts(state, doughnutChart) {
     state.currentChart.update();
   }
 }
-
-
 
 export function resetMetricSlidersUI(CONFIG) {
   updateProgress("topSpeed", "topSpeedBar", 0, CONFIG.MAX_SPEED);

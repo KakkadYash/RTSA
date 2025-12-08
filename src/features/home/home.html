@@ -13,6 +13,7 @@
 </head>
 
 <body>
+  <div id="transition-overlay"></div>
   <aside class="aside">
     <nav>
       <div class="logo-container">
@@ -26,46 +27,39 @@
         <li>
           <div class="links">
             <a href="#" id="profile" data-page="profile" data-css="profile.css" data-js="profile.js" class="nav-link">
-              <span class='hover-animation click-animation'>PROFILE</span> <img
-                src="../../../public/assets/images/arrow white rt.png" alt="Arrow" class="arrow" />
+              <span class='hover-animation click-animation'>PROFILE</span>
             </a>
-            <img src="../../../public/assets/images/white line rt.png" alt="Line" class="line" />
           </div>
         </li>
         <li>
           <div class="links">
-            <a href="#" id="dashboard" data-page="dashboard" data-css="dashboard.css" data-js="dashboard.js" class="nav-link">
-              <span class='hover-animation click-animation'>DASHBOARD</span> <img
-                src="../../../public/assets/images/arrow white rt.png" alt="Arrow" class="arrow" />
+            <a href="#" id="dashboard" data-page="dashboard" data-css="dashboard.css" data-js="dashboard.js"
+              class="nav-link">
+              <span class='hover-animation click-animation'>DASHBOARD</span>
             </a>
-            <img src="../../../public/assets/images/white line rt.png" alt="Line" class="line" />
           </div>
         </li>
         <li>
           <div class="links">
-            <a href="#" id="analytics" data-page="analytics" data-css="analytics.css" data-js="analytics.js" class="nav-link">
-              <span class='hover-animation click-animation'>ANALYTICS</span> <img
-                src="../../../public/assets/images/arrow white rt.png" alt="Arrow" class="arrow" />
+            <a href="#" id="analytics" data-page="analytics" data-css="analytics.css" data-js="analytics.js"
+              class="nav-link">
+              <span class='hover-animation click-animation'>ANALYTICS</span>
             </a>
-            <img src="../../../public/assets/images/white line rt.png" alt="Line" class="line" />
           </div>
         </li>
         <li>
           <div class="links">
             <a href="#" id="history" data-page="history" data-css="history.css" data-js="history.js" class="nav-link">
-              <span class='hover-animation click-animation'>HISTORY</span> <img
-                src="../../../public/assets/images/arrow white rt.png" alt="Arrow" class="arrow" />
+              <span class='hover-animation click-animation'>HISTORY</span>
             </a>
-            <img src="../../../public/assets/images/white line rt.png" alt="Line" class="line" />
           </div>
         </li>
         <li>
           <div class="links">
-            <a href="#" id="drillcatalog" data-page="drillCatalog" data-css="drillCatalog.css" data-js="drillCatalog.js" class="nav-link">
-              <span class='hover-animation click-animation'>DRILL CATALOG</span> <img
-                src="../../../public/assets/images/arrow white rt.png" alt="Arrow" class="arrow" />
+            <a href="#" id="drillcatalog" data-page="drillCatalog" data-css="drillCatalog.css" data-js="drillCatalog.js"
+              class="nav-link">
+              <span class='hover-animation click-animation'>DRILL CATALOG</span>
             </a>
-            <img src="../../../public/assets/images/white line rt.png" alt="Line" class="line" />
           </div>
         </li>
       </ul>
@@ -87,6 +81,14 @@
             <a href="https://www.linkedin.com/company/reaction-technologies/"><img
                 src="../../../public/assets/images/icons8-linkedin-50.png" alt="linkedin" class="icons" /></a>
           </div>
+          <div class="social-box">
+            <a href="https://www.tiktok.com/@reactiontech?_r=1&_t=ZP-91t9neVGQIh/"><img
+                src="../../../public/assets/images/icons8-tiktok-50.png" alt="linkedin" class="icons" /></a>
+          </div>
+          <div class="social-box">
+            <a href="https://youtube.com/@reactiontechnologiessports?si=-jI5b3UCnY8_D8_t/"><img
+                src="../../../public/assets/images/icons8-youtube-50.png" alt="linkedin" class="icons" /></a>
+          </div>
         </div>
       </div>
     </nav>
@@ -104,13 +106,14 @@
     <div class="contact">
       <div class="blurb">
         <h1>CONTACT US</h1>
-        <p>Have a general question about Reaction<br /> Technologies? Feel free to drop us a note<br /></p>
+        <p><span>Have a general question about Reaction</span> <span>Technologies? Feel free to drop us a note</span>
+        </p>
       </div>
       <form id="contactForm">
         <input type="text" id="name" class="form-control" placeholder="NAME" required />
         <input type="text" id="email" class="form-control" placeholder="EMAIL" required />
         <input type="text" id="note" class="form-control" placeholder="NOTE" required />
-        <button id="submitButton" type="submit" class="button">SUBMIT</button>
+        <button id="submitButton" type="submit" class="button hover-animation click-animation">SUBMIT</button>
       </form>
     </div>
   </main>

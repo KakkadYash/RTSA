@@ -5,23 +5,74 @@
 // home.js
 
 document.addEventListener("DOMContentLoaded", () => {
+  // --------------------------------------------
+  // 🎯 TUTORIAL LAUNCHER (Conditional + Safe)
+  // --------------------------------------------
+  (async () => {
+    const subscription = localStorage.getItem("subscriptionPlanType");
+    const step = Number(localStorage.getItem("freeTrialStep") || 0);
+    const done = localStorage.getItem("tutorialCompleted");
+
+    // ❌ Do NOT run tutorial during free trial OR before completion
+    if (subscription === "free_trial" || step !== 3) {
+      console.log("[TUTORIAL] Skipped — free trial not completed");
+      return;
+    }
+
+    // ❌ If already done, never run again
+    if (done === "true") {
+      console.log("[TUTORIAL] Skipped — already completed");
+      return;
+    }
+
+    // ✅ Conditions satisfied → load tutorial
+    const mod = await import("../tutorial/tutorial.js");
+    mod.startTutorial();
+  })();
+
   const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
   const tabs = document.querySelectorAll(".nav-link");
-  // --- TEMPORARY: always trigger tutorial ---
-  localStorage.setItem("runTutorial", "yes");
-  (async () => {
-    const runTutorial = localStorage.getItem("runTutorial");
+  // 🔹 Background parallax for elements with .parallax-bg
+  function initParallax() {
+    const SPEED = 0.15; // lower = more subtle
 
-    if (runTutorial === "yes") {
-      // Clear flag immediately
-      localStorage.removeItem("runTutorial");
+    window.addEventListener(
+      "scroll",
+      () => {
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        document.querySelectorAll(".parallax-bg").forEach(el => {
+          el.style.transform = `translateY(${scrollY * SPEED * -1}px)`;
+        });
+      },
+      { passive: true }
+    );
+  }
 
-      // Lazy-load tutorial module
-      const mod = await import("../tutorial/tutorial.js");
-      mod.startTutorial(); // Start the tutorial
-    }
-  })();
+  initParallax();
+
+  // 🔹 Create sliding underline inside the sidebar nav
+  const nav = document.querySelector("aside nav");
+  let navIndicator = null;
+  if (nav) {
+    navIndicator = document.createElement("div");
+    navIndicator.id = "nav-indicator";
+    nav.appendChild(navIndicator);
+  }
+
+  function moveIndicator(activeLink) {
+    if (!navIndicator || !activeLink) return;
+
+    // Height of each tab
+    const tabHeight = activeLink.offsetHeight;
+
+    // Position the bottom of the dashed underline
+    navIndicator.style.top = `${activeLink.offsetTop + tabHeight - 3}px`;
+
+    navIndicator.style.opacity = "1";
+  }
+
+
 
   const pageFunctionMap = {
     dashboard: "loadDashboard",
@@ -76,7 +127,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // ✅ NEW: Signal that profile page is fully loaded
           if (page === "profile") {
-            document.dispatchEvent(new Event("profile-loaded"));
+            setTimeout(() => {
+              console.log("[HOME] ✅ profile-loaded dispatched");
+              document.dispatchEvent(new Event("profile-loaded"));
+            }, 100); // small delay ensures #openModalBtn exists
           }
         });
       }
@@ -111,15 +165,55 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!page) return;
 
     try {
+      // 1️⃣Darkening background starts
+      document.getElementById("transition-overlay").style.background = "rgba(0,0,0,0.6)";
+      contentArea.classList.add("page-exit");
+
+      // ⏱ Wait for exit animation to fully finish (1.5s)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // 2️⃣ Load new page content
       await loadHTML(page);
       loadCSS(page, cssFile);
       loadJS(page, jsFile);
       updateActiveTab(link);
+      // Add stagger animation to all children after HTML is loaded
+      const children = [...contentArea.querySelectorAll("*")].filter(el => el.tagName !== "SCRIPT");
+
+      children.forEach((el, index) => {
+        el.classList.add("stagger-child");
+        setTimeout(() => {
+          el.classList.add("visible");
+        }, index * 10);  // 60ms delay per element (adjust to taste)
+      });
+
+      // 3️⃣ Set new page into initial hidden state
+      contentArea.classList.add("page-enter");
+
+      // 4️⃣ Animate it into view
+      requestAnimationFrame(() => {
+        contentArea.classList.add("page-enter-active");
+        contentArea.classList.remove("page-exit");
+
+        // Remove dark background when new page starts appearing
+        document.getElementById("transition-overlay").style.background = "rgba(0,0,0,0)";
+      });
+
+
+      // 5️⃣ Cleanup classes after animation ends (1.5s)
+      setTimeout(() => {
+        contentArea.classList.remove("page-enter", "page-enter-active");
+      }, 500);
+
     } catch (error) {
       console.error("Tab load error:", error);
       contentArea.innerHTML = `<p class="error">Failed to load page. Please try again later.</p>`;
     }
+
   }
+
+
+
 
   /**
    * Update active tab styling.
@@ -127,7 +221,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateActiveTab(activeLink) {
     tabs.forEach(tab => tab.classList.remove("active"));
     activeLink.classList.add("active");
+    moveIndicator(activeLink); // 🔥 animate underline to this tab
   }
+
 
   // Attach event listeners to tabs
   tabs.forEach(link => {
@@ -143,5 +239,5 @@ document.addEventListener("DOMContentLoaded", () => {
  */
 function logout() {
   alert("Logging out...");
-  window.location.href = "../../../index.html";
+  // window.location.href = "../../../index.html";
 }

@@ -4,25 +4,31 @@
 
 #bg {
   background-image: url(../../../public/assets/images/route.png), url(../../../public/assets/images/Dashes.png);
-  background-position: right center, right bottom;
-  background-repeat: no-repeat, no-repeat, no-repeat;
-  background-attachment: scroll, scroll, scroll;
-  background-size: 50px, 65px auto;
+  background-position: right top, right center;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: scroll, scroll;
+  background-size: 4em auto;
   margin: 0 0 1em 0;
   padding: 1em;
 }
 
 main span {
-  padding-top: 10px;
-  padding-left: 10px;
-  line-height: 1;
   color: #fff;
 }
 
+img.lock {
+  padding: 0 0 0.2em 0;
+  width: 20%;
+  height: 80%;
+}
+
 button#one-page-report {
-  width: 6em;
-  height: 2em;
+  width: 7em;
+  height: 2.2em;
   font-size: 1em;
+  font-weight: normal;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .header-wrapper {
@@ -40,89 +46,63 @@ button#one-page-report {
   justify-content: flex-start;
   gap: 0.5rem;
   font-size: 2em;
+  flex-direction: column;
+}
+
+.name-wrapper {
+  display: flex;
+  align-items: center;
+  font-size: 1.5em;
+  gap: 0.2em;
 }
 
 .hello {
   display: flex;
   flex-direction: column;
-  margin: 1em 0 0 0;
 }
 
 #nameInfo {
   display: flex;
   line-height: 1;
-  color: #fff;
+  color: #d02720;
 }
 
 .userData span {
   display: flex;
   line-height: 1;
-  font-size: 2em;
+  font-size: 1.5em;
   color: white;
   padding: 0;
 }
 
+.chart-heading-wrapper span {
+  color: #d02720;
+  font-size: 2.5em;
+}
+
 #bg .line {
-  padding-left: 6px;
   height: auto;
-  width: 150px;
+  width: 6em;
 }
 
 main .line2 {
-  padding-left: 6px;
   height: auto;
-  width: 165px;
+  width: 12em;
 }
 
 .userData {
   display: flex;
   flex-direction: column;
-  padding: 0 1em 0 1em;
   height: 100%;
   justify-content: space-evenly;
 }
 
-canvas {
-  background-color: #A7A7A7;
-  border-radius: 1vw;
-  width: 30em;
-  height: 15em;
-}
-
-.avatar {
-  border-radius: 1vw;
-  background-color: #000000;
-  height: 100%;
-  width: 12vw;
-  margin-right: 3vw;
-  display: flex;
-  align-items: center;
-  border: 1px solid #FFFFFF;
-  justify-content: center;
-  flex-wrap: wrap;
-  flex-direction: row;
-  align-content: center;
-}
-
 .uploads {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  /* padding: 1vw 0 1vw 1vw; */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
   width: 100%;
-  height: 5em;
-  /* flex-wrap: wrap; */
-  /* align-items: flex-start; */
-  /* flex-direction: column; */
-  align-items: center;
-  align-content: flex-start;
-}
-
-.chart-container {
-  width: 1000px;
-  height: 400px;
-  /* ✅ fixed height */
-  position: relative;
+  align-items: stretch;
 }
 
 #prevChart {
@@ -133,41 +113,20 @@ canvas {
   background-image: url(../../../public/assets/images/right.png);
 }
 
-.chart-arrows {
-  height: 2vw;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0vw 0.1vw;
-}
-
-.chart-arrows button {
-  background-repeat: no-repeat;
-  background-color: white;
-  width: 2vw;
-  height: 100%;
-  border-radius: 0.5vw;
-  cursor: pointer;
-  background-size: contain;
-}
-
-.chart-arrows button:hover {
-  transform: scale(1.1);
-}
-
 .small-box {
   background-color: #000000;
   color: #FFFFFF;
-  font-size: 2.5vw;
-  border-radius: 1vw;
+  border-radius: 1em;
   display: flex;
   flex-direction: column;
   align-items: start;
   justify-content: center;
-  /* padding: 1vw; */
-  width: 7em;
-  height: 100%;
+  width: 10em;
+  min-height: 2.5em;
+  font-size: clamp(18px, 2vw, 26px);
   border: 1px solid #FFFFFF;
+  height: 100%;
+  font-weight: normal;
 }
 
 .info {
@@ -176,7 +135,140 @@ canvas {
   justify-content: space-evenly;
 }
 
+
+.greeting-wrapper {
+  font-size: clamp(20px, 2vw, 32px);
+}
+
+.chart-wrapper {
+  background: linear-gradient(to bottom, #444444, #000000);
+  border-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0.5em;
+  width: 100%;
+  height: 65%;
+  margin: 0 0 2em 0;
+}
+
+.unified-legend {
+  display: flex;
+  gap: 0.4em;
+  width: 100%;
+  padding: 0.4em 0;
+  justify-content: space-evenly;
+}
+
+input.legend-checkbox {
+  display: none;
+}
+
+.unified-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  color: white;
+  font-family: "Futura LtCn BT";
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.unified-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+#dashboardChart {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0.6rem;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+
+/* === TOOLTIP SYSTEM (same as analytics) === */
+.tooltip-label {
+  position: relative;
+  cursor: help;
+  font-weight: bold;
+}
+
+/* Tooltip box */
+.tooltip-label .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  width: 8em;
+  background: #fff;
+  color: #222;
+  text-align: left;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  font-size: 0.8em;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 130%;
+  right: 0;
+  z-index: 10;
+  transition: opacity 0.25s ease;
+}
+
+/* Tooltip arrow */
+.tooltip-label .tooltip-text::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  right: 10%;
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent #fff transparent;
+}
+
+/* Show tooltip on hover */
+.tooltip-label:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* === One Page Report click shake animation === */
+@keyframes one-page-report-shake-horizontal {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  15%,
+  45%,
+  75% {
+    transform: translateX(-5px);
+  }
+
+  30%,
+  60%,
+  90% {
+    transform: translateX(5px);
+  }
+}
+
+/* Class added via JS when button is clicked */
+#one-page-report.shake-report {
+  animation: one-page-report-shake-horizontal 0.4s ease;
+}
+
 @media (max-width: 768px) {
+  .uploads {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-container {
+    width: 100%;
+    height: 70vw;
+  }
 
   main span,
   .userData span {
@@ -251,52 +343,4 @@ canvas {
   .chart-container {
     width: 56.5vw;
   }
-}
-
-.chart-wrapper {
-  background: linear-gradient(to bottom, #444444, #000000);
-  border-radius: 1em;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 0.5em;
-  width: 100%;
-  margin: 0 0 4em 0;
-}
-
-.unified-legend {
-  display: flex;
-  gap: 0.4em;
-  width: 100%;
-  padding: 0.4em 0;
-  justify-content: space-evenly;
-}
-
-input.legend-checkbox {
-  display: none;
-}
-
-.unified-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.4em;
-  color: white;
-  font-family: "Futura LtCn BT";
-  font-size: 1em;
-  cursor: pointer;
-}
-
-.unified-legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
-
-#dashboardChart {
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: 0.6rem;
-  background-color: transparent;
-  overflow: hidden;
 }
