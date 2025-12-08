@@ -51,7 +51,7 @@ form.addEventListener("submit", async function (event) {
             form.style.display = "none";
 
             // ✅ Show success state
-            successBox.style.display = "block";
+            successBox.style.display = "flex";
 
             // ✅ Reset form inputs for clean state
             form.reset();
