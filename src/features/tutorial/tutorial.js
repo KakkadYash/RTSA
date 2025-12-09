@@ -41,6 +41,21 @@ export function startTutorial() {
 
     const link = e.target.closest("#profile");
     if (!link) return;
+    // 🔥 Remove BOTH backdrop + golden ring when PROFILE tab is clicked
+    if (state.nodes.backdrop) {
+      state.nodes.backdrop.style.display = "none";
+      state.nodes.backdrop.style.opacity = "0";
+      state.nodes.backdrop.style.background = "transparent";
+      state.nodes.backdrop.style.maskImage = "none";
+      state.nodes.backdrop.style.webkitMaskImage = "none";
+    }
+
+    // 🔥 Remove golden spotlight ring too
+    if (state.nodes.ring) {
+      state.nodes.ring.style.display = "none";
+      state.nodes.ring.style.opacity = "0";
+    }
+
 
 
     // ✅ allow page navigation to happen
