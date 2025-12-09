@@ -119,6 +119,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       localStorage.setItem("subscriptionStatus", data.subscription_status || "inactive");
       localStorage.setItem("isFirstLogin", String(data.is_first_login));
       localStorage.setItem("calibratedHeightM", data.calibrated_height_m ?? "");
+      localStorage.setItem("freeTrialStep", String(data.freeTrialStep ?? 0));
 
       // Store userId and email in localStorage
       localStorage.setItem("userId", data.userId);
