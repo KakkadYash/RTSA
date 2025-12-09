@@ -290,26 +290,36 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       await handleTabClick(link);
 
-      // ✅ AUTO-OPEN CALIBRATION MODAL ON STEP 1 PROFILE CLICK
       const step = Number(localStorage.getItem("freeTrialStep") || 0);
 
+      // ✅ AUTO-OPEN CALIBRATION MODAL ON STEP 1 PROFILE CLICK (SAFE VERSION)
       if (
         subscription === "free_trial" &&
         step === 1 &&
         link.dataset.page === "profile"
       ) {
-        console.log("🎯 Free Trial Step 1 → Auto-opening Calibration Modal");
+        console.log("🎯 Free Trial Step 1 → Waiting for Profile DOM to load...");
 
-        // Allow DOM to fully paint before clicking
-        setTimeout(() => {
+        let attempts = 0;
+        const maxAttempts = 20; // ~4 seconds total
+
+        const waitForModalBtn = setInterval(() => {
           const openBtn = document.getElementById("openModalBtn");
+
           if (openBtn) {
+            clearInterval(waitForModalBtn);
+            console.log("✅ openModalBtn found → Auto-clicking now");
             openBtn.click();
-          } else {
-            console.warn("⚠️ openModalBtn not found for auto-trigger");
           }
-        }, 100);
+
+          attempts++;
+          if (attempts > maxAttempts) {
+            clearInterval(waitForModalBtn);
+            console.warn("❌ openModalBtn never appeared in DOM");
+          }
+        }, 200);
       }
+
     });
   });
 
