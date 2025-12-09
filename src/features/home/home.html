@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="home.css" />
   <link rel="stylesheet" href="../../../src/shared/components.css">
   <link rel="stylesheet" href="../../../src/shared/stylesheet.css">
+  <link rel="preload" as="video" href="/public/assets/videos/Metrics_Card_Animation.mp4" type="video/mp4">
+  <link rel="stylesheet" href="../../../src/features/tutorial/tutorial.css">
 </head>
 
 <body>
@@ -24,7 +26,7 @@
       <ul>
         <li>
           <div class="links">
-            <a href="#" data-page="profile" data-section="profile" data-css="profile.css" data-js="profile.js"
+            <a href="#" id="profile" data-page="profile" data-section="profile" data-css="profile.css" data-js="profile.js"
               class="nav-link">
               <span class='  click-animation'>PROFILE</span>
               <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="locked">
@@ -34,7 +36,7 @@
         </li>
         <li>
           <div class="links">
-            <a href="#" data-page="dashboard" data-css="dashboard.css" data-section="dashboard" data-js="dashboard.js"
+            <a href="#" id="dashboard" data-page="dashboard" data-css="dashboard.css" data-section="dashboard" data-js="dashboard.js"
               class="nav-link">
               <span class='  click-animation'>DASHBOARD</span>
               <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="locked">
@@ -44,7 +46,7 @@
         </li>
         <li>
           <div class="links">
-            <a href="#" data-page="analytics" data-css="analytics.css" data-section="analytics" data-js="analytics.js"
+            <a href="#" id="analytics" data-page="analytics" data-css="analytics.css" data-section="analytics" data-js="analytics.js"
               class="nav-link">
               <span class='  click-animation'>ANALYTICS</span>
               <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="locked">
@@ -54,7 +56,7 @@
         </li>
         <li>
           <div class="links">
-            <a href="#" data-page="history" data-css="history.css" data-section="history" data-js="history.js"
+            <a href="#" id="history" data-page="history" data-css="history.css" data-section="history" data-js="history.js"
               class="nav-link">
               <span class='  click-animation'>HISTORY</span>
               <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="locked">
@@ -64,7 +66,7 @@
         </li>
         <li>
           <div class="links">
-            <a href="#" data-page="drillCatalog" data-section="drillCatalog" data-css="drillCatalog.css"
+            <a href="#" id="drillcatalog" data-page="drillCatalog" data-section="drillCatalog" data-css="drillCatalog.css"
               data-js="drillCatalog.js" class="nav-link">
               <span class='  click-animation'>DRILL CATALOG</span>
               <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="locked">
@@ -76,7 +78,7 @@
 
       <div class="footer">
         <div class="logOut">
-          <span class="  click-animation" id="logoutButton" onclick="logout()">LOG OUT</span>
+          <span class="hover-animation click-animation" id="logoutButton" onclick="logout()">LOG OUT</span>
         </div>
         <div class="socials">
           <div class="social-box">
@@ -134,6 +136,24 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
   <script src="home.js"></script>
+  <template id="rt-tour-tooltip-template">
+    <div class="rt-tour-tooltip">
+      <div class="rt-tour-text"></div>
+      <div class="rt-tour-actions">
+        <button class="rt-tour-btn rt-tour-btn-ghost
+        hover-animation
+        click-animation" data-act="skip">Skip</button>
+        <button class="rt-tour-btn rt-tour-btn-ghost
+        hover-animation
+        click-animation" data-act="prev">Back</button>
+        <button class="rt-tour-btn rt-tour-btn-primary
+        hover-animation
+        click-animation" data-act="next">Next</button>
+      </div>
+    </div>
+  </template>
+
+  <div class="tutorial-done-safe"></div>
   <script src="./sidebar.js"></script>
 </body>
 

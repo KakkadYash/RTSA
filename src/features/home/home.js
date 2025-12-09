@@ -3,6 +3,7 @@
  * Page Loader Module
  * Handles navigation, dynamic resource loading, and tab switching.
  */
+// home.js
 
 document.addEventListener("DOMContentLoaded", () => {
   // ===============================
@@ -87,6 +88,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     saveStep(1);
   }
+
+  // --------------------------------------------
+  // 🎯 TUTORIAL LAUNCHER (Conditional + Safe)
+  // --------------------------------------------
+  (async () => {
+    const subscription = localStorage.getItem("subscriptionPlanType");
+    const step = Number(localStorage.getItem("freeTrialStep") || 0);
+    const done = localStorage.getItem("tutorialCompleted");
+
+    // ❌ Do NOT run tutorial during free trial OR before completion
+    if (subscription === "free_trial" || step !== 3) {
+      console.log("[TUTORIAL] Skipped — free trial not completed");
+      return;
+    }
+
+    // ❌ If already done, never run again
+    if (done === "true") {
+      console.log("[TUTORIAL] Skipped — already completed");
+      return;
+    }
+
+    // ✅ Conditions satisfied → load tutorial
+    const mod = await import("../tutorial/tutorial.js");
+    mod.startTutorial();
+  })();
 
   const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
@@ -180,9 +206,16 @@ document.addEventListener("DOMContentLoaded", () => {
     jsEl.onload = () => {
       const funcName = pageFunctionMap[page];
       if (funcName && typeof window[funcName] === "function") {
-        // Defer execution to next browser paint to ensure injected DOM exists
         requestAnimationFrame(() => {
           window[funcName]();
+
+          // ✅ NEW: Signal that profile page is fully loaded
+          if (page === "profile") {
+            setTimeout(() => {
+              console.log("[HOME] ✅ profile-loaded dispatched");
+              document.dispatchEvent(new Event("profile-loaded"));
+            }, 100); // small delay ensures #openModalBtn exists
+          }
         });
       }
     };
@@ -378,5 +411,5 @@ document.addEventListener("DOMContentLoaded", () => {
  */
 function logout() {
   alert("Logging out...");
-  window.location.href = "../../../index.html";
+  // window.location.href = "../../../index.html";
 }
