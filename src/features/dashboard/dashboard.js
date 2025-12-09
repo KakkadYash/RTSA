@@ -43,7 +43,15 @@ function loadDashboard() {
     const ctx = chartCanvas.getContext("2d");
     if (dashboardChart) dashboardChart.destroy();
 
-    const labels = Array.from({ length: Math.max(topSpeed.length, maxAccel.length, headUp.length) }, (_, i) => `Video ${i + 1}`);
+    const labels = window.dashboardUploadDates && window.dashboardUploadDates.length
+      ? window.dashboardUploadDates.map(d => {
+        const date = new Date(d);
+        return (
+          String(date.getMonth() + 1).padStart(2, "0") + "/" +
+          String(date.getDate()).padStart(2, "0")
+        );
+      })
+      : Array.from({ length: topSpeed.length }, (_, i) => `Video ${i + 1}`);
 
     const datasets = [
       { label: "Head Angle", key: "headUp", color: "#E93632", bg: "rgba(255,0,0,0.12)", data: headUp },
@@ -83,6 +91,7 @@ function loadDashboard() {
           fill: true,
           tension: 0.25,
           pointRadius: 0.5,
+          spanGaps: true,
           yAxisID: `y${i}`,
         })),
       },
@@ -112,8 +121,8 @@ function loadDashboard() {
 
   async function fetchUploadCount() {
     try {
-      console.log("[NETWORK] Triggering /get-total-uploads for userId", userId);
-      const res = await fetch(`${API_BASE}get-total-uploads?userId=${userId}`);
+      console.log("[NETWORK] Triggering /dashboard for userId", userId);
+      const res = await fetch(`${API_BASE}dashboard?userId=${userId}`);
       console.log("[NETWORK] Response status:", res.status);
 
       if (!res.ok) {
@@ -127,9 +136,12 @@ function loadDashboard() {
       uploadCounter.textContent = data.total_uploads || "0";
 
       const metrics = data.recent_analytics || {};
-      const topSpeed = metrics.topSpeed || [];
-      const maxAccel = metrics.maxAcceleration || [];
-      const headUp = metrics.headUpPercentage || [];
+      
+      const topSpeed = (metrics.topSpeed || []).slice().reverse();
+      const maxAccel = (metrics.maxAcceleration || []).slice().reverse();
+      const headUp = (metrics.headUpPercentage || []).slice().reverse();
+      window.dashboardUploadDates = (metrics.uploadDates || []).slice().reverse();
+
 
       renderUnifiedChart(topSpeed, maxAccel, headUp);
     } catch (err) {
@@ -141,24 +153,38 @@ function loadDashboard() {
   console.log("[DEBUG] Calling fetchUploadCount() in 100ms...");
   setTimeout(fetchUploadCount, 100);
 
-  // Report button setup (unchanged)
+  // ==== One Page Report button shake setup ====
   const reportBtn = document.getElementById("one-page-report");
+
+  // Remove the shake class after the animation finishes so it can retrigger
   if (reportBtn) {
-    reportBtn.addEventListener("click", () => {
-      console.log("clicked one-page-report");
-      window.open("../../../src/features/reportForm/reportform.html", "_blank");
+    reportBtn.addEventListener("animationend", () => {
+      reportBtn.classList.remove("shake-report");
     });
-  } else {
-    console.warn("⚠️ One Page Report button not found.");
   }
 
+  function triggerReportShake() {
+    const btn = document.getElementById("one-page-report");
+    if (!btn) return;
+
+    // Reset class so re-click retriggers animation
+    btn.classList.remove("shake-report");
+    // Force reflow to restart animation
+    void btn.offsetWidth;
+    btn.classList.add("shake-report");
+  }
+
+  // Use a single delegated listener so clicks on the text, lock icon, etc. all count
   document.addEventListener("click", function (e) {
-    const reportBtn = e.target.closest("#one-page-report");
-    if (reportBtn) {
+    const clickedReportBtn = e.target.closest("#one-page-report");
+    if (clickedReportBtn) {
       console.log("clicked one-page-report");
-      window.open("../../../src/features/reportForm/reportform.html", "_blank");
+      triggerReportShake();
+      // Comment out the line below when you want One Page Report feature
+      // window.open("../../../src/features/reportForm/reportform.html", "_blank");
     }
   });
+
 }
 
 // Required so home.js can access it globally

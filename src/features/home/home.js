@@ -1,3 +1,4 @@
+// home.js
 /**
  * Page Loader Module
  * Handles navigation, dynamic resource loading, and tab switching.
@@ -5,6 +6,89 @@
 // home.js
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ===============================
+  // AUTO-FILL USER ID FOR FEEDBACK
+  // ===============================
+  const userCacheFB = JSON.parse(localStorage.getItem("userCache") || "{}");
+  const userIdFB = userCacheFB.userId;
+  const userField = document.getElementById("feedbackUserId");
+
+  if (userField && userIdFB) {
+    userField.value = userIdFB;
+  }
+
+  // ✅ AUTO SCROLL TO FEEDBACK SECTION ON HOME LOAD
+  setTimeout(() => {
+    const feedbackSection = document.getElementById("feedback");
+    if (feedbackSection) {
+      feedbackSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  }, 300);
+
+  // =====================================================
+  //  FREE TRIAL STATE SETUP
+  // =====================================================
+  const userCache = JSON.parse(localStorage.getItem("userCache") || "{}");
+
+  // 🔹 Single source of truth for subscription type
+  const subscription =
+    localStorage.getItem("subscriptionPlanType") ||
+    userCache.subscriptionPlanType ||
+    "free_trial";
+
+  let freeTrialStep = Number(localStorage.getItem("freeTrialStep") || 0);
+
+  // ======================================================
+  // FREE TRIAL STEP 2 → 3 (Unlock everything after 10 uploads)
+  // Backend must give: userCache.uploadCount
+  // ======================================================
+  if (subscription === "free_trial") {
+    if (userCache.uploadCount >= 10 && freeTrialStep < 3) {
+      console.log("🔥 User has 10 uploads → unlocking ALL sections");
+      freeTrialStep = 3;
+      localStorage.setItem("freeTrialStep", 3);
+      document.dispatchEvent(new Event("freeTrialStepUpdated"));
+    }
+  }
+
+  // 0 = Intro locked
+  // 1 = Profile unlocked
+  // 2 = Profile + Analytics unlocked
+  // 3 = All unlocked
+
+  function saveStep(step) {
+    freeTrialStep = step;
+    localStorage.setItem("freeTrialStep", step);
+    document.dispatchEvent(new Event("freeTrialStepUpdated")); // sidebar.js listens
+  }
+
+  // ======================================================
+  // Sidebar listens to this event to refresh lock states
+  // ======================================================
+  document.addEventListener("freeTrialStepUpdated", () => {
+    console.log("🔄 Sidebar should update lock/unlock icons now");
+  });
+
+  // =====================================================
+  // Only show Free Trial intro ONCE:
+  // Condition: free trial plan + step = 0
+  // =====================================================
+  if (subscription === "free_trial" && freeTrialStep === 0) {
+    showFreeTrialIntro();   // will move step to 1
+  }
+
+
+  function showFreeTrialIntro() {
+    // Replace alert() with your modal later
+    alert("👋 Welcome to RTSA! Let's get you started.");
+    alert("First step → Update your profile photo to unlock Analytics.");
+
+    saveStep(1);
+  }
+
   const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
   const tabs = document.querySelectorAll(".nav-link");
@@ -22,6 +106,46 @@ document.addEventListener("DOMContentLoaded", () => {
       mod.startTutorial(); // Start the tutorial
     }
   })();
+  // 🔹 Background parallax for elements with .parallax-bg
+  function initParallax() {
+    const SPEED = 0.15; // lower = more subtle
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        document.querySelectorAll(".parallax-bg").forEach(el => {
+          el.style.transform = `translateY(${scrollY * SPEED * -1}px)`;
+        });
+      },
+      { passive: true }
+    );
+  }
+
+  initParallax();
+
+  // 🔹 Create sliding underline inside the sidebar nav
+  const nav = document.querySelector("aside nav");
+  let navIndicator = null;
+  if (nav) {
+    navIndicator = document.createElement("div");
+    navIndicator.id = "nav-indicator";
+    nav.appendChild(navIndicator);
+  }
+
+  function moveIndicator(activeLink) {
+    if (!navIndicator || !activeLink) return;
+
+    // Height of each tab
+    const tabHeight = activeLink.offsetHeight;
+
+    // Position the bottom of the dashed underline
+    navIndicator.style.top = `${activeLink.offsetTop + tabHeight - 3}px`;
+
+    navIndicator.style.opacity = "1";
+  }
+
+
 
   const pageFunctionMap = {
     dashboard: "loadDashboard",
@@ -111,15 +235,55 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!page) return;
 
     try {
+      // 1️⃣Darkening background starts
+      document.getElementById("transition-overlay").style.background = "rgba(0,0,0,0.6)";
+      contentArea.classList.add("page-exit");
+
+      // ⏱ Wait for exit animation to fully finish (1.5s)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // 2️⃣ Load new page content
       await loadHTML(page);
       loadCSS(page, cssFile);
       loadJS(page, jsFile);
       updateActiveTab(link);
+      // Add stagger animation to all children after HTML is loaded
+      const children = [...contentArea.querySelectorAll("*")].filter(el => el.tagName !== "SCRIPT");
+
+      children.forEach((el, index) => {
+        el.classList.add("stagger-child");
+        setTimeout(() => {
+          el.classList.add("visible");
+        }, index * 10);  // 60ms delay per element (adjust to taste)
+      });
+
+      // 3️⃣ Set new page into initial hidden state
+      contentArea.classList.add("page-enter");
+
+      // 4️⃣ Animate it into view
+      requestAnimationFrame(() => {
+        contentArea.classList.add("page-enter-active");
+        contentArea.classList.remove("page-exit");
+
+        // Remove dark background when new page starts appearing
+        document.getElementById("transition-overlay").style.background = "rgba(0,0,0,0)";
+      });
+
+
+      // 5️⃣ Cleanup classes after animation ends (1.5s)
+      setTimeout(() => {
+        contentArea.classList.remove("page-enter", "page-enter-active");
+      }, 500);
+
     } catch (error) {
       console.error("Tab load error:", error);
       contentArea.innerHTML = `<p class="error">Failed to load page. Please try again later.</p>`;
     }
+
   }
+
+
+
 
   /**
    * Update active tab styling.
@@ -127,15 +291,105 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateActiveTab(activeLink) {
     tabs.forEach(tab => tab.classList.remove("active"));
     activeLink.classList.add("active");
+    moveIndicator(activeLink); // 🔥 animate underline to this tab
   }
+
 
   // Attach event listeners to tabs
   tabs.forEach(link => {
-    link.addEventListener("click", e => {
+    link.addEventListener("click", async (e) => {
+
+      if (subscription === "free_trial" && link.classList.contains("locked")) {
+        e.preventDefault();
+        link.classList.add("shake");
+        setTimeout(() => link.classList.remove("shake"), 450);
+        return;
+      }
+
       e.preventDefault();
-      handleTabClick(link);
+      await handleTabClick(link);
+
+      const step = Number(localStorage.getItem("freeTrialStep") || 0);
+
+      // ✅ AUTO-OPEN CALIBRATION MODAL ON STEP 1 PROFILE CLICK (SAFE VERSION)
+      if (
+        subscription === "free_trial" &&
+        step === 1 &&
+        link.dataset.page === "profile"
+      ) {
+        console.log("🎯 Free Trial Step 1 → Waiting for Profile DOM to load...");
+
+        let attempts = 0;
+        const maxAttempts = 20; // ~4 seconds total
+
+        const waitForModalBtn = setInterval(() => {
+          const openBtn = document.getElementById("openModalBtn");
+
+          if (openBtn) {
+            clearInterval(waitForModalBtn);
+            console.log("✅ openModalBtn found → Auto-clicking now");
+            openBtn.click();
+          }
+
+          attempts++;
+          if (attempts > maxAttempts) {
+            clearInterval(waitForModalBtn);
+            console.warn("❌ openModalBtn never appeared in DOM");
+          }
+        }, 200);
+      }
+
     });
   });
+
+  // ===============================
+  // CONTACT FORM SUBMISSION LOGIC
+  // ===============================
+  const contactForm = document.getElementById("contactForm");
+
+  if (contactForm) {
+    contactForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const userId = document.getElementById("feedbackUserId").value;
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const note = document.getElementById("note").value.trim();
+
+      if (!userId) {
+        alert("User not logged in. Please log in again.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("userId", userId);
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("message", note);
+      try {
+        const res = await fetch(
+          "https://rtsa-backend-gpu-843332298202.us-central1.run.app/submit-feedback",
+          {
+            method: "POST",
+            body: formData
+          }
+        );
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert("Thank you! Your message has been submitted.");
+          contactForm.reset();
+        } else {
+          alert("Failed to submit. Please try again later.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error sending feedback.");
+      }
+    });
+  }
+
 });
 
 /**

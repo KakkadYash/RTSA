@@ -1,5 +1,6 @@
+// profile.js
+const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/";
 function loadProfile() {
-  const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/";
   const userId = localStorage.getItem("userId");
   if (!userId) {
     alert("User ID not found. Redirecting to login.");
@@ -373,6 +374,20 @@ function loadProfile() {
       }
     });
   }
+  // ======================================================
+  // FREE TRIAL STEP 1 → 2
+  // Listen for calibration completion (from calibration.js)
+  // ======================================================
+  document.addEventListener("calibrationComplete", () => {
+    console.log("🔥 Calibration complete → unlocking Analytics");
+
+    // Update free trial step → step 2
+    localStorage.setItem("freeTrialStep", 2);
+
+    // Notify sidebar to update lock/unlock icons
+    document.dispatchEvent(new Event("freeTrialStepUpdated"));
+  });
+
 }
 
 window.loadProfile = loadProfile;

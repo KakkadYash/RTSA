@@ -32,3 +32,41 @@
     box-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
     align-items: center;
 }
+
+/* === Staggered entrance for Analytics metric cards === */
+@keyframes card-stagger-in {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#stats-container .card-container {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: card-stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Delays for stagger effect */
+#stats-container .card-container:nth-child(1) {
+    animation-delay: 0.10s;
+}
+
+#stats-container .card-container:nth-child(2) {
+    animation-delay: 0.22s;
+}
+
+#stats-container .card-container:nth-child(3) {
+    animation-delay: 0.34s;
+}
+
+/* Subtle parallax for feature page backgrounds */
+.parallax-bg {
+    will-change: transform;
+    transition: transform 0.1s linear;
+}

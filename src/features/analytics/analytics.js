@@ -25,10 +25,9 @@ import {
     wireCardsAndShowAll,
     setAnalyzeHandler,
     setPlayProcessedHandler,
-    setUploadUploading, setUploadSuccess, resetUploadButton,
+    resetUploadButton,
     setAnalyzing, resetAnalyze,
     setPlaying, resetPlayButton,
-    setPlayButtonEnabled,
     disableInteractiveButton, enableInteractiveButton
 } from "./modules/uiHandlers.js";
 
@@ -69,6 +68,37 @@ import {
         myChart: document.getElementById("myChart"),
         myChart2: document.getElementById("myChart2"),
     };
+    
+    // STATE
+    const state = {
+        video: null,
+        currentChart: null,
+        chartType: "radar",
+        lastOverlayTick: 0,
+        backend: {
+            chartLabels: [],
+            headAngleData: [],
+            speedData: [],
+            accelerationData: [],
+            decelerationData: [],
+            strideData: [],
+            jumpData: [],
+            outerRing: { Running: 0, Standing: 0, Crouching: 0 },
+            innerRing: { "Head Up": 0, "Head Down": 100 },
+            topSpeed: 0,
+            totalDistance: 0,
+            totalSteps: 0
+        },
+        cached: {
+            metrics: null,
+            ready: false
+        },
+        ticker: null,
+    };
+    // state.overlayReady = false;
+    state.cached.ready = false;
+    state.videoSelected = false;
+    state.metricsReady = false;
 
     function setInitialUI() {
         // Video + canvas
@@ -89,7 +119,7 @@ import {
         // Play button
         els.playProcessedButton.style.display = "none";
         resetPlayButton(els.playProcessedButton);
-        setPlayButtonEnabled(false);
+        updatePlayButtonStatus();
 
         // ALL METRICS button
         enableInteractiveButton(els.showMetricsBtn);
@@ -140,7 +170,7 @@ import {
         state.video = null;
         state.cached.metrics = null;
         state.cached.ready = false;
-        state.overlayReady = false;
+        // state.overlayReady = false;
         window.__RTSA_OVERLAY_READY__ = false;
         const uploadLabel = document.getElementById("uploadvideo");
         enableInteractiveButton(uploadLabel);
@@ -155,46 +185,34 @@ import {
     }
 
     // ➋ On page load, Play must be disabled
-    setPlayButtonEnabled(false);
+    updatePlayButtonStatus();
+
+    function updatePlayButtonStatus() {
+        const btn = els.playProcessedButton;
+
+        if (state.videoSelected && state.metricsReady) {
+            btn.disabled = false;
+            btn.classList.add("enabled");
+            btn.style.opacity = "1";
+            btn.style.pointerEvents = "auto";
+        } else {
+            btn.disabled = true;
+            btn.classList.remove("enabled");
+            btn.style.opacity = "0.4";
+            btn.style.pointerEvents = "none";
+        }
+    }
 
     const ctx2D = els.canvas.getContext("2d");
     // Hide canvas at start
     els.canvas.style.display = "none";
 
-    // STATE
-    const state = {
-        video: null,
-        currentChart: null,
-        chartType: "radar",
-        lastOverlayTick: 0,
-        backend: {
-            chartLabels: [],
-            headAngleData: [],
-            speedData: [],
-            accelerationData: [],
-            decelerationData: [],
-            strideData: [],
-            jumpData: [],
-            outerRing: { Running: 0, Standing: 0, Crouching: 0 },
-            innerRing: { "Head Up": 0, "Head Down": 100 },
-            topSpeed: 0,
-            totalDistance: 0,
-            totalSteps: 0
-        },
-        cached: {
-            metrics: null,
-            ready: false
-        },
-        ticker: null,
-    };
-    state.overlayReady = false;
-    state.cached.ready = false;
 
-    // ✅ Listen for Mediapipe overlay finish event
+    // Listen for Mediapipe overlay finish event
     window.addEventListener("overlayReady", () => {
         console.log("[EVENT] Overlay ready received");
-        state.overlayReady = true;
-        maybeEnablePlayButton();
+        // state.overlayReady = true;
+        // maybeEnablePlayButton();
     });
 
     if (state.currentChart) state.currentChart.destroy();
@@ -241,7 +259,7 @@ import {
             }
             state.cached.metrics = null;
             state.cached.ready = false;
-            state.overlayReady = false;
+            // state.overlayReady = false;
 
             resetCharts(state, doughnutChart);
             resetMetricSlidersUI(CONFIG);
@@ -249,14 +267,14 @@ import {
             els.canvas.style.display = "none";
             els.playProcessedButton.style.display = "none";
             els.analyzeButton.style.display = "block";
-            setPlayButtonEnabled(false);
+            updatePlayButtonStatus();
 
             // mark "uploaded" locally
             localStorage.setItem("rtsa_lastVideoName", state.video?.name || "");
             localStorage.setItem("rtsa_hasVideo", "1");
 
             alert("Video uploaded successfully"); // as per your spec
-            // ✅ Now show Analyze button only after upload success
+            // Now show Analyze button only after upload success
             els.analyzeButton.style.display = "block";
             enableInteractiveButton(els.analyzeButton);
             resetAnalyze(els.analyzeButton);
@@ -265,7 +283,10 @@ import {
         },
         (file) => {
             console.log(`[EVENT] Selected file: ${file.name}`);
+
             state.video = file;
+            state.videoSelected = true;
+            updatePlayButtonStatus();
         }
     );
 
@@ -318,9 +339,8 @@ import {
             setAnalyzing(els.analyzeButton);
             els.analyzeButton.style.display = "none";
             els.loadingOverlay.style.display = "block";
-            setPlayButtonEnabled(false);
+            updatePlayButtonStatus();
 
-            // 3) Call /analyze-video with the file
             const analyzeJson = await callAnalyzeVideo({
                 apiBase: CONFIG.API_BASE,
                 userId: localStorage.getItem("userId"),
@@ -330,13 +350,21 @@ import {
             if (!analyzeJson || !analyzeJson.metrics) {
                 console.warn("[WARN] /analyze-video returned unexpected structure:", analyzeJson);
                 alert("Something went wrong with the analysis data. Please re-upload your video.");
-                // fullReset();
                 return;
             }
 
+            // ⬅️ grab videoId from backend
+            const backendVideoId = analyzeJson.videoId;
+
             // 4) Cache metrics locally (no UI yet)
-            applyBackendResultsToState(state, analyzeJson.metrics || analyzeJson);
-            localStorage.setItem("rtsa_metrics", JSON.stringify(analyzeJson.metrics || analyzeJson));
+            const metricsPayload = analyzeJson.metrics || analyzeJson;
+            applyBackendResultsToState(state, metricsPayload);
+
+            // NEW: backend metrics arrived
+            state.metricsReady = true;
+            updatePlayButtonStatus();
+
+            localStorage.setItem("rtsa_metrics", JSON.stringify(metricsPayload));
 
             // 5) Trigger /upload asynchronously (non-blocking)
             console.log("[NETWORK] Starting background upload to /upload...");
@@ -344,13 +372,15 @@ import {
                 apiBase: CONFIG.API_BASE,
                 userId: localStorage.getItem("userId"),
                 video: state.video,
-                metrics: analyzeJson.metrics || analyzeJson
+                videoId: backendVideoId,       // ⬅️ send it
+                metrics: metricsPayload
             })
+
                 .then(resp => {
                     console.log("[BACKGROUND] Upload finished:", resp);
-                    // ✅ After full analysis & background upload — ensure overlay and metrics both checked
+                    // After full analysis & background upload — ensure overlay and metrics both checked
                     state.cached.ready = true;
-                    maybeEnablePlayButton();
+                    // maybeEnablePlayButton();
 
                 })
                 .catch(err => {
@@ -361,8 +391,8 @@ import {
             els.loadingOverlay.style.display = "none";
             els.playProcessedButton.style.display = "block";
             els.playProcessedButton.classList.add("enabled"); // fade-in animation
-            setPlayButtonEnabled(true); // make it clickable immediately
-            console.log("[UI] ✅ /analyze-video complete — Play button enabled instantly");
+            updatePlayButtonStatus();
+            console.log("[UI] /analyze-video complete — Play button enabled instantly");
 
 
         } catch (err) {
@@ -558,28 +588,28 @@ import {
         els.playProcessedButton.disabled = false;
         els.playProcessedButton.classList.remove("button-disabled");
 
-        setPlayButtonEnabled(true);
+        // setPlayButtonEnabled(true);
     });
 
 
-    function maybeEnablePlayButton() {
-        const playBtn = document.getElementById("playProcessedButton");
-        if (!playBtn) return;
+    // function maybeEnablePlayButton() {
+    //     const playBtn = document.getElementById("playProcessedButton");
+    //     if (!playBtn) return;
 
-        const metricsReady = state?.cached?.ready;
-        const overlayReady = state?.overlayReady;
+    //     const metricsReady = state?.cached?.ready;
+    //     const overlayReady = state?.overlayReady;
 
-        if (metricsReady && overlayReady) {
-            setPlayButtonEnabled(true);
-            playBtn.style.display = "block";
-            playBtn.classList.add("enabled");
-            els.canvas.style.display = "block";
-            console.log("[UI] ✅ Metrics + Overlay ready — Play button enabled");
-        } else {
-            setPlayButtonEnabled(false);
-            console.log("[UI] Waiting for both metrics & overlay...");
-        }
-    }
+    //     if (metricsReady && overlayReady) {
+    //         setPlayButtonEnabled(true);
+    //         playBtn.style.display = "block";
+    //         playBtn.classList.add("enabled");
+    //         els.canvas.style.display = "block";
+    //         console.log("[UI] ✅ Metrics + Overlay ready — Play button enabled");
+    //     } else {
+    //         setPlayButtonEnabled(false);
+    //         console.log("[UI] Waiting for both metrics & overlay...");
+    //     }
+    // }
 
     // 🔹 Helper
     function lastKnownVideoTime(video) {
@@ -592,7 +622,7 @@ import {
         st.cached.metrics = payload;
         st.cached.ready = true;
         console.log("[STATE] Metrics ready — checking overlay readiness");
-        maybeEnablePlayButton();
+        // maybeEnablePlayButton();
         // --- Force Play button visible + animated (metrics already ready) ---
         const playBtn = document.getElementById("playProcessedButton");
         if (playBtn) {
@@ -602,8 +632,6 @@ import {
             playBtn.classList.remove("button-disabled");
             console.log("[UI] ✅ Play button forced visible after metrics readiness");
         }
-
-
 
         // ensure visualizations remain reset/empty until Play
         st.backend = {
@@ -625,11 +653,16 @@ import {
         // IMPORTANT: do NOT call showUnifiedChart, updateDoughnutChartFromData, or updateSlidersFromData here
     }
 
-    async function callUploadVideo({ apiBase, userId, video, metrics }) {
+    async function callUploadVideo({ apiBase, userId, video, videoId, metrics }) {
         console.log("[NETWORK] Uploading video to /upload AFTER analysis...");
         const form = new FormData();
         form.append("userId", userId || "");
+        if (videoId) {
+            form.append("videoId", videoId);   // ⬅️ link to analyze-video
+        }
         form.append("video", video);
+
+        // (optional) still send metrics if you want for future use
         if (metrics) {
             form.append("metrics", JSON.stringify(metrics));
         }
@@ -657,7 +690,7 @@ import {
     }
 
     window.loadAnalytics = loadAnalytics;
-    // 👇 Cleanup hook for SPA navigation
+    // Cleanup hook for SPA navigation
     window.addEventListener("beforeunloadAnalytics", () => {
         console.log("[CLEANUP] Analytics tearing down...");
         window.__RTSA_ANALYTICS_INIT__ = false;

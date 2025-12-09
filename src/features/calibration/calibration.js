@@ -1,4 +1,4 @@
-const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app";
+const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/";
 const modal = document.getElementById("popupModal");
 const container = document.getElementById("calibrationModalContainer");
 
@@ -27,6 +27,7 @@ function initCalibrationModalEvents() {
       container.classList.add("hidden");
     }
   });
+  initHeightGuideOverlay();
 }
 
 function initCalibrationFormHandler() {
@@ -105,6 +106,9 @@ function initCalibrationFormHandler() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       console.log("[CALIBRATION] Success:", data);
+      // ✅ FREE TRIAL UNLOCK SIGNAL
+      document.dispatchEvent(new Event("calibrationComplete"));
+
       if (res.status === 200) {
         // ✅ Stop scanning animation
         if (previewContainer) {
@@ -173,3 +177,23 @@ function initImagePreview() {
   }, 200);
 }
 
+// ✅ Height Guide Popup Logic
+function initHeightGuideOverlay() {
+  const overlay = document.getElementById("heightGuideOverlay");
+  const okBtn = document.getElementById("heightGuideOkBtn");
+  const formWrapper = document.getElementById("calibrationFormWrapper");
+
+  if (!overlay || !okBtn || !formWrapper) {
+    console.warn("Height guide elements missing");
+    return;
+  }
+
+  // Always start with guide visible and form hidden
+  overlay.style.display = "flex";
+  formWrapper.classList.add("hidden");
+
+  okBtn.addEventListener("click", () => {
+    overlay.style.display = "none";
+    formWrapper.classList.remove("hidden");
+  });
+}
