@@ -14,10 +14,12 @@ export function startTutorial() {
   const subscription = localStorage.getItem("subscriptionPlanType");
   const step = Number(localStorage.getItem("freeTrialStep") || 0);
 
-  if (subscription === "free_trial" || step !== 3) {
+  if (subscription === "free_trial" && step !== 3) {
+    console.log("[TUTORIAL] ✅ PASSED GATE → Starting tutorial");
     console.warn("[TUTORIAL] Blocked → Trial not completed yet");
-    return; // ❌ STOP tutorial completely
+    return;
   }
+
   const alreadyDone = localStorage.getItem("tutorialCompleted");
 
   if (alreadyDone === "true") {
@@ -35,7 +37,7 @@ export function startTutorial() {
     const step = Number(localStorage.getItem("freeTrialStep") || 0);
 
     // ❌ Block forced tutorial jumps during free trial
-    if (subscription === "free_trial" || step !== 3) return;
+    if (subscription === "free_trial" && step !== 3) return;
 
     const link = e.target.closest("#profile");
     if (!link) return;
