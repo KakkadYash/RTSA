@@ -26,39 +26,51 @@
       <ul>
         <li>
           <div class="links">
-            <a href="#" id="profile" data-page="profile" data-css="profile.css" data-js="profile.js" class="nav-link">
-              <span class='hover-animation click-animation'>PROFILE</span>
-            </a>
-          </div>
-        </li>
-        <li>
-          <div class="links">
-            <a href="#" id="dashboard" data-page="dashboard" data-css="dashboard.css" data-js="dashboard.js"
+            <a href="#" data-page="profile" data-section="profile" data-css="profile.css" data-js="profile.js"
               class="nav-link">
-              <span class='hover-animation click-animation'>DASHBOARD</span>
+              <span class='  click-animation'>PROFILE</span>
+              <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="locked">
+              <img class="unlock" src="../../../public/assets/images/icons8-unlock-50.png" alt="unlocked">
             </a>
           </div>
         </li>
         <li>
           <div class="links">
-            <a href="#" id="analytics" data-page="analytics" data-css="analytics.css" data-js="analytics.js"
+            <a href="#" data-page="dashboard" data-css="dashboard.css" data-section="dashboard" data-js="dashboard.js"
               class="nav-link">
-              <span class='hover-animation click-animation'>ANALYTICS</span>
+              <span class='  click-animation'>DASHBOARD</span>
+              <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="locked">
+              <img class="unlock" src="../../../public/assets/images/icons8-unlock-50.png" alt="unlocked">
             </a>
           </div>
         </li>
         <li>
           <div class="links">
-            <a href="#" id="history" data-page="history" data-css="history.css" data-js="history.js" class="nav-link">
-              <span class='hover-animation click-animation'>HISTORY</span>
-            </a>
-          </div>
-        </li>
-        <li>
-          <div class="links">
-            <a href="#" id="drillcatalog" data-page="drillCatalog" data-css="drillCatalog.css" data-js="drillCatalog.js"
+            <a href="#" data-page="analytics" data-css="analytics.css" data-section="analytics" data-js="analytics.js"
               class="nav-link">
-              <span class='hover-animation click-animation'>DRILL CATALOG</span>
+              <span class='  click-animation'>ANALYTICS</span>
+              <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="locked">
+              <img class="unlock" src="../../../public/assets/images/icons8-unlock-50.png" alt="unlocked">
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="#" data-page="history" data-css="history.css" data-section="history" data-js="history.js"
+              class="nav-link">
+              <span class='  click-animation'>HISTORY</span>
+              <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="locked">
+              <img class="unlock" src="../../../public/assets/images/icons8-unlock-50.png" alt="unlocked">
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="links">
+            <a href="#" data-page="drillCatalog" data-section="drillCatalog" data-css="drillCatalog.css"
+              data-js="drillCatalog.js" class="nav-link">
+              <span class='  click-animation'>DRILL CATALOG</span>
+              <img class="lock" src="../../../public/assets/images/icons8-lock-50.png" alt="locked">
+              <img class="unlock" src="../../../public/assets/images/icons8-unlock-50.png" alt="unlocked">
             </a>
           </div>
         </li>
@@ -101,23 +113,24 @@
     <img src="../../../public/assets/images/SplashScreen.png" alt="Splash" />
     <img src="../../../public/assets/images/Quote.png" alt="Quote" />
     <img src="../../../public/assets/images/Analytics.png" alt="Analytics" />
-    <img src="../../../public/assets/images/HowTo.png" alt="HowTo" />
-    <img src="../../../public/assets/images/HowItWorks.png" alt="HowItWorks" />
-    <div class="contact">
+    <div class="contact" id="feedback">
       <div class="blurb">
         <h1>CONTACT US</h1>
-        <p><span>Have a general question about Reaction</span> <span>Technologies? Feel free to drop us a note</span>
+        <p><span>Have a question, idea, or challenge in mind? Our team at Reaction Technologies is here to turn your
+            curiosity into real solutions. Reach out today and let’s build smarter, high-performance technology
+            together.</span>
         </p>
       </div>
       <form id="contactForm">
+        <input type="hidden" id="feedbackUserId" />
         <input type="text" id="name" class="form-control" placeholder="NAME" required />
         <input type="text" id="email" class="form-control" placeholder="EMAIL" required />
-        <input type="text" id="note" class="form-control" placeholder="NOTE" required />
+        <textarea type="text" id="note" class="form-control" placeholder="NOTE" required minlength="20"
+          maxlength="300"></textarea>
         <button id="submitButton" type="submit" class="button hover-animation click-animation">SUBMIT</button>
       </form>
     </div>
   </main>
-
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -141,6 +154,7 @@
   </template>
 
   <div class="tutorial-done-safe"></div>
+  <script src="./sidebar.js"></script>
 </body>
 
 </html>
