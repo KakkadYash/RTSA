@@ -92,20 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const PAGE_ROOT = "../../../src/features/";
   const contentArea = document.getElementById("content-area");
   const tabs = document.querySelectorAll(".nav-link");
-  // --- TEMPORARY: always trigger tutorial ---
-  localStorage.setItem("runTutorial", "yes");
-  (async () => {
-    const runTutorial = localStorage.getItem("runTutorial");
 
-    if (runTutorial === "yes") {
-      // Clear flag immediately
-      localStorage.removeItem("runTutorial");
-
-      // Lazy-load tutorial module
-      const mod = await import("../tutorial/tutorial.js");
-      mod.startTutorial(); // Start the tutorial
-    }
-  })();
   // 🔹 Background parallax for elements with .parallax-bg
   function initParallax() {
     const SPEED = 0.15; // lower = more subtle
