@@ -1,7 +1,6 @@
 //tutorial.js 
 import steps from "./WalkThroughSteps.js";
-const FORCED_NAVIGATION_STEPS = ["profile-highlight"];
-let state = {
+const FORCED_NAVIGATION_STEPS = ["profile-highlight", "analytics-highlight"]; let state = {
   idx: 0,
   nodes: { backdrop: null, ring: null, tip: null }
 };
@@ -50,7 +49,6 @@ export function startTutorial() {
     if (state.nodes.backdrop) {
       state.nodes.backdrop.style.display = "none";
       state.nodes.backdrop.style.opacity = "0";
-      state.nodes.backdrop.style.background = "transparent";
       state.nodes.backdrop.style.maskImage = "none";
       state.nodes.backdrop.style.webkitMaskImage = "none";
     }
@@ -185,21 +183,6 @@ function prev() {
 function finish() {
   localStorage.setItem("tutorialCompleted", "true");
   teardown();
-
-  try {
-    const userId = localStorage.getItem("userId");
-    if (userId) {
-      fetch(`${window.API_BASE}/users/tutorial-completed`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Id": userId
-        }
-      });
-    }
-  } catch (err) {
-    console.warn("[TUTORIAL] Could not update completion:", err);
-  }
 }
 
 
@@ -418,6 +401,34 @@ function placeStep(firstRun = false) {
 
     // Add clickable access back ONLY to the current link
     target.classList.add("rt-spot-active");
+    // ✅ FINAL HANDOFF: END TUTORIAL ON ANALYTICS CLICK → AUTO OPEN CAROUSEL
+    if (step.id === "analytics-highlight") {
+      const target = query(step.selector);
+
+      if (target && !target.dataset.handoffBound) {
+        target.dataset.handoffBound = "true";
+
+        target.addEventListener("click", () => {
+          console.log("[TUTORIAL] ✅ Analytics clicked → Ending tutorial + auto-opening carousel");
+
+          // ✅ END TUTORIAL CLEANLY
+          finish();
+
+          // ✅ FULLY REMOVE ALL TOUR UI + LOCKS
+          document.body.classList.remove("rt-disable-all");
+
+          document.querySelectorAll(
+            ".rt-tour-backdrop, .rt-tour-highlight, .rt-tour-tooltip, .rt-tour-container"
+          ).forEach(el => el?.remove());
+
+          // ✅ FIRE GLOBAL EVENT FOR ANALYTICS MODULE
+          setTimeout(() => {
+            document.dispatchEvent(new Event("tutorial:enter-analytics"));
+          }, 300);
+
+        }, { once: true });
+      }
+    }
 
     return; // skip default layout
   }

@@ -5,11 +5,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const hasCalibrated = localStorage.getItem("hasCalibrated") === "true";
 
     if (isPaid && hasCalibrated) {
-      console.log("🔓 PAID USER CALIBRATED → UNLOCKING ALL TABS");
+      console.log("🔓 PAID USER CALIBRATED → UNLOCKING ONLY ANALYTICS");
 
       navLinks.forEach(link => {
-        link.classList.remove("locked");
-        link.classList.remove("shake");
+        const page = link.dataset.page;
+
+        if (page === "analytics") {
+          // ✅ ONLY analytics unlocked
+          link.classList.remove("locked");
+          link.classList.remove("shake");
+        } else if (page !== "profile") {
+          // 🔒 Everything else remains locked (except profile)
+          link.classList.add("locked");
+        }
       });
 
       return; // ✅ Skip free-trial logic completely
