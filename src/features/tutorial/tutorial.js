@@ -13,12 +13,17 @@ export function startTutorial() {
   // ✅ ✅ HARD GATE: Only allow tutorial after free trial is COMPLETE
   const subscription = localStorage.getItem("subscriptionPlanType");
   const step = Number(localStorage.getItem("freeTrialStep") || 0);
+  const isPaidUser = localStorage.getItem("isPaidUser") === "true";
 
+  // ❌ Block ONLY free-trial users before completion
   if (subscription === "free_trial" && step !== 3) {
-    console.log("[TUTORIAL] ✅ PASSED GATE → Starting tutorial");
-    console.warn("[TUTORIAL] Blocked → Trial not completed yet");
+    console.warn("[TUTORIAL] Blocked — Free trial not completed yet");
     return;
   }
+
+  // ✅ Always allow tutorial for PAID users
+  console.log("[TUTORIAL] ✅ Tutorial allowed for this user");
+
 
   const alreadyDone = localStorage.getItem("tutorialCompleted");
 
@@ -59,18 +64,69 @@ export function startTutorial() {
 
 
     // ✅ allow page navigation to happen
-    document.body.classList.remove("rt-disable-all");
-
-    // ✅ move tutorial index to the first profile step
-    const targetStepIndex = steps.findIndex(s => s.id === "profile-open-modal");
-    if (targetStepIndex === -1) return;
-
-    state.idx = targetStepIndex;
-
-    // ✅ WAIT FOR PROFILE DOM THEN FORCE PLACE
     document.addEventListener("profile-loaded", () => {
-      console.log("[TUTORIAL] ✅ Jumping to openModalBtn spotlight");
-      placeStep(true);
+      console.log("[TUTORIAL] ✅ profile-loaded received");
+
+      // ✅ Ensure tutorial UI settles first
+      requestAnimationFrame(() => {
+        placeStep(true);
+      });
+
+      // ✅ HARD SYNC with Profile DOM (same logic as free trial, but isolated)
+      let attempts = 0;
+      const maxAttempts = 20;
+
+      console.log("[TUTORIAL] 🎯 Waiting for openModalBtn to appear...");
+
+      const waitForModalBtn = setInterval(() => {
+        const openBtn = document.getElementById("openModalBtn");
+
+        if (openBtn) {
+          clearInterval(waitForModalBtn);
+
+          console.log("[TUTORIAL] ✅ openModalBtn found → Auto-clicking now");
+
+          // ✅ Prevent double-trigger if user already clicked
+          if (!openBtn.dataset.tutorialClicked) {
+            openBtn.dataset.tutorialClicked = "true";
+            openBtn.click();
+
+            // ✅ PAUSE TUTORIAL AFTER AUTO-OPENING MODAL
+            console.log("[TUTORIAL] ⏸️ Pausing tutorial until calibration completes");
+
+            window.__RT_TUTORIAL_PAUSED__ = true;
+
+            console.log("[TUTORIAL] ⏸️ Pausing tutorial — releasing UI locks");
+
+            // ✅ Hide tooltip + ring
+            if (state.nodes.tip) state.nodes.tip.style.display = "none";
+            if (state.nodes.ring) state.nodes.ring.style.display = "none";
+
+            // ✅ REMOVE BACKDROP COMPLETELY
+            if (state.nodes.backdrop) {
+              state.nodes.backdrop.style.display = "none";
+              state.nodes.backdrop.style.opacity = "0";
+              state.nodes.backdrop.style.pointerEvents = "none";
+            }
+
+            // ✅ RE-ENABLE FULL PAGE INTERACTION
+            document.body.classList.remove("rt-disable-all");
+
+            // ✅ Remove any forced spotlight click target
+            document.querySelectorAll(".rt-spot-active")
+              .forEach(el => el.classList.remove("rt-spot-active"));
+
+          }
+
+        }
+
+        attempts++;
+        if (attempts > maxAttempts) {
+          clearInterval(waitForModalBtn);
+          console.warn("[TUTORIAL] ❌ openModalBtn never appeared in DOM");
+        }
+      }, 200);
+
     }, { once: true });
   });
 
@@ -461,3 +517,31 @@ function placeStep(firstRun = false) {
 /* ---------- Utils ---------- */
 function query(sel) { try { return document.querySelector(sel); } catch { return null; } }
 function el(tag, cls) { const n = document.createElement(tag); if (cls) n.className = cls; return n; }
+// ✅ DEV CONSOLE ACCESS
+window.startTutorial = startTutorial;
+// ✅ FORCE UI REFRESH AFTER PAUSE → RESUME
+window.__RT_TUTORIAL_FORCE_REFRESH__ = function () {
+  console.log("[TUTORIAL] 🔄 Hard refresh requested");
+  try {
+    placeStep(true); // Re-draw spotlight + tooltip safely
+  } catch (e) {
+    console.warn("[TUTORIAL] Refresh failed:", e);
+  }
+};
+// ✅ FORCE ADVANCE + FULL VISUAL RE-DRAW (USED AFTER CALIBRATION RESUME)
+window.__RT_TUTORIAL_FORCE_NEXT__ = function () {
+  try {
+    console.log("[TUTORIAL] 🔄 Force-advancing tutorial with full redraw");
+
+    // Move to next step index safely
+    state.idx = Math.min(state.idx + 1, steps.length - 1);
+
+    // HARD redraw spotlight + tooltip + mask
+    requestAnimationFrame(() => {
+      placeStep(true);
+    });
+
+  } catch (e) {
+    console.warn("[TUTORIAL] Force-next failed:", e);
+  }
+};

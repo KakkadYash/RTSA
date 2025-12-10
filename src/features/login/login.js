@@ -116,6 +116,13 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       localStorage.setItem("userCache", JSON.stringify(userCache));
       // Store subscription + free-trial gating info
       localStorage.setItem("subscriptionPlanType", data.subscription_plan_type || "None");
+      // ✅ PAID USER FLAG
+      if (data.subscription_plan_type === "athlete_plan") {
+        localStorage.setItem("isPaidUser", "true");
+      } else {
+        localStorage.setItem("isPaidUser", "false");
+      }
+
       localStorage.setItem("subscriptionStatus", data.subscription_status || "inactive");
       localStorage.setItem("isFirstLogin", String(data.is_first_login));
       localStorage.setItem("calibratedHeightM", data.calibrated_height_m ?? "");

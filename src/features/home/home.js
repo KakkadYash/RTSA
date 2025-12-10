@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.getItem("subscriptionPlanType") ||
     userCache.subscriptionPlanType ||
     "free_trial";
+  const isPaidUser = localStorage.getItem("isPaidUser") === "true";
 
   let freeTrialStep = Number(localStorage.getItem("freeTrialStep") || 0);
 
@@ -76,9 +77,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // Only show Free Trial intro ONCE:
   // Condition: free trial plan + step = 0
   // =====================================================
+  // ✅ FREE TRIAL INTRO
   if (subscription === "free_trial" && freeTrialStep === 0) {
-    showFreeTrialIntro();   // will move step to 1
+    showFreeTrialIntro();
   }
+
+  // ✅ PAID USER LOCK — PROFILE ONLY until calibration
+  if (isPaidUser && !localStorage.getItem("calibratedHeightM")) {
+    localStorage.setItem("paidCalibrationLocked", "true");
+    document.dispatchEvent(new Event("freeTrialStepUpdated"));
+  }
+
 
 
   function showFreeTrialIntro() {
@@ -97,11 +106,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const step = Number(localStorage.getItem("freeTrialStep") || 0);
     const done = localStorage.getItem("tutorialCompleted");
 
-    // ❌ Do NOT run tutorial during free trial OR before completion
-    if (subscription === "free_trial" || step !== 3) {
+    // ❌ Block ONLY free-trial users before step 3
+    if (subscription === "free_trial" && step !== 3) {
       console.log("[TUTORIAL] Skipped — free trial not completed");
       return;
     }
+
 
     // ❌ If already done, never run again
     if (done === "true") {
@@ -296,8 +306,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   }
 
+  // ===============================
+  // GLOBAL HELPER: Auto-open Profile Calibration
+  // ===============================
+  window.rtAutoOpenProfileCalibration = function () {
+    let attempts = 0;
+    const maxAttempts = 20; // ~4 seconds
 
+    console.log("[RT] 🎯 Waiting for openModalBtn to appear...");
 
+    const waitForModalBtn = setInterval(() => {
+      const openBtn = document.getElementById("openModalBtn");
+
+      if (openBtn) {
+        clearInterval(waitForModalBtn);
+        console.log("[RT] ✅ openModalBtn found → Auto-clicking now");
+        openBtn.click();
+      }
+
+      attempts++;
+      if (attempts > maxAttempts) {
+        clearInterval(waitForModalBtn);
+        console.warn("[RT] ❌ openModalBtn never appeared in DOM");
+      }
+    }, 200);
+  };
 
   /**
    * Update active tab styling.
@@ -313,44 +346,41 @@ document.addEventListener("DOMContentLoaded", () => {
   tabs.forEach(link => {
     link.addEventListener("click", async (e) => {
 
-      if (subscription === "free_trial" && link.classList.contains("locked")) {
+      const isLocked = link.classList.contains("locked");
+      const isPaid = localStorage.getItem("isPaidUser") === "true";
+      const hasCalibrated = localStorage.getItem("hasCalibrated") === "true";
+
+      // ✅ UNIVERSAL LOCK GUARD (FREE + PAID)
+      if (isLocked) {
         e.preventDefault();
+
+        console.log("🔒 Locked tab blocked:", link.dataset.page);
+
         link.classList.add("shake");
         setTimeout(() => link.classList.remove("shake"), 450);
-        return;
+
+        return; // ⛔ STOP navigation here always
       }
 
+      // ✅ Normal navigation
       e.preventDefault();
       await handleTabClick(link);
 
+
       const step = Number(localStorage.getItem("freeTrialStep") || 0);
 
-      // ✅ AUTO-OPEN CALIBRATION MODAL ON STEP 1 PROFILE CLICK (SAFE VERSION)
+      // ✅ AUTO-OPEN CALIBRATION MODAL ON STEP 1 PROFILE CLICK (USING SHARED HELPER)
       if (
         subscription === "free_trial" &&
         step === 1 &&
         link.dataset.page === "profile"
       ) {
         console.log("🎯 Free Trial Step 1 → Waiting for Profile DOM to load...");
-
-        let attempts = 0;
-        const maxAttempts = 20; // ~4 seconds total
-
-        const waitForModalBtn = setInterval(() => {
-          const openBtn = document.getElementById("openModalBtn");
-
-          if (openBtn) {
-            clearInterval(waitForModalBtn);
-            console.log("✅ openModalBtn found → Auto-clicking now");
-            openBtn.click();
-          }
-
-          attempts++;
-          if (attempts > maxAttempts) {
-            clearInterval(waitForModalBtn);
-            console.warn("❌ openModalBtn never appeared in DOM");
-          }
-        }, 200);
+        if (typeof window.rtAutoOpenProfileCalibration === "function") {
+          window.rtAutoOpenProfileCalibration();
+        } else {
+          console.warn("[HOME] rtAutoOpenProfileCalibration is not defined");
+        }
       }
 
     });
@@ -411,5 +441,5 @@ document.addEventListener("DOMContentLoaded", () => {
  */
 function logout() {
   alert("Logging out...");
-  // window.location.href = "../../../index.html";
+  window.location.href = "../../../index.html";
 }
