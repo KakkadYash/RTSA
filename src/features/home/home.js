@@ -106,12 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const step = Number(localStorage.getItem("freeTrialStep") || 0);
     const done = localStorage.getItem("tutorialCompleted");
 
-    // ❌ Block ONLY free-trial users before step 3
-    if (subscription === "free_trial" && step !== 3) {
-      console.log("[TUTORIAL] Skipped — free trial not completed");
+    // ❌ HARD BLOCK tutorial for ALL free-trial users (any step)
+    if (subscription === "free_trial") {
+      console.log("[TUTORIAL] Skipped — free trial users are not allowed tutorial");
       return;
     }
-
 
     // ❌ If already done, never run again
     if (done === "true") {
