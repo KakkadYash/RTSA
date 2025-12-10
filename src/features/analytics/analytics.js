@@ -68,7 +68,7 @@ import {
         myChart: document.getElementById("myChart"),
         myChart2: document.getElementById("myChart2"),
     };
-    
+
     // STATE
     const state = {
         video: null,
@@ -695,5 +695,4 @@ import {
         console.log("[CLEANUP] Analytics tearing down...");
         window.__RTSA_ANALYTICS_INIT__ = false;
     });
-
 })();
