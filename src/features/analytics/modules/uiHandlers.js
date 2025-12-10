@@ -135,7 +135,7 @@ export function resetAnalyze(el) {
 }
 
 export function setPlaying(el) {
-  el.textContent = "PLAYING...";
+  el.textContent = "REPLAY VIDEO";
   el.classList.add("button-disabled");
 }
 
