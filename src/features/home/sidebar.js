@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Re-run sidebar lock logic automatically
     console.log("🔄 Sidebar should update lock/unlock icons now");
-    // location.reload();
+    location.reload();
   });
   const hideAllIcons = () => {
     document.querySelectorAll(".lock").forEach(i => i.style.display = "none");
