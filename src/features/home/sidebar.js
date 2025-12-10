@@ -4,25 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const isPaid = localStorage.getItem("isPaidUser") === "true";
     const hasCalibrated = localStorage.getItem("hasCalibrated") === "true";
 
-    if (isPaid && hasCalibrated) {
-      console.log("🔓 PAID USER CALIBRATED → UNLOCKING ONLY ANALYTICS");
-
-      navLinks.forEach(link => {
-        const page = link.dataset.page;
-
-        if (page === "analytics") {
-          // ✅ ONLY analytics unlocked
-          link.classList.remove("locked");
-          link.classList.remove("shake");
-        } else if (page !== "profile") {
-          // 🔒 Everything else remains locked (except profile)
-          link.classList.add("locked");
-        }
-      });
-
-      return; // ✅ Skip free-trial logic completely
-    }
-
     // Re-run sidebar lock logic automatically
     console.log("🔄 Sidebar should update lock/unlock icons now");
     location.reload();
@@ -58,14 +39,19 @@ document.addEventListener("DOMContentLoaded", () => {
     navLinks.forEach(link => link.classList.remove("locked"));
   };
 
-
-  // 🔥 PAID USERS: All unlocked
+  // 🔥 PAID USERS: FULL ACCESS AFTER CALIBRATION (SOURCE OF TRUTH = hasCalibrated)
   if (isPaidUser) {
-    if (paidCalibrationLocked) {
+    const hasCalibrated = localStorage.getItem("hasCalibrated") === "true";
+
+    if (!hasCalibrated) {
+      console.log("🔒 PAID USER NOT CALIBRATED → ONLY PROFILE UNLOCKED");
+
       lockAll();
       unlock("profile");   // ✅ ONLY profile unlocked
       return;
     }
+
+    console.log("✅ PAID USER CALIBRATED → ALL TABS UNLOCKED");
 
     unlockAll();           // ✅ After calibration → FULL ACCESS
     hideAllIcons();
@@ -73,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   else {
 
-    // 🔥 FREE TRIAL FLOW
+    // 🔥 FREE TRIAL FLOW (UNCHANGED)
     if (step === 0) {
       lockAll();
     }
@@ -93,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       hideAllIcons();
     }
   }
+
 
   // ✅ UNIVERSAL LOCKED TAB BEHAVIOR (FREE TRIAL + PAID)
   navLinks.forEach(link => {
