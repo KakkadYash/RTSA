@@ -1,8 +1,23 @@
 // sidebar.js
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("freeTrialStepUpdated", () => {
+    const isPaid = localStorage.getItem("isPaidUser") === "true";
+    const hasCalibrated = localStorage.getItem("hasCalibrated") === "true";
+
+    if (isPaid && hasCalibrated) {
+      console.log("🔓 PAID USER CALIBRATED → UNLOCKING ALL TABS");
+
+      navLinks.forEach(link => {
+        link.classList.remove("locked");
+        link.classList.remove("shake");
+      });
+
+      return; // ✅ Skip free-trial logic completely
+    }
+
     // Re-run sidebar lock logic automatically
-    location.reload();
+    console.log("🔄 Sidebar should update lock/unlock icons now");
+    // location.reload();
   });
   const hideAllIcons = () => {
     document.querySelectorAll(".lock").forEach(i => i.style.display = "none");
@@ -10,6 +25,9 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   const subscription = localStorage.getItem("subscriptionPlanType");
   const step = Number(localStorage.getItem("freeTrialStep") || 0);
+  const isPaidUser = localStorage.getItem("isPaidUser") === "true";
+  const paidCalibrationLocked = localStorage.getItem("paidCalibrationLocked") === "true";
+
   const navLinks = document.querySelectorAll(".nav-link");
 
   const lockAll = () => {
@@ -34,11 +52,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // 🔥 PAID USERS: All unlocked
-  if (subscription !== "free_trial") {
-    unlockAll();
+  if (isPaidUser) {
+    if (paidCalibrationLocked) {
+      lockAll();
+      unlock("profile");   // ✅ ONLY profile unlocked
+      return;
+    }
+
+    unlockAll();           // ✅ After calibration → FULL ACCESS
     hideAllIcons();
     return;
-  } else {
+  }
+  else {
 
     // 🔥 FREE TRIAL FLOW
     if (step === 0) {
@@ -61,15 +86,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Shake on locked click
+  // ✅ UNIVERSAL LOCKED TAB BEHAVIOR (FREE TRIAL + PAID)
   navLinks.forEach(link => {
     link.addEventListener("click", (e) => {
+      e.preventDefault(); // ✅ CRITICAL — prevents page reload
+
       if (link.classList.contains("locked")) {
-        e.preventDefault();
+        console.log("🔒 Locked tab clicked → shake + block");
+
         link.classList.add("shake");
-        setTimeout(() => link.classList.remove("shake"), 350);
+        setTimeout(() => link.classList.remove("shake"), 450);
+
+        if (
+          localStorage.getItem("isPaidUser") === "true" &&
+          localStorage.getItem("hasCalibrated") !== "true"
+        ) {
+          alert("🔒 Please complete profile calibration to unlock this section.");
+        }
+
+        return false;
       }
+
+      // ✅ If NOT locked → allow SPA navigation only
     });
   });
+
 
 });
