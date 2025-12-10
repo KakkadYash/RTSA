@@ -341,6 +341,11 @@ import {
             els.loadingOverlay.style.display = "block";
             updatePlayButtonStatus();
 
+            // ✅ SAFEGUARD: Prevent preview video 'ended' from interfering during analysis
+            els.video.onended = () => {
+                console.log("[EVENT] Preview video ended during analysis — ignored.");
+            };
+
             const analyzeJson = await callAnalyzeVideo({
                 apiBase: CONFIG.API_BASE,
                 userId: localStorage.getItem("userId"),
@@ -363,6 +368,7 @@ import {
             // NEW: backend metrics arrived
             state.metricsReady = true;
             updatePlayButtonStatus();
+
 
             localStorage.setItem("rtsa_metrics", JSON.stringify(metricsPayload));
 
@@ -387,13 +393,19 @@ import {
                     console.error("[BACKGROUND] Upload failed:", err);
                 });
 
-            // 6) Show and enable Play button immediately after analysis
+            // 6) Backend response arrived → NOW we stop the analyzing spinner
             els.loadingOverlay.style.display = "none";
-            els.playProcessedButton.style.display = "block";
-            els.playProcessedButton.classList.add("enabled"); // fade-in animation
-            updatePlayButtonStatus();
-            console.log("[UI] /analyze-video complete — Play button enabled instantly");
 
+            // Show Play button (but only use PLAY VIDEO always)
+            els.playProcessedButton.style.display = "block";
+            els.playProcessedButton.textContent = "PLAY VIDEO";
+            els.playProcessedButton.classList.add("enabled");
+
+            // state.metricsReady = true;
+            // updatePlayButtonStatus();
+            enableInteractiveButton(els.showMetricsBtn); // ✅ RE-ENABLE ALL METRICS
+            enableInteractiveButton(document.getElementById("uploadvideo")); // ✅ RE-ENABLE UPLOAD
+            console.log("[UI] /analyze-video complete — Play button enabled instantly");
 
         } catch (err) {
             console.error("[ERROR] Analyze or upload sequence failed:", err);
@@ -565,51 +577,10 @@ import {
     });
 
     els.video.addEventListener("ended", () => {
-        console.log("[EVENT] Video ended — keeping Play enabled for replay");
-
-        // stopOverlayLoop();
-
-        if (state.ticker) {
-            clearInterval(state.ticker);
-            state.ticker = null;
-        }
-
-        // Show original video, hide overlay canvas
-        // els.canvas.style.display = "none";
-        // els.video.style.display = "block";
-
-        // Reset upload/analyze/show-metrics states
-        resetButtonsOnly();
-
-        // ✅ Keep Play button visible & enabled as REPLAY
-        els.playProcessedButton.style.display = "block";
-        els.playProcessedButton.textContent = "REPLAY VIDEO";
-        els.playProcessedButton.classList.add("enabled");
-        els.playProcessedButton.disabled = false;
-        els.playProcessedButton.classList.remove("button-disabled");
-
-        // setPlayButtonEnabled(true);
+        console.log("[EVENT] Preview or processed video ended — no UI changes.");
+        // Do absolutely nothing. Play button behavior handled only by backend readiness.
     });
 
-
-    // function maybeEnablePlayButton() {
-    //     const playBtn = document.getElementById("playProcessedButton");
-    //     if (!playBtn) return;
-
-    //     const metricsReady = state?.cached?.ready;
-    //     const overlayReady = state?.overlayReady;
-
-    //     if (metricsReady && overlayReady) {
-    //         setPlayButtonEnabled(true);
-    //         playBtn.style.display = "block";
-    //         playBtn.classList.add("enabled");
-    //         els.canvas.style.display = "block";
-    //         console.log("[UI] ✅ Metrics + Overlay ready — Play button enabled");
-    //     } else {
-    //         setPlayButtonEnabled(false);
-    //         console.log("[UI] Waiting for both metrics & overlay...");
-    //     }
-    // }
 
     // 🔹 Helper
     function lastKnownVideoTime(video) {
