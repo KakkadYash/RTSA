@@ -1,3 +1,4 @@
+// profile.js
 const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/";
 function loadProfile() {
   const userId = localStorage.getItem("userId");
@@ -373,6 +374,94 @@ function loadProfile() {
       }
     });
   }
+  // === Tutorial Hook: Notify tutorial engine that Profile page is ready ===
+  setTimeout(() => {
+    console.log("[PROFILE] Dispatching profile-loaded event for tutorial");
+    document.dispatchEvent(new Event("profile-loaded"));
+  }, 250);
+  // ======================================================
+  // CALIBRATION COMPLETE → UNLOCK LOGIC (FREE TRIAL + PAID)
+  // ======================================================
+  document.addEventListener("calibrationComplete", () => {
+    console.log("🔥 Calibration complete → evaluating unlock rules");
+
+    const isPaidUser = localStorage.getItem("isPaidUser") === "true";
+
+    // ✅ FREE TRIAL BEHAVIOR (UNCHANGED)
+    if (!isPaidUser) {
+      console.log("🧪 Free Trial user → moving to Step 2");
+
+      localStorage.setItem("freeTrialStep", 2);
+      document.dispatchEvent(new Event("freeTrialStepUpdated"));
+      return;
+    }
+
+    // ✅ PAID USER BEHAVIOR (NEW)
+    console.log("💳 Paid user → unlocking ALL tabs permanently");
+
+    // Remove paid calibration lock
+    localStorage.removeItem("paidCalibrationLocked");
+
+    // Mark calibrated permanently
+    localStorage.setItem("hasCalibrated", "true");
+
+    // Force sidebar to re-evaluate
+    document.dispatchEvent(new Event("freeTrialStepUpdated"));
+    // ✅ RESUME TUTORIAL AFTER CALIBRATION (HARD VISUAL RESTORE)
+    if (window.__RT_TUTORIAL_PAUSED__) {
+      console.log("[PROFILE] ▶️ Resuming tutorial after calibration");
+
+      window.__RT_TUTORIAL_PAUSED__ = false;
+
+      // ✅ MARK PAID USER AS CALIBRATED
+      localStorage.setItem("hasCalibrated", "true");
+      localStorage.removeItem("paidCalibrationLocked");
+
+      // ✅ FORCE SIDEBAR TO UNLOCK EVERYTHING
+      document.dispatchEvent(new Event("freeTrialStepUpdated"));
+
+      // ✅ RE-ENABLE TUTORIAL LOCK MODE
+      document.body.classList.add("rt-disable-all");
+
+      setTimeout(() => {
+        // ✅ RESTORE BACKDROP
+        const backdrop = document.querySelector(".rt-tour-backdrop");
+        if (backdrop) {
+          backdrop.style.display = "flex";
+          backdrop.style.opacity = "1";
+          backdrop.style.pointerEvents = "auto";
+        }
+
+        // ✅ RESTORE RING
+        const ring = document.querySelector(".rt-tour-highlight");
+        if (ring) {
+          ring.style.display = "block";
+          ring.style.opacity = "1";
+        }
+
+        // ✅ RESTORE TOOLTIP
+        const tip = document.querySelector(".rt-tour-tooltip");
+        if (tip) {
+          tip.style.display = "block";
+          tip.style.opacity = "1";
+        }
+
+        // ✅ FORCE TUTORIAL TO ADVANCE VISUALLY (CRITICAL)
+        if (typeof window.__RT_TUTORIAL_FORCE_NEXT__ === "function") {
+          console.log("[TUTORIAL] ▶️ Forcing next step after resume");
+          window.__RT_TUTORIAL_FORCE_NEXT__();
+        }
+
+      }, 400);
+    }
+
+
+
+
+
+  });
+
+
 }
 
 window.loadProfile = loadProfile;

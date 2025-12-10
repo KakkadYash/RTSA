@@ -1,3 +1,4 @@
+// login.js
 const API_BASE = "https://rtsa-backend-gpu-843332298202.us-central1.run.app/"
 // Open modal on forgot password click
 // ✅ Open Forgot Password Modal (Pure JS)
@@ -107,15 +108,25 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         profilePicUrl: data.profilePicUrl,
         is_first_login: data.is_first_login,
         timestamp: Date.now(),
+        subscriptionPlanType: data.subscription_plan_type,
+        uploadCount: data.upload_count || 0,
       };
 
       // ✅ Store compact user cache
       localStorage.setItem("userCache", JSON.stringify(userCache));
       // Store subscription + free-trial gating info
       localStorage.setItem("subscriptionPlanType", data.subscription_plan_type || "None");
+      // ✅ PAID USER FLAG
+      if (data.subscription_plan_type === "athlete_plan") {
+        localStorage.setItem("isPaidUser", "true");
+      } else {
+        localStorage.setItem("isPaidUser", "false");
+      }
+
       localStorage.setItem("subscriptionStatus", data.subscription_status || "inactive");
       localStorage.setItem("isFirstLogin", String(data.is_first_login));
       localStorage.setItem("calibratedHeightM", data.calibrated_height_m ?? "");
+      localStorage.setItem("freeTrialStep", String(data.freeTrialStep ?? 0));
 
       // Store userId and email in localStorage
       localStorage.setItem("userId", data.userId);

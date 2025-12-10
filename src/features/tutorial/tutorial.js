@@ -1,0 +1,558 @@
+//tutorial.js 
+import steps from "./WalkThroughSteps.js";
+const FORCED_NAVIGATION_STEPS = ["profile-highlight", "analytics-highlight"]; let state = {
+  idx: 0,
+  nodes: { backdrop: null, ring: null, tip: null }
+};
+
+let controller = null;   // ← ADD THIS EXACTLY HERE
+
+export function startTutorial() {
+
+  // ✅ ✅ HARD GATE: Only allow tutorial after free trial is COMPLETE
+  const subscription = localStorage.getItem("subscriptionPlanType");
+  const step = Number(localStorage.getItem("freeTrialStep") || 0);
+  const isPaidUser = localStorage.getItem("isPaidUser") === "true";
+
+  // ❌ Block ONLY free-trial users before completion
+  if (subscription === "free_trial" && step !== 3) {
+    console.warn("[TUTORIAL] Blocked — Free trial not completed yet");
+    return;
+  }
+
+  // ✅ Always allow tutorial for PAID users
+  console.log("[TUTORIAL] ✅ Tutorial allowed for this user");
+
+
+  const alreadyDone = localStorage.getItem("tutorialCompleted");
+
+  if (alreadyDone === "true") {
+    console.warn("[TUTORIAL] Already completed — blocked");
+    return;
+  }
+
+  // Build overlay nodes once
+  buildScaffold();
+  // ✅ Jump directly to openModalBtn spotlight when PROFILE tab is clicked
+  // ✅ Force jump to profile tutorial whenever PROFILE tab is clicked
+  document.addEventListener("click", (e) => {
+
+    const subscription = localStorage.getItem("subscriptionPlanType");
+    const step = Number(localStorage.getItem("freeTrialStep") || 0);
+
+    // ❌ Block forced tutorial jumps during free trial
+    if (subscription === "free_trial" && step !== 3) return;
+
+    const link = e.target.closest("#profile");
+    if (!link) return;
+    // 🔥 Remove BOTH backdrop + golden ring when PROFILE tab is clicked
+    if (state.nodes.backdrop) {
+      state.nodes.backdrop.style.display = "none";
+      state.nodes.backdrop.style.opacity = "0";
+      state.nodes.backdrop.style.maskImage = "none";
+      state.nodes.backdrop.style.webkitMaskImage = "none";
+    }
+
+    // 🔥 Remove golden spotlight ring too
+    if (state.nodes.ring) {
+      state.nodes.ring.style.display = "none";
+      state.nodes.ring.style.opacity = "0";
+    }
+
+
+
+    // ✅ allow page navigation to happen
+    document.addEventListener("profile-loaded", () => {
+      console.log("[TUTORIAL] ✅ profile-loaded received");
+
+      // ✅ Ensure tutorial UI settles first
+      requestAnimationFrame(() => {
+        placeStep(true);
+      });
+
+      // ✅ HARD SYNC with Profile DOM (same logic as free trial, but isolated)
+      let attempts = 0;
+      const maxAttempts = 20;
+
+      console.log("[TUTORIAL] 🎯 Waiting for openModalBtn to appear...");
+
+      const waitForModalBtn = setInterval(() => {
+        const openBtn = document.getElementById("openModalBtn");
+
+        if (openBtn) {
+          clearInterval(waitForModalBtn);
+
+          console.log("[TUTORIAL] ✅ openModalBtn found → Auto-clicking now");
+
+          // ✅ Prevent double-trigger if user already clicked
+          if (!openBtn.dataset.tutorialClicked) {
+            openBtn.dataset.tutorialClicked = "true";
+            openBtn.click();
+
+            // ✅ PAUSE TUTORIAL AFTER AUTO-OPENING MODAL
+            console.log("[TUTORIAL] ⏸️ Pausing tutorial until calibration completes");
+
+            window.__RT_TUTORIAL_PAUSED__ = true;
+
+            console.log("[TUTORIAL] ⏸️ Pausing tutorial — releasing UI locks");
+
+            // ✅ Hide tooltip + ring
+            if (state.nodes.tip) state.nodes.tip.style.display = "none";
+            if (state.nodes.ring) state.nodes.ring.style.display = "none";
+
+            // ✅ REMOVE BACKDROP COMPLETELY
+            if (state.nodes.backdrop) {
+              state.nodes.backdrop.style.display = "none";
+              state.nodes.backdrop.style.opacity = "0";
+              state.nodes.backdrop.style.pointerEvents = "none";
+            }
+
+            // ✅ RE-ENABLE FULL PAGE INTERACTION
+            document.body.classList.remove("rt-disable-all");
+
+            // ✅ Remove any forced spotlight click target
+            document.querySelectorAll(".rt-spot-active")
+              .forEach(el => el.classList.remove("rt-spot-active"));
+
+          }
+
+        }
+
+        attempts++;
+        if (attempts > maxAttempts) {
+          clearInterval(waitForModalBtn);
+          console.warn("[TUTORIAL] ❌ openModalBtn never appeared in DOM");
+        }
+      }, 200);
+
+    }, { once: true });
+  });
+
+  // Modern: use AbortController for cleanup
+  controller = new AbortController();
+  const { signal } = controller;
+
+  window.addEventListener("resize", placeStep, { passive: true, signal });
+  window.addEventListener("keydown", onKey, { signal });
+
+  // Begin on first valid step
+  state.idx = 0;
+  placeStep(true);
+}
+
+
+/* ---------- Controls ---------- */
+function onKey(e) {
+  if (e.key === "Escape") return finish();
+  if (e.key === "ArrowRight" || e.key === "Enter") return next();
+  if (e.key === "ArrowLeft") return prev();
+}
+
+function next(firstRun = false) {
+  const currentStep = steps[state.idx];
+
+  // 🚫 If current step is a forced navigation step → block Next
+  if (FORCED_NAVIGATION_STEPS.includes(currentStep.id)) {
+    console.warn("[TUTORIAL] Next disabled on this step. User must click target.");
+    // OPTIONAL: small shake animation to show "no"
+    const btn = state.nodes.tip.querySelector('[data-act="next"]');
+    if (btn) {
+      btn.classList.add("rt-disabled-shake");
+      setTimeout(() => btn.classList.remove("rt-disabled-shake"), 400);
+    }
+    return; // Stop here
+  }
+
+  // Normal behavior
+  let i = state.idx;
+  do { i++; } while (i < steps.length && !query(steps[i].selector));
+  if (i >= steps.length) return finish();
+  state.idx = i;
+  placeStep(firstRun);
+}
+
+
+function prev() {
+  let i = state.idx;
+  do { i--; } while (i >= 0 && !query(steps[i].selector));
+  if (i < 0) return; // stay
+  state.idx = i;
+  placeStep();
+}
+
+function finish() {
+  localStorage.setItem("tutorialCompleted", "true");
+  teardown();
+}
+
+
+/* ---------- DOM helpers ---------- */
+function buildScaffold() {
+  // Parent container for backdrop + ring
+  const container = el("div", "rt-tour-container");
+
+  // Backdrop (mask)
+  const backdrop = el("div", "rt-tour-backdrop");
+  backdrop.addEventListener("click", () => next());
+  container.appendChild(backdrop);
+  // Highlight ring
+  const ring = el("div", "rt-tour-highlight");
+  container.appendChild(ring);
+
+  // Add container to DOM
+  document.body.appendChild(container);
+
+
+  // Tooltip (modern: via <template>)
+  let tip;
+  const tpl = document.getElementById("rt-tour-tooltip-template");
+  if (tpl && 'content' in tpl) {
+    tip = tpl.content.firstElementChild.cloneNode(true);
+  } else {
+    // Fallback (in case template is missing)
+    tip = el("div", "rt-tour-tooltip");
+    tip.innerHTML = `
+  <div class="rt-tour-text"></div>
+  <div class="rt-tour-actions">
+
+    <button
+      class="
+        rt-tour-btn
+        rt-tour-btn-ghost
+        button
+        hover-animation
+        click-animation
+        btn-scale
+        transition-fast
+      "
+      data-act="skip"
+    >Skip</button>
+
+    <button
+      class="
+        rt-tour-btn
+        rt-tour-btn-ghost
+        button
+        hover-animation
+        click-animation
+        btn-scale
+        transition-fast
+      "
+      data-act="prev"
+    >Back</button>
+
+    <button
+      class="
+        rt-tour-btn
+        rt-tour-btn-primary
+        button
+        hover-animation
+        click-animation
+        btn-scale
+        transition-fast
+      "
+      data-act="next"
+    >Next</button>
+
+  </div>
+`;
+
+  }
+
+  tip.addEventListener("click", (e) => {
+    const act = e.target?.dataset?.act;
+    if (act === "skip") finish();
+    else if (act === "prev") prev();
+    else if (act === "next") next();
+  });
+  document.body.appendChild(tip);
+
+  // Allow initial layout, then fade in (modern, smooth)
+  requestAnimationFrame(() => {
+    tip.classList.add("rt-tour-tooltip--visible");
+  });
+
+  state.nodes = { container, backdrop, ring, tip };
+}
+
+function teardown() {
+  if (controller) {
+    controller.abort();   // removes both listeners
+    controller = null;
+  }
+  Object.values(state.nodes).forEach(n => n?.remove());
+  state.nodes = { container: null, backdrop: null, ring: null, tip: null };
+
+}
+
+/* ---------- Layout ---------- */
+function placeStep(firstRun = false) {
+  const step = steps[state.idx];
+  // 🔧 Dynamically sync aside width into CSS variable
+  const aside = document.querySelector(".aside");
+  if (aside) {
+    document.documentElement.style.setProperty(
+      "--aside-width",
+      `${aside.offsetWidth}px`
+    );
+  }
+
+
+  // For full-screen welcome/intro steps, disable spotlight
+  if (["welcome", "intro-message"].includes(step.id)) {
+    if (state.nodes.backdrop) {
+      state.nodes.backdrop.style.maskImage = "none";
+      state.nodes.backdrop.style.webkitMaskImage = "none";
+    }
+  } else {
+    // Use CSS-defined rectangular mask for guided steps
+    if (state.nodes.backdrop) {
+      state.nodes.backdrop.style.maskImage = "";
+      state.nodes.backdrop.style.webkitMaskImage = "";
+    }
+  }
+
+  if (!step) return;
+  const target = query(step.selector);
+  if (!target) return next(); // selector missing → skip
+
+  // 🔒 Scroll lock ONLY for specific steps
+  const lockSteps = ["welcome", "intro-message"];
+  if (lockSteps.includes(step.id)) {
+    document.body.classList.add("rt-scroll-lock");
+  } else {
+    document.body.classList.remove("rt-scroll-lock");
+  }
+  // Always show backdrop during guided steps
+  if (state.nodes.backdrop) {
+    state.nodes.backdrop.style.display = "block";
+    requestAnimationFrame(() => (state.nodes.backdrop.style.opacity = "1"));
+  }
+
+
+
+
+  // CUSTOM SPOTLIGHT LOGIC — for all aside menu items
+  // ------------------------------------------------------
+  if (["profile-highlight", "analytics-highlight"].includes(step.id)) {
+
+    // 2) Normal behavior
+    const target = query(step.selector);
+    if (!target) return next();
+
+
+    const rect = target.getBoundingClientRect();
+    const ring = state.nodes.ring;
+    const tip = state.nodes.tip;
+
+    // Hide text completely during aside highlights
+    const txt = tip.querySelector(".rt-tour-text");
+    if (txt) txt.style.display = "none";
+
+    // Tooltip layout (buttons only at bottom)
+    tip.style.position = "fixed";
+    tip.style.top = "128.5px";
+    tip.style.left = "30%";
+    tip.style.bottom = "5%";
+    tip.style.background = "transparent";
+    tip.style.boxShadow = "none";
+    tip.style.display = "flex";
+    tip.style.width = "100%";
+    tip.style.flexDirection = "column";
+    tip.style.justifyContent = "flex-end";
+
+    // Buttons row styling
+    const actions = tip.querySelector(".rt-tour-actions");
+    actions.style.display = "flex";
+    actions.style.gap = "8px";
+    actions.style.width = "100%";
+    actions.style.justifyContent = "space-evenly";
+
+    // ✅ Position golden ring
+    ring.style.left = `${rect.left - 8 + window.scrollX}px`;
+    ring.style.top = `${rect.top - 8 + window.scrollY}px`;
+    ring.style.width = `${rect.width + 16}px`;
+    ring.style.height = `${rect.height + 16}px`;
+    ring.style.display = "block";
+
+    // ✅ Spotlight mask positioning
+    if (state.nodes.backdrop) {
+      const padding = 12;
+      const width = rect.width + padding * 2;
+      const height = rect.height + padding * 2;
+
+      const left = rect.left + window.scrollX - padding;
+      const top = rect.top + window.scrollY - padding;
+
+      const backdrop = state.nodes.backdrop;
+
+      backdrop.style.setProperty("--spot-left", `${left}px`);
+      backdrop.style.setProperty("--spot-top", `${top}px`);
+      backdrop.style.setProperty("--spot-width", `${width}px`);
+      backdrop.style.setProperty("--spot-height", `${height}px`);
+
+    }
+    // --- Make ONLY the current aside link clickable ---
+    document.body.classList.add("rt-disable-all");
+
+    // Remove previous spot-active
+    document.querySelectorAll(".rt-spot-active")
+      .forEach(el => el.classList.remove("rt-spot-active"));
+
+    // Add clickable access back ONLY to the current link
+    target.classList.add("rt-spot-active");
+    // ✅ FINAL HANDOFF: END TUTORIAL ON ANALYTICS CLICK → AUTO OPEN CAROUSEL
+    if (step.id === "analytics-highlight") {
+      const target = query(step.selector);
+
+      if (target && !target.dataset.handoffBound) {
+        target.dataset.handoffBound = "true";
+
+        target.addEventListener("click", () => {
+          console.log("[TUTORIAL] ✅ Analytics clicked → Ending tutorial + auto-opening carousel");
+
+          // ✅ END TUTORIAL CLEANLY
+          finish();
+
+          // ✅ FULLY REMOVE ALL TOUR UI + LOCKS
+          document.body.classList.remove("rt-disable-all");
+
+          document.querySelectorAll(
+            ".rt-tour-backdrop, .rt-tour-highlight, .rt-tour-tooltip, .rt-tour-container"
+          ).forEach(el => el?.remove());
+
+          // ✅ FIRE GLOBAL EVENT FOR ANALYTICS MODULE
+          setTimeout(() => {
+            document.dispatchEvent(new Event("tutorial:enter-analytics"));
+          }, 300);
+
+        }, { once: true });
+      }
+    }
+
+    return; // skip default layout
+  }
+  else {
+    // Re-enable whole page for non-aside steps
+    document.body.classList.remove("rt-disable-all");
+    document.querySelectorAll(".rt-spot-active")
+      .forEach(el => el.classList.remove("rt-spot-active"));
+
+    // ⭐ Restore tooltip text for normal steps
+    const tip = state.nodes.tip;
+    const txt = tip.querySelector(".rt-tour-text");
+    if (txt) {
+      txt.style.display = "block";
+    }
+
+    // ⭐ Restore tooltip default styling
+    tip.style.background = "var(--rt-color-bg)";
+    tip.style.boxShadow = "";
+    tip.style.width = "";
+    tip.style.flexDirection = "";
+    tip.style.justifyContent = "";
+    tip.style.position = "absolute";
+    tip.style.bottom = "";
+    tip.style.left = "";
+    tip.style.top = "";
+    tip.style.display = "";
+
+    // ⭐ Restore button row layout
+    const actions = tip.querySelector(".rt-tour-actions");
+    if (actions) {
+      actions.style.display = "";
+      actions.style.gap = "";
+      actions.style.width = "";
+      actions.style.justifyContent = "";
+    }
+
+    // ⭐ Restore all buttons to original state
+    const buttons = tip.querySelectorAll(".rt-tour-btn");
+    buttons.forEach(btn => {
+      btn.style.position = "";
+      btn.style.bottom = "";
+      btn.style.left = "";
+      btn.style.right = "";
+      btn.style.top = "";
+      btn.style.background = "";
+      btn.style.boxShadow = "";
+      btn.style.width = "";
+      btn.style.flex = "";
+    });
+  }
+
+
+
+  const rect = target.getBoundingClientRect();
+  const ring = state.nodes.ring;
+  ring.style.left = `${rect.left - 6 + window.scrollX}px`;
+  ring.style.top = `${rect.top - 6 + window.scrollY}px`;
+  ring.style.width = `${rect.width + 12}px`;
+  ring.style.height = `${rect.height + 12}px`;
+
+  const tip = state.nodes.tip;
+  tip.querySelector(".rt-tour-text").textContent = step.text;
+
+  if (!step.disableAutoPosition) {
+    // Position tooltip (default behavior)
+    const gap = 10;
+    let top = rect.top + window.scrollY;
+    let left = rect.left + window.scrollX;
+
+    switch ((step.placement || "bottom").toLowerCase()) {
+      case "top": top -= (tip.offsetHeight || 120) + gap; break;
+      case "right": left += rect.width + gap; break;
+      case "left": left -= (tip.offsetWidth || 320) + gap; break;
+      default: top += rect.height + gap; break;
+    }
+
+    if (step.placement === "center") {
+      const w = tip.offsetWidth || 320;
+      const h = tip.offsetHeight || 120;
+      top = window.scrollY + (window.innerHeight - h) / 2;
+      left = window.scrollX + (window.innerWidth - w) / 2;
+    }
+
+    tip.style.top = `${Math.max(window.scrollY + 12, top)}px`;
+    tip.style.left = `${Math.max(window.scrollX + 12, left)}px`;
+  }
+
+  // Button text for last step
+  const nextBtn = tip.querySelector('[data-act="next"]');
+  nextBtn.textContent = (state.idx === steps.length - 1) ? "Finish" : "Next";
+
+  // Auto-scroll target into view on first paint of step
+  if (!firstRun) target.scrollIntoView({ block: "center", behavior: "smooth" });
+}
+
+/* ---------- Utils ---------- */
+function query(sel) { try { return document.querySelector(sel); } catch { return null; } }
+function el(tag, cls) { const n = document.createElement(tag); if (cls) n.className = cls; return n; }
+// ✅ DEV CONSOLE ACCESS
+window.startTutorial = startTutorial;
+// ✅ FORCE UI REFRESH AFTER PAUSE → RESUME
+window.__RT_TUTORIAL_FORCE_REFRESH__ = function () {
+  console.log("[TUTORIAL] 🔄 Hard refresh requested");
+  try {
+    placeStep(true); // Re-draw spotlight + tooltip safely
+  } catch (e) {
+    console.warn("[TUTORIAL] Refresh failed:", e);
+  }
+};
+// ✅ FORCE ADVANCE + FULL VISUAL RE-DRAW (USED AFTER CALIBRATION RESUME)
+window.__RT_TUTORIAL_FORCE_NEXT__ = function () {
+  try {
+    console.log("[TUTORIAL] 🔄 Force-advancing tutorial with full redraw");
+
+    // Move to next step index safely
+    state.idx = Math.min(state.idx + 1, steps.length - 1);
+
+    // HARD redraw spotlight + tooltip + mask
+    requestAnimationFrame(() => {
+      placeStep(true);
+    });
+
+  } catch (e) {
+    console.warn("[TUTORIAL] Force-next failed:", e);
+  }
+};
