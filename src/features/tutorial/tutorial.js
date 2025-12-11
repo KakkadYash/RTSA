@@ -1,6 +1,7 @@
 //tutorial.js 
 import steps from "./WalkThroughSteps.js";
-const FORCED_NAVIGATION_STEPS = ["profile-highlight", "analytics-highlight"]; let state = {
+const FORCED_NAVIGATION_STEPS = ["profile-highlight", "analytics-highlight"];
+let state = {
   idx: 0,
   nodes: { backdrop: null, ring: null, tip: null }
 };

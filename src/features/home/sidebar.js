@@ -1,13 +1,13 @@
 // sidebar.js
 document.addEventListener("DOMContentLoaded", () => {
-  document.addEventListener("freeTrialStepUpdated", () => {
-    const isPaid = localStorage.getItem("isPaidUser") === "true";
-    const hasCalibrated = localStorage.getItem("hasCalibrated") === "true";
+  // document.addEventListener("freeTrialStepUpdated", () => {
+  //   const isPaid = localStorage.getItem("isPaidUser") === "true";
+  //   const hasCalibrated = localStorage.getItem("hasCalibrated") === "true";
 
-    // Re-run sidebar lock logic automatically
-    console.log("🔄 Sidebar should update lock/unlock icons now");
-    location.reload();
-  });
+  //   // Re-run sidebar lock logic automatically
+  //   console.log("🔄 Sidebar should update lock/unlock icons now");
+  //   location.reload();
+  // });
   const hideAllIcons = () => {
     document.querySelectorAll(".lock").forEach(i => i.style.display = "none");
     document.querySelectorAll(".unlock").forEach(i => i.style.display = "none");
@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // ✅ UNIVERSAL LOCKED TAB BEHAVIOR (FREE TRIAL + PAID)
+  // ✅ UNIVERSAL LOCKED TAB BEHAVIOR (FREE TRIAL + PAID)
   navLinks.forEach(link => {
     link.addEventListener("click", (e) => {
       e.preventDefault(); // ✅ CRITICAL — prevents page reload
@@ -106,5 +107,43 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // ======================================================
+  // 🔄 React to freeTrialStepUpdated WITHOUT reloading page
+  // ======================================================
+  document.addEventListener("freeTrialStepUpdated", () => {
+    const isPaidUserNow = localStorage.getItem("isPaidUser") === "true";
+    const hasCalibratedNow = localStorage.getItem("hasCalibrated") === "true";
+    const stepNow = Number(localStorage.getItem("freeTrialStep") || 0);
+
+    console.log("🔄 Sidebar updating lock/unlock (no reload)");
+
+    if (isPaidUserNow) {
+      if (!hasCalibratedNow) {
+        lockAll();
+        unlock("profile");
+        return;
+      }
+
+      unlockAll();
+      hideAllIcons();
+      return;
+    }
+
+    lockAll();
+
+    if (stepNow >= 1) {
+      unlock("profile");
+    }
+
+    if (stepNow >= 2) {
+      unlock("analytics");
+    }
+
+    if (stepNow >= 3) {
+      unlockAll();
+      hideAllIcons();
+    }
+  });
 
 });
+
