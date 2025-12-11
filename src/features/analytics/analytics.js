@@ -449,11 +449,12 @@ setPlayProcessedHandler(els.playProcessedButton, () => {
         return;
     }
 
-    setPlaying(els.playProcessedButton);
-    els.canvas.style.display = "block";
-    // ✅ HARD RESET playback before replay (prevents mid-stop bug)
-    els.video.pause();
-    els.video.currentTime = 0;
+        setPlaying(els.playProcessedButton);
+        els.canvas.style.display = "block";
+        document.getElementById("canvas-wrapper").style.display = "block";   // <--- ADD THIS
+        // ✅ HARD RESET playback before replay (prevents mid-stop bug)
+        els.video.pause();
+        els.video.currentTime = 0;
 
     setTimeout(() => {
         els.video.play();
