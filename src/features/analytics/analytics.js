@@ -428,6 +428,7 @@ import {
 
         setPlaying(els.playProcessedButton);
         els.canvas.style.display = "block";
+        document.getElementById("canvas-wrapper").style.display = "block";   // <--- ADD THIS
         // ✅ HARD RESET playback before replay (prevents mid-stop bug)
         els.video.pause();
         els.video.currentTime = 0;

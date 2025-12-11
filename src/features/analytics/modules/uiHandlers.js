@@ -37,8 +37,6 @@ export function wireUploadButton(inputEl, videoEl, canvasEl, onMetadataReady, on
         canvasWrapper.classList.add("horizonatl-canvas-wrapper");
         canvasEl.classList.add("horizonatl-output_canvas");
       }
-
-      // Allow caller to reset UI state
       onMetadataReady?.();
     };
 
