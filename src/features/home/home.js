@@ -17,17 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     userField.value = userIdFB;
   }
 
-  // ✅ AUTO SCROLL TO FEEDBACK SECTION ON HOME LOAD
-  setTimeout(() => {
-    const feedbackSection = document.getElementById("feedback");
-    if (feedbackSection) {
-      feedbackSection.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }
-  }, 300);
-
   // =====================================================
   //  FREE TRIAL STATE SETUP
   // =====================================================
@@ -223,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
               console.log("[HOME] ✅ profile-loaded dispatched");
               document.dispatchEvent(new Event("profile-loaded"));
-            }, 100); // small delay ensures #openModalBtn exists
+            }, 400); // small delay ensures #openModalBtn exists
           }
         });
       }

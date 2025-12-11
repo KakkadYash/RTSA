@@ -268,6 +268,9 @@ import {
             els.playProcessedButton.style.display = "none";
             els.analyzeButton.style.display = "block";
             updatePlayButtonStatus();
+            // ✅ RESTORE native controls for fresh preview video
+            els.video.setAttribute("controls", "controls");
+            console.log("[UI] Native video controls restored for new upload");
 
             // mark "uploaded" locally
             localStorage.setItem("rtsa_lastVideoName", state.video?.name || "");
@@ -400,6 +403,9 @@ import {
             els.playProcessedButton.style.display = "block";
             els.playProcessedButton.textContent = "PLAY VIDEO";
             els.playProcessedButton.classList.add("enabled");
+            // ✅ HIDE NATIVE VIDEO CONTROLS when Play button appears
+            els.video.removeAttribute("controls");
+            console.log("[UI] Native video controls removed for processed playback");
 
             // state.metricsReady = true;
             // updatePlayButtonStatus();
