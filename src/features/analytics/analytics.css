@@ -91,12 +91,14 @@ video {
 }
 
 .vertical-canvas-wrapper {
+    display: none;
     position: absolute;
     height: 100%;
     width: 40%;
 }
 
 .horizonatl-canvas-wrapper {
+    display: none;
     position: absolute;
     height: 100%;
     width: 100%;
