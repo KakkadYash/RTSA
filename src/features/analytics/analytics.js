@@ -384,274 +384,297 @@ import {
                     // After full analysis & background upload — ensure overlay and metrics both checked
                     state.cached.ready = true;
 
-                })
-                .catch(err => {
-                    console.error("[BACKGROUND] Upload failed:", err);
-                });
+                })// 🔥 SYNC FREE TRIAL STATE AFTER UPLOAD
+                ; (async () => {
+                    try {
+                        const userId = localStorage.getItem("userId");
+                        const res = await fetch(`${CONFIG.API_BASE}/profile?userId=${userId}`);
+                        const data = await res.json();
 
-            // 6) Backend response arrived → NOW we stop the analyzing spinner
-            els.loadingOverlay.style.display = "none";
+                        if (data.freeTrialStep !== undefined) {
+                            localStorage.setItem("freeTrialStep", data.freeTrialStep);
+                            document.dispatchEvent(new Event("freeTrialStepUpdated"));
+                        }
 
-            // Show Play button (but only use PLAY VIDEO always)
-            els.playProcessedButton.style.display = "block";
-            els.playProcessedButton.textContent = "PLAY VIDEO";
-            els.playProcessedButton.classList.add("enabled");
-            // ✅ HIDE NATIVE VIDEO CONTROLS when Play button appears
-            els.video.removeAttribute("controls");
-            console.log("[UI] Native video controls removed for processed playback");
+                        if (data.videosUploaded !== undefined) {
+                            const cache = { uploadCount: data.videosUploaded };
+                            localStorage.setItem("userCache", JSON.stringify(cache));
+                        }
 
-            enableInteractiveButton(els.showMetricsBtn); // ✅ RE-ENABLE ALL METRICS
-            enableInteractiveButton(document.getElementById("uploadvideo")); // ✅ RE-ENABLE UPLOAD
-            console.log("[UI] /analyze-video complete — Play button enabled instantly");
-
-        } catch (err) {
-            console.error("[ERROR] Analyze or upload sequence failed:", err);
-            alert("Something went wrong, please upload another video.");
-
-            // Full reset to initial state
-            fullReset();
-        } finally {
-            resetAnalyze(els.analyzeButton);
-        }
-    });
-
-
-    //  PLAY PROCESSED VIDEO
-    setPlayProcessedHandler(els.playProcessedButton, () => {
-        console.log("[EVENT] Play processed video clicked");
-
-        if (!state.cached.ready || !state.cached.metrics) {
-            resetPlayButton(els.playProcessedButton);
-            alert("Metrics are not ready yet. Please run analysis again.");
-            return;
-        }
-
-        setPlaying(els.playProcessedButton);
-        els.canvas.style.display = "block";
-        // ✅ HARD RESET playback before replay (prevents mid-stop bug)
-        els.video.pause();
-        els.video.currentTime = 0;
-
-        setTimeout(() => {
-            els.video.play();
-            startOverlayLoop();
-        }, 50);
-
-
-
-        // 1) Move cached metrics into live backend state now
-        const m = state.cached.metrics;
-        state.backend.chartLabels = Array.isArray(m.chartLabels) ? m.chartLabels : [];
-        state.backend.headAngleData = Array.isArray(m.headAngleData) ? m.headAngleData : [];
-        state.backend.speedData = Array.isArray(m.speedData) ? m.speedData : [];
-        state.backend.accelerationData = Array.isArray(m.accelerationData) ? m.accelerationData : [];
-        state.backend.decelerationData = Array.isArray(m.decelerationData) ? m.decelerationData : [];
-        state.backend.stepLengthData = Array.isArray(m.stepWidth) ? m.stepWidth : [];
-        state.backend.jumpData = Array.isArray(m.jumpData) ? m.jumpData : [];
-
-        state.backend.outerRing = m.outerRing || { Running: 0, Standing: 0, Crouching: 0 };
-        state.backend.innerRing = m.innerRing || { "Head Up": 0, "Head Down": 100 };
-        state.backend.athleticScores = m.athleticScores || state.backend.athleticScores;
-        state.backend.topSpeed = Number(m.topSpeed || 0);
-        state.backend.totalDistance = Number(m.totalDistance || 0);
-        state.backend.totalSteps = Number(m.totalSteps || 0);
-        state.backend.stepFrequency = Number(m.stepFrequency || 0);
-        state.backend.maxMetrics = m.maxMetrics || null;
-
-        // 3) Update the double donut now that backend has posture/head metrics
-        updateDoughnutChartFromData(doughnutChart, state.backend);
-
-
-        // 2) Initialize the unified chart with labels only (series empty)
-        // 🧹 Clean up any existing chart before creating a new one
-        if (Chart.getChart("myChart2")) {
-            try {
-                Chart.getChart("myChart2").destroy();
-                console.log("[CLEANUP] Previous myChart2 instance destroyed");
-            } catch (err) {
-                console.warn("[WARN] Failed to destroy existing chart:", err);
-            }
-        }
-
-        // ✅ Build fresh chart safely
-        showUnifiedChart(state, [0, 1, 2, 3, 4, 5]);
-
-        // immediately clear series so it starts "empty"
-        state.currentChart.data.datasets.forEach(ds => ds.data = []);
-        state.currentChart.data.labels = state.backend.chartLabels || [];
-        state.currentChart.update('none');
-        // ---- Rounding helpers (mirror metricsVisualization.js rules) ----
-        const roundWhole = (n) => {
-            const num = Number(n) || 0;
-            const base = Math.floor(num);
-            const decimal = num - base;
-            if (decimal < 0.5) return base;
-            return base + 1;
-        };
-
-        const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
-
-        // Slice up to index and round depending on metric key
-        const sliceAndRound = (arr, key, uptoIdx) => {
-            const raw = (arr || []).slice(0, uptoIdx + 1);
-            if (key === "jumpData" || key === "stepLengthData") {
-                return raw.map(round2);
-            }
-            return raw.map(roundWhole);
-        };
-
-        // 5) Progressive metric updates synced to video time
-        const labels = state.backend.chartLabels || [];
-        const L = labels.length;
-        let lastIdx = -1;
-
-        // run exactly on your aggregation cadence
-        const TICK_MS = 250;
-        state.ticker = setInterval(() => {
-            if (!els.video || els.video.paused || els.video.ended) return;
-
-            const t = els.video.currentTime || 0;
-            // find index i such that labels[i] <= t < labels[i+1]
-            // labels are 0.25s spaced; this is a fast integer map:
-            let idx = Math.floor(t / 0.25);
-            if (idx >= L) idx = L - 1;
-            if (idx <= lastIdx) return; // nothing new to show
-
-            // update chart series up to idx (rounded)
-            const ds = state.currentChart.data.datasets;
-
-            ds[0].data = sliceAndRound(state.backend.headAngleData, "headAngleData", idx);
-            ds[1].data = sliceAndRound(state.backend.speedData, "speedData", idx);
-            ds[2].data = sliceAndRound(state.backend.accelerationData, "accelerationData", idx);
-            ds[3].data = sliceAndRound(state.backend.stepLengthData, "stepLengthData", idx);
-            ds[4].data = sliceAndRound(state.backend.jumpData, "jumpData", idx);
-
-            state.currentChart.update("none");
-            state.currentChart.update("none");
-
-
-            // update sliders/top boxes progressively using uptoIndex
-            updateSlidersFromData(state.backend, CONFIG, idx);
-            updateTopMetricBoxes({
-                timeSecs: t,
-                totalDistanceYards: state.backend.totalDistance, // (distance is already a total)
-                steps: state.backend.totalSteps || 0
+                        if (data.subscription_plan_type === "athlete_plan") {
+                            localStorage.setItem("isPaidUser", "true");
+                        }
+                    } catch (err) {
+                        console.warn("[FREE TRIAL SYNC] Failed to refresh profile:", err);
+                    }
+                })()
+                .catch (err => {
+                console.error("[BACKGROUND] Upload failed:", err);
             });
-            const avgSpeed = state.backend.totalDistance / (t || 1);
-            updateAverageSpeedBox(avgSpeed);
 
-            lastIdx = idx;
-        }, TICK_MS);
+    // 6) Backend response arrived → NOW we stop the analyzing spinner
+    els.loadingOverlay.style.display = "none";
 
-    });
+    // Show Play button (but only use PLAY VIDEO always)
+    els.playProcessedButton.style.display = "block";
+    els.playProcessedButton.textContent = "PLAY VIDEO";
+    els.playProcessedButton.classList.add("enabled");
+    // ✅ HIDE NATIVE VIDEO CONTROLS when Play button appears
+    els.video.removeAttribute("controls");
+    console.log("[UI] Native video controls removed for processed playback");
 
-    //  CHART CLICK → SEEK VIDEO
-    els.myChart2.addEventListener("click", (evt) => {
-        console.log("[EVENT] Chart clicked for seeking");
-        const chart = state.currentChart;
-        if (!chart || chart.config.type !== "line") return;
+    enableInteractiveButton(els.showMetricsBtn); // ✅ RE-ENABLE ALL METRICS
+    enableInteractiveButton(document.getElementById("uploadvideo")); // ✅ RE-ENABLE UPLOAD
+    console.log("[UI] /analyze-video complete — Play button enabled instantly");
 
-        const points = chart.getElementsAtEventForMode(evt, "nearest", { intersect: true }, true);
-        if (points && points.length > 0) {
-            const idx = points[0].index;
-            const t = chart.data.labels[idx];
-            console.log(`[VIDEO] Seeking to ${t} seconds`);
-            els.video.pause();
-            els.video.currentTime = Number(t) || 0;
-            els.video.addEventListener("seeked", () => {
-                console.log("[VIDEO] Seek completed → drawing paused frame");
-                drawOneFrameIfPaused();
-            }, { once: true });
-        }
-    });
+} catch (err) {
+    console.error("[ERROR] Analyze or upload sequence failed:", err);
+    alert("Something went wrong, please upload another video.");
 
-    els.video.addEventListener("ended", () => {
-        console.log("[EVENT] Preview or processed video ended — no UI changes.");
-        // Do absolutely nothing. Play button behavior handled only by backend readiness.
+    // Full reset to initial state
+    fullReset();
+} finally {
+    resetAnalyze(els.analyzeButton);
+}
     });
 
 
-    // 🔹 Helper
-    function lastKnownVideoTime(video) {
-        return Number(video?.currentTime?.toFixed?.(1) || 0);
+//  PLAY PROCESSED VIDEO
+setPlayProcessedHandler(els.playProcessedButton, () => {
+    console.log("[EVENT] Play processed video clicked");
+
+    if (!state.cached.ready || !state.cached.metrics) {
+        resetPlayButton(els.playProcessedButton);
+        alert("Metrics are not ready yet. Please run analysis again.");
+        return;
     }
 
-    function applyBackendResultsToState(st, payload) {
-        console.log("[STATE] Caching backend results (no UI updates yet)");
-        // just cache aggregated metrics blob as-is
-        st.cached.metrics = payload;
-        st.cached.ready = true;
-        console.log("[STATE] Metrics ready — checking overlay readiness");
-        // --- Force Play button visible + animated (metrics already ready) ---
-        const playBtn = document.getElementById("playProcessedButton");
-        if (playBtn) {
-            playBtn.style.display = "block";
-            playBtn.classList.add("enabled"); // triggers fadeIn animation
-            playBtn.disabled = false;
-            playBtn.classList.remove("button-disabled");
-            console.log("[UI] ✅ Play button forced visible after metrics readiness");
+    setPlaying(els.playProcessedButton);
+    els.canvas.style.display = "block";
+    // ✅ HARD RESET playback before replay (prevents mid-stop bug)
+    els.video.pause();
+    els.video.currentTime = 0;
+
+    setTimeout(() => {
+        els.video.play();
+        startOverlayLoop();
+    }, 50);
+
+
+
+    // 1) Move cached metrics into live backend state now
+    const m = state.cached.metrics;
+    state.backend.chartLabels = Array.isArray(m.chartLabels) ? m.chartLabels : [];
+    state.backend.headAngleData = Array.isArray(m.headAngleData) ? m.headAngleData : [];
+    state.backend.speedData = Array.isArray(m.speedData) ? m.speedData : [];
+    state.backend.accelerationData = Array.isArray(m.accelerationData) ? m.accelerationData : [];
+    state.backend.decelerationData = Array.isArray(m.decelerationData) ? m.decelerationData : [];
+    state.backend.stepLengthData = Array.isArray(m.stepWidth) ? m.stepWidth : [];
+    state.backend.jumpData = Array.isArray(m.jumpData) ? m.jumpData : [];
+
+    state.backend.outerRing = m.outerRing || { Running: 0, Standing: 0, Crouching: 0 };
+    state.backend.innerRing = m.innerRing || { "Head Up": 0, "Head Down": 100 };
+    state.backend.athleticScores = m.athleticScores || state.backend.athleticScores;
+    state.backend.topSpeed = Number(m.topSpeed || 0);
+    state.backend.totalDistance = Number(m.totalDistance || 0);
+    state.backend.totalSteps = Number(m.totalSteps || 0);
+    state.backend.stepFrequency = Number(m.stepFrequency || 0);
+    state.backend.maxMetrics = m.maxMetrics || null;
+
+    // 3) Update the double donut now that backend has posture/head metrics
+    updateDoughnutChartFromData(doughnutChart, state.backend);
+
+
+    // 2) Initialize the unified chart with labels only (series empty)
+    // 🧹 Clean up any existing chart before creating a new one
+    if (Chart.getChart("myChart2")) {
+        try {
+            Chart.getChart("myChart2").destroy();
+            console.log("[CLEANUP] Previous myChart2 instance destroyed");
+        } catch (err) {
+            console.warn("[WARN] Failed to destroy existing chart:", err);
         }
-
-        // ensure visualizations remain reset/empty until Play
-        st.backend = {
-            chartLabels: [],
-            headAngleData: [],
-            speedData: [],
-            accelerationData: [],
-            decelerationData: [],
-            strideData: [],
-            jumpData: [],
-            outerRing: { Running: 0, Standing: 0, Crouching: 0 },
-            innerRing: { "Head Up": 0, "Head Down": 100 },
-            topSpeed: 0,
-            totalDistance: 0,
-            totalSteps: 0,
-            maxMetrics: null
-        };
-
-        // IMPORTANT: do NOT call showUnifiedChart, updateDoughnutChartFromData, or updateSlidersFromData here
     }
 
-    async function callUploadVideo({ apiBase, userId, video, videoId, metrics }) {
-        console.log("[NETWORK] Uploading video to /upload AFTER analysis...");
-        const form = new FormData();
-        form.append("userId", userId || "");
-        if (videoId) {
-            form.append("videoId", videoId);   // ⬅️ link to analyze-video
+    // ✅ Build fresh chart safely
+    showUnifiedChart(state, [0, 1, 2, 3, 4, 5]);
+
+    // immediately clear series so it starts "empty"
+    state.currentChart.data.datasets.forEach(ds => ds.data = []);
+    state.currentChart.data.labels = state.backend.chartLabels || [];
+    state.currentChart.update('none');
+    // ---- Rounding helpers (mirror metricsVisualization.js rules) ----
+    const roundWhole = (n) => {
+        const num = Number(n) || 0;
+        const base = Math.floor(num);
+        const decimal = num - base;
+        if (decimal < 0.5) return base;
+        return base + 1;
+    };
+
+    const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+
+    // Slice up to index and round depending on metric key
+    const sliceAndRound = (arr, key, uptoIdx) => {
+        const raw = (arr || []).slice(0, uptoIdx + 1);
+        if (key === "jumpData" || key === "stepLengthData") {
+            return raw.map(round2);
         }
-        form.append("video", video);
+        return raw.map(roundWhole);
+    };
 
-        // (optional) still send metrics if you want for future use
-        if (metrics) {
-            form.append("metrics", JSON.stringify(metrics));
-        }
+    // 5) Progressive metric updates synced to video time
+    const labels = state.backend.chartLabels || [];
+    const L = labels.length;
+    let lastIdx = -1;
 
-        const resp = await fetch(`${apiBase}/upload`, { method: "POST", body: form });
-        const data = await resp.json();
-        console.log("[NETWORK] /upload response:", resp.status, data);
+    // run exactly on your aggregation cadence
+    const TICK_MS = 250;
+    state.ticker = setInterval(() => {
+        if (!els.video || els.video.paused || els.video.ended) return;
 
-        if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
-        return data;
+        const t = els.video.currentTime || 0;
+        // find index i such that labels[i] <= t < labels[i+1]
+        // labels are 0.25s spaced; this is a fast integer map:
+        let idx = Math.floor(t / 0.25);
+        if (idx >= L) idx = L - 1;
+        if (idx <= lastIdx) return; // nothing new to show
+
+        // update chart series up to idx (rounded)
+        const ds = state.currentChart.data.datasets;
+
+        ds[0].data = sliceAndRound(state.backend.headAngleData, "headAngleData", idx);
+        ds[1].data = sliceAndRound(state.backend.speedData, "speedData", idx);
+        ds[2].data = sliceAndRound(state.backend.accelerationData, "accelerationData", idx);
+        ds[3].data = sliceAndRound(state.backend.stepLengthData, "stepLengthData", idx);
+        ds[4].data = sliceAndRound(state.backend.jumpData, "jumpData", idx);
+
+        state.currentChart.update("none");
+        state.currentChart.update("none");
+
+
+        // update sliders/top boxes progressively using uptoIndex
+        updateSlidersFromData(state.backend, CONFIG, idx);
+        updateTopMetricBoxes({
+            timeSecs: t,
+            totalDistanceYards: state.backend.totalDistance, // (distance is already a total)
+            steps: state.backend.totalSteps || 0
+        });
+        const avgSpeed = state.backend.totalDistance / (t || 1);
+        updateAverageSpeedBox(avgSpeed);
+
+        lastIdx = idx;
+    }, TICK_MS);
+
+});
+
+//  CHART CLICK → SEEK VIDEO
+els.myChart2.addEventListener("click", (evt) => {
+    console.log("[EVENT] Chart clicked for seeking");
+    const chart = state.currentChart;
+    if (!chart || chart.config.type !== "line") return;
+
+    const points = chart.getElementsAtEventForMode(evt, "nearest", { intersect: true }, true);
+    if (points && points.length > 0) {
+        const idx = points[0].index;
+        const t = chart.data.labels[idx];
+        console.log(`[VIDEO] Seeking to ${t} seconds`);
+        els.video.pause();
+        els.video.currentTime = Number(t) || 0;
+        els.video.addEventListener("seeked", () => {
+            console.log("[VIDEO] Seek completed → drawing paused frame");
+            drawOneFrameIfPaused();
+        }, { once: true });
+    }
+});
+
+els.video.addEventListener("ended", () => {
+    console.log("[EVENT] Preview or processed video ended — no UI changes.");
+    // Do absolutely nothing. Play button behavior handled only by backend readiness.
+});
+
+
+// 🔹 Helper
+function lastKnownVideoTime(video) {
+    return Number(video?.currentTime?.toFixed?.(1) || 0);
+}
+
+function applyBackendResultsToState(st, payload) {
+    console.log("[STATE] Caching backend results (no UI updates yet)");
+    // just cache aggregated metrics blob as-is
+    st.cached.metrics = payload;
+    st.cached.ready = true;
+    console.log("[STATE] Metrics ready — checking overlay readiness");
+    // --- Force Play button visible + animated (metrics already ready) ---
+    const playBtn = document.getElementById("playProcessedButton");
+    if (playBtn) {
+        playBtn.style.display = "block";
+        playBtn.classList.add("enabled"); // triggers fadeIn animation
+        playBtn.disabled = false;
+        playBtn.classList.remove("button-disabled");
+        console.log("[UI] ✅ Play button forced visible after metrics readiness");
     }
 
-    async function callAnalyzeVideo({ apiBase, userId, video }) {
-        console.log("[NETWORK] Triggering /analyze-video with raw file...");
-        const form = new FormData();
-        form.append("userId", userId || "");
-        form.append("video", video);
+    // ensure visualizations remain reset/empty until Play
+    st.backend = {
+        chartLabels: [],
+        headAngleData: [],
+        speedData: [],
+        accelerationData: [],
+        decelerationData: [],
+        strideData: [],
+        jumpData: [],
+        outerRing: { Running: 0, Standing: 0, Crouching: 0 },
+        innerRing: { "Head Up": 0, "Head Down": 100 },
+        topSpeed: 0,
+        totalDistance: 0,
+        totalSteps: 0,
+        maxMetrics: null
+    };
 
-        const resp = await fetch(`${apiBase}/analyze-video`, { method: "POST", body: form });
-        const data = await resp.json();
-        console.log("[NETWORK] /analyze-video response:", resp.status, data);
+    // IMPORTANT: do NOT call showUnifiedChart, updateDoughnutChartFromData, or updateSlidersFromData here
+}
 
-        if (!resp.ok) throw new Error(`Analyze failed: ${resp.status}`);
-        return data; // expected: { status:200, metrics:{...}, ... }
+async function callUploadVideo({ apiBase, userId, video, videoId, metrics }) {
+    console.log("[NETWORK] Uploading video to /upload AFTER analysis...");
+    const form = new FormData();
+    form.append("userId", userId || "");
+    if (videoId) {
+        form.append("videoId", videoId);   // ⬅️ link to analyze-video
+    }
+    form.append("video", video);
+
+    // (optional) still send metrics if you want for future use
+    if (metrics) {
+        form.append("metrics", JSON.stringify(metrics));
     }
 
-    window.loadAnalytics = loadAnalytics;
-    // Cleanup hook for SPA navigation
-    window.addEventListener("beforeunloadAnalytics", () => {
-        console.log("[CLEANUP] Analytics tearing down...");
-        window.__RTSA_ANALYTICS_INIT__ = false;
-    });
-})();
+    const resp = await fetch(`${apiBase}/upload`, { method: "POST", body: form });
+    const data = await resp.json();
+    console.log("[NETWORK] /upload response:", resp.status, data);
+
+    if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
+    return data;
+}
+
+async function callAnalyzeVideo({ apiBase, userId, video }) {
+    console.log("[NETWORK] Triggering /analyze-video with raw file...");
+    const form = new FormData();
+    form.append("userId", userId || "");
+    form.append("video", video);
+
+    const resp = await fetch(`${apiBase}/analyze-video`, { method: "POST", body: form });
+    const data = await resp.json();
+    console.log("[NETWORK] /analyze-video response:", resp.status, data);
+
+    if (!resp.ok) throw new Error(`Analyze failed: ${resp.status}`);
+    return data; // expected: { status:200, metrics:{...}, ... }
+}
+
+window.loadAnalytics = loadAnalytics;
+// Cleanup hook for SPA navigation
+window.addEventListener("beforeunloadAnalytics", () => {
+    console.log("[CLEANUP] Analytics tearing down...");
+    window.__RTSA_ANALYTICS_INIT__ = false;
+});
+}) ();

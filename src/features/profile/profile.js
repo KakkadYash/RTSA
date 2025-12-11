@@ -118,6 +118,12 @@ function loadProfile() {
         imagePreview.src = objectUrl;
 
         alert("Profile picture updated successfully!");
+        // 🔥 FREE TRIAL STEP ADVANCE → Move to Step 1
+        const isPaid = localStorage.getItem("isPaidUser") === "true";
+        if (!isPaid) {
+          localStorage.setItem("freeTrialStep", "1");
+          document.dispatchEvent(new Event("freeTrialStepUpdated"));
+        }
       } catch (err) {
         console.error("Error uploading profile picture:", err);
         alert("Could not upload profile picture. Please try again.");
@@ -391,7 +397,8 @@ function loadProfile() {
     if (!isPaidUser) {
       console.log("🧪 Free Trial user → moving to Step 2");
 
-      localStorage.setItem("freeTrialStep", 2);
+      localStorage.setItem("hasCalibrated", "true");   // 🔥 MISSING LINE
+      localStorage.setItem("freeTrialStep", "2");
       document.dispatchEvent(new Event("freeTrialStepUpdated"));
       return;
     }
