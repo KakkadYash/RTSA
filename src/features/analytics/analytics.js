@@ -95,7 +95,6 @@ import {
         },
         ticker: null,
     };
-    // state.overlayReady = false;
     state.cached.ready = false;
     state.videoSelected = false;
     state.metricsReady = false;
@@ -146,7 +145,6 @@ import {
         // Analyze button
         resetAnalyze(els.analyzeButton);
         enableInteractiveButton(els.analyzeButton);
-        // els.analyzeButton.style.display = "block";
 
         // Play button
         resetPlayButton(els.playProcessedButton);
@@ -170,7 +168,6 @@ import {
         state.video = null;
         state.cached.metrics = null;
         state.cached.ready = false;
-        // state.overlayReady = false;
         window.__RTSA_OVERLAY_READY__ = false;
         const uploadLabel = document.getElementById("uploadvideo");
         enableInteractiveButton(uploadLabel);
@@ -211,8 +208,6 @@ import {
     // Listen for Mediapipe overlay finish event
     window.addEventListener("overlayReady", () => {
         console.log("[EVENT] Overlay ready received");
-        // state.overlayReady = true;
-        // maybeEnablePlayButton();
     });
 
     if (state.currentChart) state.currentChart.destroy();
@@ -259,7 +254,6 @@ import {
             }
             state.cached.metrics = null;
             state.cached.ready = false;
-            // state.overlayReady = false;
 
             resetCharts(state, doughnutChart);
             resetMetricSlidersUI(CONFIG);
@@ -389,7 +383,6 @@ import {
                     console.log("[BACKGROUND] Upload finished:", resp);
                     // After full analysis & background upload — ensure overlay and metrics both checked
                     state.cached.ready = true;
-                    // maybeEnablePlayButton();
 
                 })
                 .catch(err => {
@@ -407,8 +400,6 @@ import {
             els.video.removeAttribute("controls");
             console.log("[UI] Native video controls removed for processed playback");
 
-            // state.metricsReady = true;
-            // updatePlayButtonStatus();
             enableInteractiveButton(els.showMetricsBtn); // ✅ RE-ENABLE ALL METRICS
             enableInteractiveButton(document.getElementById("uploadvideo")); // ✅ RE-ENABLE UPLOAD
             console.log("[UI] /analyze-video complete — Play button enabled instantly");
@@ -437,8 +428,14 @@ import {
 
         setPlaying(els.playProcessedButton);
         els.canvas.style.display = "block";
-        els.video.play();
-        startOverlayLoop();
+        // ✅ HARD RESET playback before replay (prevents mid-stop bug)
+        els.video.pause();
+        els.video.currentTime = 0;
+
+        setTimeout(() => {
+            els.video.play();
+            startOverlayLoop();
+        }, 50);
 
 
 
@@ -526,7 +523,6 @@ import {
             ds[0].data = sliceAndRound(state.backend.headAngleData, "headAngleData", idx);
             ds[1].data = sliceAndRound(state.backend.speedData, "speedData", idx);
             ds[2].data = sliceAndRound(state.backend.accelerationData, "accelerationData", idx);
-            // ds[3].data = sliceAndRound(state.backend.decelerationData, "decelerationData", idx);
             ds[3].data = sliceAndRound(state.backend.stepLengthData, "stepLengthData", idx);
             ds[4].data = sliceAndRound(state.backend.jumpData, "jumpData", idx);
 
@@ -546,19 +542,6 @@ import {
 
             lastIdx = idx;
         }, TICK_MS);
-
-        // stop the ticker when video ends or page unloads
-        els.video.addEventListener("ended", () => {
-            console.log("[EVENT] Video ended (play handler) — letting global ended handler manage UI");
-            // stopOverlayLoop();
-            if (state.ticker) {
-                clearInterval(state.ticker);
-                state.ticker = null;
-            }
-            // ❌ Do NOT call resetButtonsOnly() here.
-            // Global 'ended' listener will handle UI + Play button.
-        }, { once: true });
-
 
     });
 
@@ -599,7 +582,6 @@ import {
         st.cached.metrics = payload;
         st.cached.ready = true;
         console.log("[STATE] Metrics ready — checking overlay readiness");
-        // maybeEnablePlayButton();
         // --- Force Play button visible + animated (metrics already ready) ---
         const playBtn = document.getElementById("playProcessedButton");
         if (playBtn) {
