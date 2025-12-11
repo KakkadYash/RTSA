@@ -38,13 +38,6 @@ export function initPoseOverlay({ video, canvas, ctx2D: ctx }) {
 export function startOverlayLoop() {
   if (!videoEl) return;
   playing = true;
-
-  if (videoEl.paused && !videoEl.ended) {
-    videoEl.play().catch((err) => {
-      console.warn("Video play failed:", err);
-    });
-  }
-
   requestAnimationFrame(processFrameLoop);
 }
 
