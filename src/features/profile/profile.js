@@ -459,7 +459,7 @@ function loadProfile() {
           window.__RT_TUTORIAL_FORCE_NEXT__();
         }
 
-      }, 400);
+      }, 1000);
     }
 
 
