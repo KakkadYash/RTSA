@@ -86,6 +86,20 @@ document.addEventListener("DOMContentLoaded", () => {
   navLinks.forEach(link => {
     link.addEventListener("click", (e) => {
       e.preventDefault(); // ✅ CRITICAL — prevents page reload
+      // ⭐ FREE TRIAL — Step 2 → Analytics unlocked but full access requires 10 uploads
+      // ⭐ FREE TRIAL — Step 2 → Analytics unlocked but full access requires 10 uploads
+      if (
+        localStorage.getItem("subscriptionPlanType") === "free_trial" &&
+        Number(localStorage.getItem("freeTrialStep")) === 2 &&
+        link.dataset.section === "analytics"
+      ) {
+        const cache = JSON.parse(localStorage.getItem("userCache") || "{}");
+        const uploads = cache.uploadCount || 0;
+
+        if (uploads < 10) {
+          alert("Upload 10 videos to unlock all pages.");
+        }
+      }
 
       if (link.classList.contains("locked")) {
         console.log("🔒 Locked tab clicked → shake + block");
